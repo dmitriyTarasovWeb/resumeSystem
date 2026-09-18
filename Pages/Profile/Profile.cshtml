@@ -1,4 +1,4 @@
-﻿@page
+﻿@page "/Profile/{id?}"
 @model resumeSystem.Pages.Profile.ProfileModel
 
 @{
@@ -9,47 +9,152 @@
 
 <div class="row">
     <div class="col-md-6">
-        <form method="post">
 
+        @if (Model.CanEdit)
+        {
+            <form method="post">
+
+                <div class="mb-3">
+                    <label asp-for="Input.FirstName" class="form-label">
+                        Имя
+                    </label>
+
+                    <input asp-for="Input.FirstName"
+                           class="form-control" />
+
+                    <span asp-validation-for="Input.FirstName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.LastName" class="form-label">
+                        Фамилия
+                    </label>
+
+                    <input asp-for="Input.LastName"
+                           class="form-control" />
+
+                    <span asp-validation-for="Input.LastName"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Age" class="form-label">
+                        Возраст
+                    </label>
+
+                    <input asp-for="Input.Age"
+                           type="number"
+                           class="form-control" />
+
+                    <span asp-validation-for="Input.Age"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Location" class="form-label">
+                        Местоположение
+                    </label>
+
+                    <input asp-for="Input.Location"
+                           class="form-control" />
+
+                    <span asp-validation-for="Input.Location"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Description" class="form-label">
+                        О себе
+                    </label>
+
+                    <textarea asp-for="Input.Description"
+                              class="form-control"
+                              rows="5"></textarea>
+
+                    <span asp-validation-for="Input.Description"
+                          class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Input.Email" class="form-label">
+                        Email
+                    </label>
+
+                    <input asp-for="Input.Email"
+                           class="form-control"
+                           readonly />
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    Сохранить
+                </button>
+
+            </form>
+        }
+        else
+        {
             <div class="mb-3">
-                <label asp-for="Input.FirstName" class="form-label">
+                <label class="form-label">
                     Имя
                 </label>
 
-                <input asp-for="Input.FirstName"
-                       class="form-control" />
-
-                <span asp-validation-for="Input.FirstName"
-                      class="text-danger"></span>
+                <div class="form-control-plaintext">
+                    @Model.Input.FirstName
+                </div>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Input.LastName" class="form-label">
+                <label class="form-label">
                     Фамилия
                 </label>
 
-                <input asp-for="Input.LastName"
-                       class="form-control" />
-
-                <span asp-validation-for="Input.LastName"
-                      class="text-danger"></span>
+                <div class="form-control-plaintext">
+                    @Model.Input.LastName
+                </div>
             </div>
 
             <div class="mb-3">
-                <label asp-for="Input.Email" class="form-label">
+                <label class="form-label">
+                    Возраст
+                </label>
+
+                <div class="form-control-plaintext">
+                    @(Model.Input.Age?.ToString() ?? "Не указан")
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    Местоположение
+                </label>
+
+                <div class="form-control-plaintext">
+                    @(Model.Input.Location ?? "Не указано")
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
+                    О себе
+                </label>
+
+                <div class="form-control-plaintext">
+                    @(Model.Input.Description ?? "Не указано")
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">
                     Email
                 </label>
 
-                <input asp-for="Input.Email"
-                       class="form-control"
-                       readonly />
+                <div class="form-control-plaintext">
+                    @Model.Input.Email
+                </div>
             </div>
+        }
 
-            <button type="submit" class="btn btn-primary">
-                Сохранить
-            </button>
-
-        </form>
     </div>
 </div>
 
