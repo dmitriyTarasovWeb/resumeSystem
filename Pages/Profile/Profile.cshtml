@@ -1,0 +1,58 @@
+﻿@page
+@model resumeSystem.Pages.Profile.ProfileModel
+
+@{
+    ViewData["Title"] = "Профиль";
+}
+
+<h1>Профиль</h1>
+
+<div class="row">
+    <div class="col-md-6">
+        <form method="post">
+
+            <div class="mb-3">
+                <label asp-for="Input.FirstName" class="form-label">
+                    Имя
+                </label>
+
+                <input asp-for="Input.FirstName"
+                       class="form-control" />
+
+                <span asp-validation-for="Input.FirstName"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.LastName" class="form-label">
+                    Фамилия
+                </label>
+
+                <input asp-for="Input.LastName"
+                       class="form-control" />
+
+                <span asp-validation-for="Input.LastName"
+                      class="text-danger"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Input.Email" class="form-label">
+                    Email
+                </label>
+
+                <input asp-for="Input.Email"
+                       class="form-control"
+                       readonly />
+            </div>
+
+            <button type="submit" class="btn btn-primary">
+                Сохранить
+            </button>
+
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
