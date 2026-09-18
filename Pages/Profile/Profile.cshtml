@@ -12,7 +12,40 @@
 
         @if (Model.CanEdit)
         {
-            <form method="post">
+
+           
+            <form method="post"
+                  enctype="multipart/form-data">
+
+                <div class="mb-3">
+                    <label class="form-label">
+                        Аватар
+                    </label>
+
+
+                    <span asp-validation-for="Avatar"
+                          class="text-danger"></span>
+                </div>
+
+
+               
+
+
+                <div class="mb-4">
+                    <img src="@(Model.PhotoUrl ?? "https://abrakadabra.fun/uploads/posts/2021-12/thumbs/1640528661_1-abrakadabra-fun-p-serii-chelovek-na-avu-1.png")"
+                         alt="Аватар"
+                         width="150"
+                         height="150"
+                         class="rounded-circle object-fit-cover" />
+                </div>
+
+
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-toggle="modal"
+                        data-bs-target="#avatarModal">
+                    Изменить аватар
+                </button>
 
                 <div class="mb-3">
                     <label asp-for="Input.FirstName" class="form-label">
@@ -158,6 +191,177 @@
     </div>
 </div>
 
+@if (Model.CanEdit)
+{
+    <div class="modal fade"
+         id="avatarModal"
+         tabindex="-1"
+         aria-labelledby="avatarModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <h5 class="modal-title" id="avatarModalLabel">
+                        Изменить аватар
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+                </div>
+
+                <div class="modal-body">
+
+                    <form method="post"
+                          enctype="multipart/form-data"
+                          id="avatarForm">
+
+                        <div id="avatarDropZone"
+                             class="border rounded p-5 text-center">
+
+                            <div class="mb-3">
+                                Перетащите фото сюда
+                            </div>
+
+                            <div class="text-muted mb-3">
+                                или
+                            </div>
+
+                            <label for="avatarInput"
+                                   class="btn btn-outline-primary">
+                                Выберите в проводнике
+                            </label>
+
+                            <input id="avatarInput"
+                                   name="Avatar"
+                                   type="file"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   class="d-none" />
+
+                        </div>
+
+                        <div id="avatarPreviewContainer"
+                             class="text-center mt-4 d-none">
+
+                            <img id="avatarPreview"
+                                 src=""
+                                 alt="Предпросмотр"
+                                 width="150"
+                                 height="150"
+                                 class="rounded-circle object-fit-cover" />
+
+                        </div>
+
+                        <div class="mt-4 d-flex justify-content-end gap-2">
+
+                            <button type="button"
+                                    class="btn btn-secondary"
+                                    data-bs-dismiss="modal">
+                                Отмена
+                            </button>
+
+                            <button type="submit"
+                                    asp-page-handler="UploadAvatar"
+                                    class="btn btn-primary">
+                                Загрузить
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const dropZone = document.getElementById("avatarDropZone")
+            const input = document.getElementById("avatarInput")
+            const previewContainer = document.getElementById("avatarPreviewContainer")
+            const preview = document.getElementById("avatarPreview")
+
+            if (!dropZone || !input) {
+                return
+            }
+
+            const allowedTypes = [
+                "image/jpeg",
+                "image/png",
+                "image/webp"
+            ]
+
+            const maxFileSize = 5 * 1024 * 1024
+
+            function handleFile(file) {
+                if (!file) {
+                    return
+                }
+
+                if (!allowedTypes.includes(file.type)) {
+                    alert("Разрешены только JPG, PNG и WebP.")
+                    input.value = ""
+                    return
+                }
+
+                if (file.size > maxFileSize) {
+                    alert("Размер изображения не должен превышать 5 МБ.")
+                    input.value = ""
+                    return
+                }
+
+                const dataTransfer = new DataTransfer()
+
+                dataTransfer.items.add(file)
+                input.files = dataTransfer.files
+
+                const reader = new FileReader()
+
+                reader.onload = function(event) {
+                    preview.src = event.target.result
+                    previewContainer.classList.remove("d-none")
+                }
+
+                reader.readAsDataURL(file)
+            }
+
+            input.addEventListener("change", function() {
+                handleFile(input.files[0])
+            })
+
+            dropZone.addEventListener("dragover", function(event) {
+                event.preventDefault()
+
+                dropZone.classList.add("bg-light")
+            })
+
+            dropZone.addEventListener("dragleave", function() {
+                dropZone.classList.remove("bg-light")
+            })
+
+            dropZone.addEventListener("drop", function(event) {
+                event.preventDefault()
+
+                dropZone.classList.remove("bg-light")
+
+                const file = event.dataTransfer.files[0]
+
+                handleFile(file)
+            })
+        })
+    </script>
 }

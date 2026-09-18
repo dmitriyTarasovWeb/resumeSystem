@@ -4,21 +4,29 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using resumeSystem.Data;
 using resumeSystem.Domain;
+using resumeSystem.Services;
 using System.ComponentModel.DataAnnotations;
+
 namespace resumeSystem.Pages.Profile;
 
 [Authorize]
 public class ProfileModel : PageModel
 {
+
+
     private readonly UserManager<ApplicationUser> _userManager;
 
     private readonly ApplicationDbContext _dbContext;
+
+    private readonly CloudinaryService _cloudinaryService;
     public ProfileModel(
     UserManager<ApplicationUser> userManager,
-    ApplicationDbContext dbContext)
+    ApplicationDbContext dbContext,
+    CloudinaryService cloudinaryService)
     {
         _userManager = userManager;
         _dbContext = dbContext;
+        _cloudinaryService = cloudinaryService;
     }
 
     [BindProperty]
@@ -27,10 +35,14 @@ public class ProfileModel : PageModel
     [BindProperty(SupportsGet = true)]
     public string? Id { get; set; }
 
+    [BindProperty]
+    public IFormFile? Avatar { get; set; }
+
     public bool CanEdit { get; private set; }
 
     public bool CanView { get; private set; }
 
+    public string? PhotoUrl { get; private set; }
     public class InputModel
     {
 
@@ -60,6 +72,9 @@ public class ProfileModel : PageModel
 
         public string Email { get; set; } = string.Empty;
     }
+
+
+
 
     public async Task<IActionResult> OnGetAsync()
     {
@@ -126,6 +141,7 @@ public class ProfileModel : PageModel
         Input.Location = requiredAttributes.Location;
         Input.Description = requiredAttributes.Description;
         Input.Email = targetUser.Email ?? string.Empty;
+        PhotoUrl = requiredAttributes.PhotoUrl;
 
         return Page();
     }
@@ -195,4 +211,91 @@ public class ProfileModel : PageModel
 
         return RedirectToPage(new { id = Id });
     }
+
+    public async Task<IActionResult> OnPostUploadAvatarAsync()
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser == null)
+        {
+            return NotFound();
+        }
+
+        ApplicationUser? targetUser;
+
+        if (string.IsNullOrEmpty(Id))
+        {
+            targetUser = currentUser;
+        }
+        else
+        {
+            targetUser = await _userManager.FindByIdAsync(Id);
+
+            if (targetUser == null)
+            {
+                return NotFound();
+            }
+        }
+
+        var isAdministrator =
+            await _userManager.IsInRoleAsync(
+                currentUser,
+                "Administrator");
+
+        var canEdit =
+            currentUser.Id == targetUser.Id ||
+            isAdministrator;
+
+        if (!canEdit)
+        {
+            return Forbid();
+        }
+
+        if (Avatar == null)
+        {
+            ModelState.AddModelError(
+                nameof(Avatar),
+                "Выберите изображение.");
+
+            return Page();
+        }
+
+        var requiredAttributes =
+            await _dbContext.RequiredUserAttributes
+                .FindAsync(targetUser.Id);
+
+        if (requiredAttributes == null)
+        {
+            return NotFound();
+        }
+
+        try
+        {
+            var photoUrl =
+                await _cloudinaryService.UploadAvatarAsync(Avatar);
+
+            requiredAttributes.PhotoUrl = photoUrl;
+
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (ArgumentException ex)
+        {
+            ModelState.AddModelError(
+                nameof(Avatar),
+                ex.Message);
+
+            return Page();
+        }
+        catch (InvalidOperationException ex)
+        {
+            ModelState.AddModelError(
+                nameof(Avatar),
+                ex.Message);
+
+            return Page();
+        }
+
+        return RedirectToPage(new { id = Id });
+    }
+
 }
