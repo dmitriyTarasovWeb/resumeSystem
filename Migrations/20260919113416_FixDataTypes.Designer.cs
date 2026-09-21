@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919113416_FixDataTypes")]
+    partial class FixDataTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,64 +258,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("DataTypeId");
 
                     b.ToTable("attributes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryId = 1,
-                            DataTypeId = 1,
-                            IsDisplay = true,
-                            Title = "Любимый язык программирования"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CategoryId = 1,
-                            DataTypeId = 2,
-                            IsDisplay = true,
-                            Title = "О себе"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CategoryId = 1,
-                            DataTypeId = 3,
-                            IsDisplay = true,
-                            Title = "Количество лет опыта"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CategoryId = 1,
-                            DataTypeId = 4,
-                            IsDisplay = true,
-                            Title = "Дата начала карьеры"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CategoryId = 1,
-                            DataTypeId = 5,
-                            IsDisplay = true,
-                            Title = "Период работы"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CategoryId = 1,
-                            DataTypeId = 6,
-                            IsDisplay = true,
-                            Title = "Готов к удалённой работе"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CategoryId = 1,
-                            DataTypeId = 7,
-                            IsDisplay = true,
-                            Title = "Уровень английского"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.AttributeOption", b =>
@@ -338,44 +283,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("AttributeId");
 
                     b.ToTable("attribute_options", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AttributeId = 7,
-                            Options = "A1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AttributeId = 7,
-                            Options = "A2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AttributeId = 7,
-                            Options = "B1"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AttributeId = 7,
-                            Options = "B2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AttributeId = 7,
-                            Options = "C1"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AttributeId = 7,
-                            Options = "C2"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.Category", b =>
@@ -399,70 +306,6 @@ namespace resumeSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("categories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDisplay = true,
-                            Title = "Общие"
-                        });
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.CompareType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CompareTypeName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("compare_type");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("compare_types", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CompareTypeName = "Equals"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CompareTypeName = "Not equals"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CompareTypeName = "Contains"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CompareTypeName = "Greater than"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CompareTypeName = "Less than"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CompareTypeName = "Greater than or equal"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CompareTypeName = "Less than or equal"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.DataType", b =>
@@ -518,202 +361,11 @@ namespace resumeSystem.Migrations
                         {
                             Id = 7,
                             DataTypeName = "One of many"
-                        });
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.DataTypeCompareType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CompareTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("compare_type");
-
-                    b.Property<int>("DataTypeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("data_type");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CompareTypeId");
-
-                    b.HasIndex("DataTypeId");
-
-                    b.ToTable("data_type_compare_types", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CompareTypeId = 1,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CompareTypeId = 2,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CompareTypeId = 3,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CompareTypeId = 1,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CompareTypeId = 2,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CompareTypeId = 3,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CompareTypeId = 1,
-                            DataTypeId = 3
                         },
                         new
                         {
                             Id = 8,
-                            CompareTypeId = 2,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CompareTypeId = 4,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CompareTypeId = 5,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CompareTypeId = 6,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CompareTypeId = 7,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 13,
-                            CompareTypeId = 1,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 14,
-                            CompareTypeId = 2,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CompareTypeId = 4,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 16,
-                            CompareTypeId = 5,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CompareTypeId = 6,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 18,
-                            CompareTypeId = 7,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 19,
-                            CompareTypeId = 1,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 20,
-                            CompareTypeId = 2,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 21,
-                            CompareTypeId = 4,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 22,
-                            CompareTypeId = 5,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 23,
-                            CompareTypeId = 6,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 24,
-                            CompareTypeId = 7,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 25,
-                            CompareTypeId = 1,
-                            DataTypeId = 6
-                        },
-                        new
-                        {
-                            Id = 26,
-                            CompareTypeId = 2,
-                            DataTypeId = 6
-                        },
-                        new
-                        {
-                            Id = 27,
-                            CompareTypeId = 1,
-                            DataTypeId = 7
-                        },
-                        new
-                        {
-                            Id = 28,
-                            CompareTypeId = 2,
-                            DataTypeId = 7
+                            DataTypeName = "Multiple choice"
                         });
                 });
 
@@ -865,25 +517,6 @@ namespace resumeSystem.Migrations
                         .IsRequired();
 
                     b.Navigation("Attribute");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.DataTypeCompareType", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.CompareType", "CompareType")
-                        .WithMany()
-                        .HasForeignKey("CompareTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.DataType", "DataType")
-                        .WithMany()
-                        .HasForeignKey("DataTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CompareType");
-
-                    b.Navigation("DataType");
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>

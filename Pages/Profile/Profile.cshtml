@@ -19,6 +19,13 @@
 
                 <div class="mb-3">
                     <label class="form-label">
+                        @Model.Role
+                    </label>
+
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">
                         Аватар
                     </label>
 
@@ -26,9 +33,6 @@
                     <span asp-validation-for="Avatar"
                           class="text-danger"></span>
                 </div>
-
-
-               
 
 
                 <div class="mb-4">
@@ -119,9 +123,33 @@
                            readonly />
                 </div>
 
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Дополнительная информация</h3>
+                    </div>
+                    <div class="card-body">
+
+                        <div id="attributes-container">
+                        </div>
+
+                        @if (Model.CanEdit)
+                        {
+                            <button type="button" class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#addAttributeModal">
+                                <i class="bi bi-plus-circle"></i> Добавить атрибут
+                            </button>
+                        }
+
+                    </div>
+                </div>
+
+
+
                 <button type="submit" class="btn btn-primary">
                     Сохранить
                 </button>
+
+
+
 
             </form>
         }
@@ -285,6 +313,43 @@
 }
 
 
+@if (Model.CanEdit)
+{
+    <div class="modal fade" id="addAttributeModal" tabindex="-1" aria-labelledby="addAttributeModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="addAttributeModalLabel">Выбор атрибута</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Категория</label>
+                        <select id="category-select" class="form-select">
+                            <option value="">-- Выберите категорию --</option>
+                            @foreach (var cat in Model.AvailableCategories)
+                            {
+                                <option value="@cat.Id">@cat.Title</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Атрибут</label>
+                        <select id="attribute-select" class="form-select">
+                            <option value="">-- Выберите атрибут --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                    <button type="button" class="btn btn-primary" id="btn-confirm-add-attribute" disabled>Добавить на страницу</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -363,5 +428,170 @@
                 handleFile(file)
             })
         })
+    </script>
+
+    <script>
+        const profileAttributesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProfileAttributes))
+
+        const container = document.getElementById('attributes-container')
+        const categorySelect = document.getElementById('category-select')
+        const attrSelect = document.getElementById('attribute-select')
+        const btnAdd = document.getElementById('btn-confirm-add-attribute')
+
+        const addedAttributeIds = new Set()
+
+        function init() {
+            profileAttributesData.forEach(attr => {
+                if (attr.Value !== null && attr.Value !== undefined && attr.Value !== "") {
+                    renderAttributeUI(attr)
+                }
+            })
+        }
+
+        function renderAttributeUI(attr) {
+            const wrapper = document.createElement('div')
+            wrapper.className = 'mb-3 d-flex align-items-start gap-3'
+            wrapper.id = `attr-wrapper-${attr.AttributeId}`
+
+            const fieldDiv = document.createElement('div')
+            fieldDiv.className = 'flex-grow-1'
+
+            const label = document.createElement('label')
+            label.className = 'form-label fw-bold'
+            label.innerText = attr.Title
+            fieldDiv.appendChild(label)
+
+            const inputName = `DynamicAttributes[${attr.AttributeId}]`
+            let inputHtml = ''
+
+            if (attr.DataTypeId === 1) {
+                inputHtml = `<input type="text" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
+            } else if (attr.DataTypeId === 2) {
+                inputHtml = `<textarea name="${inputName}" class="form-control" rows="3" required>${attr.Value || ''}</textarea>`
+            } else if (attr.DataTypeId === 3) {
+                inputHtml = `<input type="number" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
+            } else if (attr.DataTypeId === 4) {
+                inputHtml = `<input type="date" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
+            } else if (attr.DataTypeId === 5) {
+                let sVal = '', eVal = ''
+                if (attr.Value && attr.Value.includes('/')) {
+                    const parts = attr.Value.split('/')
+                    sVal = parts[0]
+                    eVal = parts[1]
+                }
+                inputHtml = `
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" class="form-control" value="${sVal}" onchange="updatePeriod(${attr.AttributeId}, this.parentNode)" required>
+                        <span>-</span>
+                        <input type="date" class="form-control" value="${eVal}" onchange="updatePeriod(${attr.AttributeId}, this.parentNode)" required>
+                        <input type="hidden" name="${inputName}" value="${attr.Value || ''}">
+                    </div>
+                `
+            } else if (attr.DataTypeId === 6) {
+                const isChecked = attr.Value === 'true' ? 'checked' : ''
+                inputHtml = `
+                    <div class="form-check form-switch mt-2">
+                        <input type="hidden" name="${inputName}" value="false">
+                        <input class="form-check-input" type="checkbox" name="${inputName}" value="true" ${isChecked} onchange="this.previousElementSibling.disabled = this.checked">
+                        <label class="form-check-label text-muted">Да / Нет</label>
+                    </div>
+                `
+            } else if (attr.DataTypeId === 7) {
+                inputHtml = `<select name="${inputName}" class="form-select" required><option value="">-- Выберите --</option>`
+                attr.Options.forEach(opt => {
+                    const selected = (attr.Value === opt) ? 'selected' : ''
+                    inputHtml += `<option value="${opt}" ${selected}>${opt}</option>`
+                })
+                inputHtml += `</select>`
+            }
+
+            fieldDiv.insertAdjacentHTML('beforeend', inputHtml)
+            wrapper.appendChild(fieldDiv)
+
+            const removeBtn = document.createElement('button')
+            removeBtn.type = 'button'
+            removeBtn.className = 'btn-close mt-4'
+            removeBtn.setAttribute('aria-label', 'Close')
+            removeBtn.onclick = () => removeAttribute(attr.AttributeId)
+
+            wrapper.appendChild(removeBtn)
+            container.appendChild(wrapper)
+
+            addedAttributeIds.add(attr.AttributeId)
+        }
+
+        window.updatePeriod = function(attrId, parentElement) {
+            const dateInputs = parentElement.querySelectorAll('input[type="date"]')
+            const hiddenInput = parentElement.querySelector('input[type="hidden"]')
+            if (dateInputs[0].value && dateInputs[1].value) {
+                hiddenInput.value = `${dateInputs[0].value}/${dateInputs[1].value}`
+            } else {
+                hiddenInput.value = ''
+            }
+        }
+
+        function removeAttribute(attrId) {
+            document.getElementById(`attr-wrapper-${attrId}`).remove()
+            addedAttributeIds.delete(attrId)
+
+            const attr = profileAttributesData.find(a => a.AttributeId === attrId)
+            if (attr) attr.Value = null
+
+            updateAttributeOptions()
+        }
+
+        categorySelect.addEventListener('change', (e) => {
+            const categoryId = parseInt(e.target.value)
+            attrSelect.innerHTML = '<option value="">-- Выберите атрибут --</option>'
+
+            if (!categoryId) {
+                attrSelect.disabled = true
+                btnAdd.disabled = true
+                return
+            }
+
+            const filtered = profileAttributesData.filter(a => a.CategoryId === categoryId && !addedAttributeIds.has(a.AttributeId))
+
+            filtered.forEach(attr => {
+                const option = document.createElement('option')
+                option.value = attr.AttributeId
+                option.innerText = attr.Title
+                attrSelect.appendChild(option)
+            })
+
+            attrSelect.disabled = filtered.length === 0
+            if (filtered.length === 0) {
+                attrSelect.innerHTML = '<option value="">-- Все атрибуты этой категории уже добавлены --</option>'
+            }
+
+            btnAdd.disabled = true
+        })
+
+        function updateAttributeOptions() {
+            categorySelect.value = ""
+            attrSelect.innerHTML = '<option value="">-- Сначала выберите категорию --</option>'
+            attrSelect.disabled = true
+            btnAdd.disabled = true
+        }
+
+        attrSelect.addEventListener('change', (e) => {
+            btnAdd.disabled = !e.target.value
+        })
+
+        btnAdd.addEventListener('click', () => {
+            const attrId = parseInt(attrSelect.value)
+            const attr = profileAttributesData.find(a => a.AttributeId === attrId)
+            if (attr) {
+                renderAttributeUI(attr)
+
+                const modalEl = document.getElementById('addAttributeModal')
+                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
+                modal.hide()
+
+                updateAttributeOptions()
+            }
+        })
+
+        init()
     </script>
 }

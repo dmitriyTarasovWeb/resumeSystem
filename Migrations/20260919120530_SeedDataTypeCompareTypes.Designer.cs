@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919120530_SeedDataTypeCompareTypes")]
+    partial class SeedDataTypeCompareTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,64 +258,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("DataTypeId");
 
                     b.ToTable("attributes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryId = 1,
-                            DataTypeId = 1,
-                            IsDisplay = true,
-                            Title = "Любимый язык программирования"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CategoryId = 1,
-                            DataTypeId = 2,
-                            IsDisplay = true,
-                            Title = "О себе"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CategoryId = 1,
-                            DataTypeId = 3,
-                            IsDisplay = true,
-                            Title = "Количество лет опыта"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CategoryId = 1,
-                            DataTypeId = 4,
-                            IsDisplay = true,
-                            Title = "Дата начала карьеры"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CategoryId = 1,
-                            DataTypeId = 5,
-                            IsDisplay = true,
-                            Title = "Период работы"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CategoryId = 1,
-                            DataTypeId = 6,
-                            IsDisplay = true,
-                            Title = "Готов к удалённой работе"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CategoryId = 1,
-                            DataTypeId = 7,
-                            IsDisplay = true,
-                            Title = "Уровень английского"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.AttributeOption", b =>
@@ -338,44 +283,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("AttributeId");
 
                     b.ToTable("attribute_options", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AttributeId = 7,
-                            Options = "A1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AttributeId = 7,
-                            Options = "A2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AttributeId = 7,
-                            Options = "B1"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AttributeId = 7,
-                            Options = "B2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AttributeId = 7,
-                            Options = "C1"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AttributeId = 7,
-                            Options = "C2"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.Category", b =>
@@ -399,14 +306,6 @@ namespace resumeSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("categories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDisplay = true,
-                            Title = "Общие"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.CompareType", b =>

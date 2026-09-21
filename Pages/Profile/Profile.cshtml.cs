@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using resumeSystem.Data;
 using resumeSystem.Domain;
 using resumeSystem.Services;
@@ -38,11 +39,31 @@ public class ProfileModel : PageModel
     [BindProperty]
     public IFormFile? Avatar { get; set; }
 
+    [BindProperty]
+    public Dictionary<int, string> DynamicAttributes { get; set; } = new();
+
     public bool CanEdit { get; private set; }
 
     public bool CanView { get; private set; }
 
+    public string? Role { get; set; }
+
+
+
     public string? PhotoUrl { get; private set; }
+    public List<ProfileAttributeViewModel> ProfileAttributes { get; set; } = new();
+    public List<Category> AvailableCategories { get; set; } = new();
+
+    public class ProfileAttributeViewModel
+    {
+        public int AttributeId { get; set; }
+        public int CategoryId { get; set; }
+        public string Title { get; set; } = string.Empty;
+        public int DataTypeId { get; set; }
+        public string? Value { get; set; }
+        public List<string> Options { get; set; } = new();
+    }
+
     public class InputModel
     {
 
@@ -101,34 +122,14 @@ public class ProfileModel : PageModel
             }
         }
 
-        var isOwner = currentUser.Id == targetUser.Id;
-
-        var isAdministrator =
-            await _userManager.IsInRoleAsync(
-                currentUser,
-                "Administrator");
-
-        var isRecruiter =
-            await _userManager.IsInRoleAsync(
-                currentUser,
-                "Recruiter");
-
-        CanView =
-            isOwner ||
-            isRecruiter ||
-            isAdministrator;
-
-        CanEdit =
-            isOwner ||
-            isAdministrator;
+        await LoadPageDataAsync(currentUser, targetUser);
 
         if (!CanView)
         {
             return Forbid();
         }
 
-        var requiredAttributes =
-            await _dbContext.RequiredUserAttributes.FindAsync(targetUser.Id);
+        var requiredAttributes = await _dbContext.RequiredUserAttributes.FindAsync(targetUser.Id);
 
         if (requiredAttributes == null)
         {
@@ -141,7 +142,6 @@ public class ProfileModel : PageModel
         Input.Location = requiredAttributes.Location;
         Input.Description = requiredAttributes.Description;
         Input.Email = targetUser.Email ?? string.Empty;
-        PhotoUrl = requiredAttributes.PhotoUrl;
 
         return Page();
     }
@@ -189,6 +189,8 @@ public class ProfileModel : PageModel
         {
             Input.Email = targetUser.Email ?? string.Empty;
 
+            await LoadPageDataAsync(currentUser, targetUser);
+
             return Page();
         }
 
@@ -206,6 +208,41 @@ public class ProfileModel : PageModel
         requiredAttributes.Age = Input.Age;
         requiredAttributes.Location = Input.Location;
         requiredAttributes.Description = Input.Description;
+        var existingUserAttributes = await _dbContext.UserAttributes
+            .Where(ua => ua.UserId == targetUser.Id)
+            .ToListAsync();
+
+        foreach (var existingAttr in existingUserAttributes)
+        {
+            if (DynamicAttributes.TryGetValue(existingAttr.AttributeId, out var newValue))
+            {
+                if (newValue == "false,true") newValue = "true";
+
+                existingAttr.Value = newValue;
+
+                DynamicAttributes.Remove(existingAttr.AttributeId);
+            }
+            else
+            {
+                _dbContext.UserAttributes.Remove(existingAttr);
+            }
+        }
+
+        foreach (var newAttr in DynamicAttributes)
+        {
+            var finalValue = newAttr.Value;
+            if (finalValue == "false,true") finalValue = "true";
+
+            if (!string.IsNullOrWhiteSpace(finalValue))
+            {
+                _dbContext.UserAttributes.Add(new UserAttribute
+                {
+                    UserId = targetUser.Id,
+                    AttributeId = newAttr.Key,
+                    Value = finalValue
+                });
+            }
+        }
 
         await _dbContext.SaveChangesAsync();
 
@@ -296,6 +333,60 @@ public class ProfileModel : PageModel
         }
 
         return RedirectToPage(new { id = Id });
+    }
+
+
+    private async Task LoadPageDataAsync(ApplicationUser currentUser, ApplicationUser targetUser)
+    {
+        var currentUserRoles = await _userManager.GetRolesAsync(currentUser);
+        bool isAdministrator = currentUserRoles.Contains("Administrator");
+        bool isRecruiter = currentUserRoles.Contains("Recruiter");
+
+        var targetUserRoles = await _userManager.GetRolesAsync(targetUser);
+
+        Role = targetUserRoles.Contains("Administrator") ? "Administrator"
+             : targetUserRoles.Contains("Recruiter") ? "Recruiter"
+             : "Candidate";
+
+        var isOwner = currentUser.Id == targetUser.Id;
+
+        CanView = isOwner || isRecruiter || isAdministrator;
+        CanEdit = isOwner || isAdministrator;
+
+        var requiredAttributes = await _dbContext.RequiredUserAttributes.FindAsync(targetUser.Id);
+        if (requiredAttributes != null)
+        {
+            PhotoUrl = requiredAttributes.PhotoUrl;
+        }
+
+        var categories = await _dbContext.Categories
+            .Where(c => c.IsDisplay)
+            .ToListAsync();
+
+        var attributes = await _dbContext.Attributes
+            .Where(a => a.IsDisplay)
+            .ToListAsync();
+
+        var attributeIds = attributes.Select(a => a.Id).ToList();
+        var options = await _dbContext.AttributeOptions
+            .Where(o => attributeIds.Contains(o.AttributeId))
+            .ToListAsync();
+
+        var userAttributes = await _dbContext.UserAttributes
+            .Where(ua => ua.UserId == targetUser.Id)
+            .ToListAsync();
+
+        ProfileAttributes = attributes.Select(attr => new ProfileAttributeViewModel
+        {
+            AttributeId = attr.Id,
+            CategoryId = attr.CategoryId,
+            Title = attr.Title,
+            DataTypeId = attr.DataTypeId,
+            Value = userAttributes.FirstOrDefault(ua => ua.AttributeId == attr.Id)?.Value,
+            Options = options.Where(o => o.AttributeId == attr.Id).Select(o => o.Options).ToList()
+        }).ToList();
+
+        AvailableCategories = categories;
     }
 
 }
