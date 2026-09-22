@@ -15,18 +15,19 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     }
 
     public DbSet<RequiredUserAttributes> RequiredUserAttributes { get; set; }
-
     public DbSet<Category> Categories { get; set; }
-
     public DbSet<DataType> DataTypes { get; set; }
-
     public DbSet<DomainAttribute> Attributes { get; set; }
     public DbSet<AttributeOption> AttributeOptions { get; set; }
     public DbSet<UserAttribute> UserAttributes { get; set; }
-
     public DbSet<CompareType> CompareTypes { get; set; }
-
     public DbSet<DataTypeCompareType> DataTypeCompareTypes { get; set; }
+
+
+    public DbSet<Position> Positions { get; set; }
+    public DbSet<Tag> Tags { get; set; }
+    public DbSet<Experience> Experiences { get; set; }
+    public DbSet<ExperienceTag> ExperienceTags { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -427,6 +428,77 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 new DataTypeCompareType { Id = 27, DataTypeId = 7, CompareTypeId = 1 },
                 new DataTypeCompareType { Id = 28, DataTypeId = 7, CompareTypeId = 2 }
             );
+        });
+
+
+        builder.Entity<Position>(entity =>
+        {
+            entity.ToTable("positions");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+
+            entity.Property(e => e.Name).HasColumnName("name");
+            entity.Property(e => e.IsDisplay).HasColumnName("is_display");
+        });
+
+        builder.Entity<Tag>(entity =>
+        {
+            entity.ToTable("tags");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.IsDisplay).HasColumnName("is_display");
+        });
+
+        builder.Entity<Experience>(entity =>
+        {
+            entity.ToTable("experience");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+
+            entity.Property(e => e.PositionId).HasColumnName("fk_position_id");
+            entity.Property(e => e.UserId).HasColumnName("fk_user_id");
+
+            entity.Property(e => e.CompanyName).HasColumnName("company_name");
+
+            entity.Property(e => e.StartDate).HasColumnName("start_date");
+            entity.Property(e => e.EndDate).HasColumnName("end_date");
+            entity.Property(e => e.Description).HasColumnName("description");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Position)
+                .WithMany(p => p.Experiences)
+                .HasForeignKey(e => e.PositionId)
+                .OnDelete(DeleteBehavior.SetNull);
+        });
+
+        builder.Entity<ExperienceTag>(entity =>
+        {
+            entity.ToTable("experience_tags");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+
+            entity.Property(e => e.ExperienceId).HasColumnName("fk_experience_id");
+            entity.Property(e => e.TagId).HasColumnName("fk_tag_id");
+
+            entity.HasOne(e => e.Experience)
+                .WithMany(e => e.ExperienceTags)
+                .HasForeignKey(e => e.ExperienceId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Tag)
+                .WithMany(t => t.ExperienceTags)
+                .HasForeignKey(e => e.TagId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
     }

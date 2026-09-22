@@ -717,6 +717,99 @@ namespace resumeSystem.Migrations
                         });
                 });
 
+            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("pk");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("CompanyName")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("company_name");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("text")
+                        .HasColumnName("description");
+
+                    b.Property<DateTime?>("EndDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("end_date");
+
+                    b.Property<int?>("PositionId")
+                        .HasColumnType("integer")
+                        .HasColumnName("fk_position_id");
+
+                    b.Property<DateTime>("StartDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("start_date");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("fk_user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("PositionId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("experience", (string)null);
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.ExperienceTag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("pk");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ExperienceId")
+                        .HasColumnType("integer")
+                        .HasColumnName("fk_experience_id");
+
+                    b.Property<int>("TagId")
+                        .HasColumnType("integer")
+                        .HasColumnName("fk_tag_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ExperienceId");
+
+                    b.HasIndex("TagId");
+
+                    b.ToTable("experience_tags", (string)null);
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Position", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("pk");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDisplay")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_display");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("name");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("positions", (string)null);
+                });
+
             modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>
                 {
                     b.Property<string>("UserId")
@@ -752,6 +845,29 @@ namespace resumeSystem.Migrations
                     b.HasKey("UserId");
 
                     b.ToTable("required_user_attributes", (string)null);
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("pk");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<bool>("IsDisplay")
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_display");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("title");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("tags", (string)null);
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.UserAttribute", b =>
@@ -886,6 +1002,43 @@ namespace resumeSystem.Migrations
                     b.Navigation("DataType");
                 });
 
+            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Position", "Position")
+                        .WithMany("Experiences")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.ExperienceTag", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Experience", "Experience")
+                        .WithMany("ExperienceTags")
+                        .HasForeignKey("ExperienceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
+                        .WithMany("ExperienceTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Experience");
+
+                    b.Navigation("Tag");
+                });
+
             modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>
                 {
                     b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
@@ -919,6 +1072,21 @@ namespace resumeSystem.Migrations
             modelBuilder.Entity("resumeSystem.Domain.ApplicationUser", b =>
                 {
                     b.Navigation("RequiredUserAttributes");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
+                {
+                    b.Navigation("ExperienceTags");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Position", b =>
+                {
+                    b.Navigation("Experiences");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
+                {
+                    b.Navigation("ExperienceTags");
                 });
 #pragma warning restore 612, 618
         }

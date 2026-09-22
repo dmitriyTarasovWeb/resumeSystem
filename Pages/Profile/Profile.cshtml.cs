@@ -54,6 +54,7 @@ public class ProfileModel : PageModel
     public List<ProfileAttributeViewModel> ProfileAttributes { get; set; } = new();
     public List<Category> AvailableCategories { get; set; } = new();
 
+    public List<ExperienceViewModel> Experiences { get; set; } = new();
     public class ProfileAttributeViewModel
     {
         public int AttributeId { get; set; }
@@ -62,6 +63,20 @@ public class ProfileModel : PageModel
         public int DataTypeId { get; set; }
         public string? Value { get; set; }
         public List<string> Options { get; set; } = new();
+    }
+
+
+    public class ExperienceViewModel
+    {
+        public int Id { get; set; }
+
+        public string CompanyName { get; set; } = string.Empty;
+
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Description { get; set; }
+
+        public List<string> Tags { get; set; } = new();
     }
 
     public class InputModel
