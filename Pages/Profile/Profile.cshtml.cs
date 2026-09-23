@@ -42,6 +42,9 @@ public class ProfileModel : PageModel
     [BindProperty]
     public Dictionary<int, string> DynamicAttributes { get; set; } = new();
 
+    [BindProperty]
+    public List<ExperienceInputModel> ExperiencesInput { get; set; } = new();
+
     public bool CanEdit { get; private set; }
 
     public bool CanView { get; private set; }
@@ -63,6 +66,17 @@ public class ProfileModel : PageModel
         public int DataTypeId { get; set; }
         public string? Value { get; set; }
         public List<string> Options { get; set; } = new();
+    }
+
+
+    public class ExperienceInputModel
+    {
+        public int Id { get; set; }
+        public string CompanyName { get; set; } = string.Empty;
+        public DateTime StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+        public string? Description { get; set; }
+        public string? Tags { get; set; }
     }
 
 
@@ -163,6 +177,8 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
+
+
         var currentUser = await _userManager.GetUserAsync(User);
 
         if (currentUser == null)
@@ -200,6 +216,8 @@ public class ProfileModel : PageModel
             return Forbid();
         }
 
+        ModelState.Remove("");
+
         if (!ModelState.IsValid)
         {
             Input.Email = targetUser.Email ?? string.Empty;
@@ -223,6 +241,9 @@ public class ProfileModel : PageModel
         requiredAttributes.Age = Input.Age;
         requiredAttributes.Location = Input.Location;
         requiredAttributes.Description = Input.Description;
+
+
+
         var existingUserAttributes = await _dbContext.UserAttributes
             .Where(ua => ua.UserId == targetUser.Id)
             .ToListAsync();
@@ -256,6 +277,85 @@ public class ProfileModel : PageModel
                     AttributeId = newAttr.Key,
                     Value = finalValue
                 });
+            }
+        }
+
+
+        var existingExperiences = await _dbContext.Experiences
+            .Include(e => e.ExperienceTags)
+            .Where(e => e.UserId == targetUser.Id)
+            .ToListAsync();
+
+        var inputIds = ExperiencesInput.Select(x => x.Id).Where(id => id > 0).ToList();
+
+        var toRemove = existingExperiences.Where(e => !inputIds.Contains(e.Id)).ToList();
+        _dbContext.Experiences.RemoveRange(toRemove);
+
+        foreach (var item in ExperiencesInput)
+        {
+            var utcStart = DateTime.SpecifyKind(item.StartDate, DateTimeKind.Utc);
+            DateTime? utcEnd = item.EndDate.HasValue
+                ? DateTime.SpecifyKind(item.EndDate.Value, DateTimeKind.Utc)
+                : null;
+
+            Experience exp;
+
+            if (item.Id > 0)
+            {
+                exp = existingExperiences.FirstOrDefault(e => e.Id == item.Id)!;
+                if (exp == null) continue;
+
+                exp.CompanyName = item.CompanyName;
+                exp.StartDate = utcStart;
+                exp.EndDate = utcEnd;
+                exp.Description = item.Description;
+            }
+            else
+            {
+                exp = new Experience
+                {
+                    UserId = targetUser.Id,
+                    CompanyName = item.CompanyName,
+                    StartDate = utcStart,
+                    EndDate = utcEnd,
+                    Description = item.Description
+                };
+                _dbContext.Experiences.Add(exp);
+            }
+
+            await _dbContext.SaveChangesAsync();
+
+            var existingExpTags = await _dbContext.ExperienceTags
+                .Where(et => et.ExperienceId == exp.Id)
+                .ToListAsync();
+            _dbContext.ExperienceTags.RemoveRange(existingExpTags);
+
+            if (!string.IsNullOrWhiteSpace(item.Tags))
+            {
+                var tagTitles = item.Tags.Split(new[] { ',', ';' }, StringSplitOptions.RemoveEmptyEntries)
+                                    .Select(t => t.Trim())
+                                    .Where(t => !string.IsNullOrWhiteSpace(t))
+                                    .Distinct(StringComparer.OrdinalIgnoreCase)
+                                    .ToList();
+
+                foreach (var title in tagTitles)
+                {
+                    var tagInDb = await _dbContext.Tags
+                        .FirstOrDefaultAsync(t => t.Title.ToLower() == title.ToLower());
+
+                    if (tagInDb == null)
+                    {
+                        tagInDb = new Tag { Title = title, IsDisplay = true };
+                        _dbContext.Tags.Add(tagInDb);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    _dbContext.ExperienceTags.Add(new ExperienceTag
+                    {
+                        ExperienceId = exp.Id,
+                        TagId = tagInDb.Id
+                    });
+                }
             }
         }
 
@@ -402,6 +502,26 @@ public class ProfileModel : PageModel
         }).ToList();
 
         AvailableCategories = categories;
+
+
+
+        var userExperiences = await _dbContext.Experiences
+            .Include(e => e.ExperienceTags)
+                .ThenInclude(et => et.Tag)
+            .Where(e => e.UserId == targetUser.Id)
+            .OrderByDescending(e => e.StartDate)
+            .ToListAsync();
+
+        Experiences = userExperiences.Select(e => new ExperienceViewModel
+        {
+            Id = e.Id,
+            CompanyName = e.CompanyName,
+            StartDate = e.StartDate,
+            EndDate = e.EndDate,
+            Description = e.Description,
+            Tags = e.ExperienceTags.Select(et => et.Tag.Title).ToList()
+        }).ToList();
     }
+
 
 }

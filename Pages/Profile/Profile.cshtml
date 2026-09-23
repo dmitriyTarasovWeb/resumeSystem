@@ -12,8 +12,6 @@
 
         @if (Model.CanEdit)
         {
-
-           
             <form method="post"
                   enctype="multipart/form-data">
 
@@ -142,15 +140,28 @@
                     </div>
                 </div>
 
+                <div class="card card-primary card-outline mb-4">
+                    <div class="card-header">
+                        <h3 class="card-title">Проекты / Опыт работы</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="experiences-list-container"></div>
+                        <div id="experiences-hidden-inputs"></div>
+
+                        @if (Model.CanEdit)
+                        {
+                            <button type="button" class="btn btn-outline-primary mt-2" id="btn-add-experience">
+                                <i class="bi bi-plus-circle"></i> Добавить проект
+                            </button>
+                        }
+                    </div>
+                </div>
+
 
 
                 <button type="submit" class="btn btn-primary">
                     Сохранить
                 </button>
-
-
-
-
             </form>
         }
         else
@@ -312,7 +323,6 @@
     </div>
 }
 
-
 @if (Model.CanEdit)
 {
     <div class="modal fade" id="addAttributeModal" tabindex="-1" aria-labelledby="addAttributeModalLabel" aria-hidden="true">
@@ -347,9 +357,54 @@
             </div>
         </div>
     </div>
+
+    @if (Model.CanEdit)
+    {
+        <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="experienceModalLabel">Проект / Опыт работы</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" id="modal-exp-id" value="0" />
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Название проекта / Компания</label>
+                            <input type="text" id="modal-exp-company" class="form-control" />
+                        </div>
+
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Дата начала</label>
+                                <input type="date" id="modal-exp-start" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Дата окончания</label>
+                                <input type="date" id="modal-exp-end" class="form-control" />
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Описание (Markdown)</label>
+                            <textarea id="modal-exp-desc" class="form-control" rows="5"></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label fw-bold">Технологические теги</label>
+                            <input type="text" id="modal-exp-tags" class="form-control" placeholder="C#, ASP.NET, PostgreSQL..." />
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
+                        <button type="button" class="btn btn-primary" id="btn-save-exp-modal">Применить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 }
-
-
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
@@ -593,5 +648,133 @@
         })
 
         init()
+
+
+
+
+        let experiencesList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Experiences.Select(e => new
+            {
+                id = e.Id,
+                companyName = e.CompanyName,
+                startDate = e.StartDate.ToString("yyyy-MM-dd"),
+                endDate = e.EndDate?.ToString("yyyy-MM-dd") ?? "",
+                description = e.Description ?? "",
+                tags = string.Join(", ", e.Tags)
+        })))
+
+        const expModalEl = document.getElementById('experienceModal')
+        const expModal = expModalEl ? new bootstrap.Modal(expModalEl) : null
+        let tempClientCounter = -1
+
+        function renderExperiencesUI() {
+            const listContainer = document.getElementById('experiences-list-container')
+            const hiddenContainer = document.getElementById('experiences-hidden-inputs')
+
+            if (!listContainer || !hiddenContainer) return
+
+            listContainer.innerHTML = ''
+            hiddenContainer.innerHTML = ''
+
+            if (experiencesList.length === 0) {
+                listContainer.innerHTML = '<p class="text-muted">Проекты пока не добавлены.</p>'
+                return
+            }
+
+            experiencesList.forEach((exp, index) => {
+                const tagsHtml = exp.tags ? exp.tags.split(',').map(t => `<span class="badge bg-secondary me-1">${t.trim()}</span>`).join('') : ''
+                const dateStr = `${exp.startDate} — ${exp.endDate || 'По настоящее время'}`
+
+                const card = document.createElement('div')
+                card.className = 'mb-4 pb-3 border-bottom'
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5>${exp.companyName}</h5>
+                            <p class="text-muted mb-2"><i class="bi bi-calendar3"></i> ${dateStr}</p>
+                        </div>
+                        ${ @Model.CanEdit.ToString().ToLower() ? `
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editExperience(${exp.id})"><i class="bi bi-pencil"></i></button>
+                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExperience(${exp.id})"><i class="bi bi-trash"></i></button>
+                            </div>
+                        ` : '' }
+                    </div>
+                    <p style="white-space: pre-wrap;">${exp.description}</p>
+                    <div>${tagsHtml}</div>
+                `
+                listContainer.appendChild(card)
+
+                hiddenContainer.insertAdjacentHTML('beforeend', `
+                    <input type="hidden" name="ExperiencesInput[${index}].Id" value="${exp.id > 0 ? exp.id : 0}" />
+                    <input type="hidden" name="ExperiencesInput[${index}].CompanyName" value="${exp.companyName}" />
+                    <input type="hidden" name="ExperiencesInput[${index}].StartDate" value="${exp.startDate}" />
+                    <input type="hidden" name="ExperiencesInput[${index}].EndDate" value="${exp.endDate}" />
+                    <input type="hidden" name="ExperiencesInput[${index}].Description" value="${exp.description}" />
+                    <input type="hidden" name="ExperiencesInput[${index}].Tags" value="${exp.tags}" />
+                `)
+            })
+        }
+
+        document.getElementById('btn-add-experience')?.addEventListener('click', () => {
+            document.getElementById('experienceModalLabel').innerText = 'Добавление проекта'
+            document.getElementById('modal-exp-id').value = tempClientCounter--
+            document.getElementById('modal-exp-company').value = ''
+            document.getElementById('modal-exp-start').value = ''
+            document.getElementById('modal-exp-end').value = ''
+            document.getElementById('modal-exp-desc').value = ''
+            document.getElementById('modal-exp-tags').value = ''
+            expModal.show()
+        })
+
+        window.editExperience = function(id) {
+            const exp = experiencesList.find(e => e.id === id)
+            if (!exp) return
+
+            document.getElementById('experienceModalLabel').innerText = 'Редактирование проекта'
+            document.getElementById('modal-exp-id').value = exp.id
+            document.getElementById('modal-exp-company').value = exp.companyName
+            document.getElementById('modal-exp-start').value = exp.startDate
+            document.getElementById('modal-exp-end').value = exp.endDate
+            document.getElementById('modal-exp-desc').value = exp.description
+            document.getElementById('modal-exp-tags').value = exp.tags
+            expModal.show()
+        }
+
+        window.removeExperience = function(id) {
+            experiencesList = experiencesList.filter(e => e.id !== id)
+            renderExperiencesUI()
+        }
+
+        document.getElementById('btn-save-exp-modal')?.addEventListener('click', () => {
+            const id = parseInt(document.getElementById('modal-exp-id').value)
+            const company = document.getElementById('modal-exp-company').value.trim()
+            const start = document.getElementById('modal-exp-start').value
+
+            if (!company || !start) {
+                alert('Пожалуйста, заполните название проекта и дату начала.')
+                return
+            }
+
+            const expData = {
+                id: id,
+                companyName: company,
+                startDate: start,
+                endDate: document.getElementById('modal-exp-end').value,
+                description: document.getElementById('modal-exp-desc').value,
+                tags: document.getElementById('modal-exp-tags').value
+            }
+
+            const existingIndex = experiencesList.findIndex(e => e.id === id)
+            if (existingIndex >= 0) {
+                experiencesList[existingIndex] = expData
+            } else {
+                experiencesList.push(expData)
+            }
+
+            renderExperiencesUI()
+            expModal.hide()
+        })
+
+        renderExperiencesUI()
     </script>
 }
