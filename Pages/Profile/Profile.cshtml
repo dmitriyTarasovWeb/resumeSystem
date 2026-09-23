@@ -5,6 +5,7 @@
     ViewData["Title"] = "Профиль";
 }
 
+
 <style>
     .tagify {
         border: none !important;
@@ -70,236 +71,363 @@
     }
 </style>
 
-<h1>Профиль</h1>
 
-<div class="row">
-    <div class="col-md-6">
+<div class="container py-4 pb-5">
 
-        @if (Model.CanEdit)
-        {
-            <form method="post"
-                  enctype="multipart/form-data">
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Профиль</h1>
+    </div>
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        @Model.Role
-                    </label>
+
+    @if (Model.CanEdit)
+    {
+        <form method="post" enctype="multipart/form-data">
+
+            <section class="border rounded bg-white mb-4">
+
+                <div class="border-bottom px-3 px-md-4 py-3">
+                    <h2 class="h6 mb-0 fw-semibold">
+                        Основная информация
+                    </h2>
+                </div>
+
+                <div class="p-3 p-md-4">
+
+                    <div class="d-flex justify-content-between align-items-start mb-4">
+
+                        <div>
+                            <div class="d-flex align-items-center gap-3">
+
+                                <img src="@(Model.PhotoUrl ?? "https://abrakadabra.fun/uploads/posts/2021-12/thumbs/1640528661_1-abrakadabra-fun-p-serii-chelovek-na-avu-1.png")"
+                                     alt="Фото профиля"
+                                     class="rounded-circle border"
+                                     width="150"
+                                     height="150"
+                                     style="object-fit: cover;" />
+
+                                <div>
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#avatarModal">
+                                        Изменить
+                                    </button>
+
+                                    <div class="text-body-secondary small mt-1">
+                                        JPG, PNG или WebP
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <span asp-validation-for="Avatar"
+                                  class="text-danger d-block mt-2"></span>
+                        </div>
+
+
+                        <div class="text-end">
+
+                            <div class="text-body-secondary small mb-1">
+                                @Model.Role
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label asp-for="Input.FirstName"
+                                       class="form-label fw-medium">
+                                    Имя
+                                </label>
+
+                                <input asp-for="Input.FirstName"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.FirstName"
+                                      class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label asp-for="Input.LastName"
+                                       class="form-label fw-medium">
+                                    Фамилия
+                                </label>
+
+                                <input asp-for="Input.LastName"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.LastName"
+                                      class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label asp-for="Input.Age"
+                                       class="form-label fw-medium">
+                                    Возраст
+                                </label>
+
+                                <input asp-for="Input.Age"
+                                       type="number"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.Age"
+                                      class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label asp-for="Input.Location"
+                                       class="form-label fw-medium">
+                                    Местоположение
+                                </label>
+
+                                <input asp-for="Input.Location"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.Location"
+                                      class="text-danger small"></span>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-4">
+
+                        <label asp-for="Input.Description"
+                               class="form-label fw-medium">
+                            О себе
+                        </label>
+
+                        <textarea asp-for="Input.Description"
+                                  id="profile-description-input"
+                                  class="form-control"
+                                  style="display:none;"
+                                  rows="5"></textarea>
+
+                        <div id="profile-description-editor"></div>
+
+                        <span asp-validation-for="Input.Description"
+                              class="text-danger small"></span>
+
+                    </div>
+
+
+                    <div>
+
+                        <label asp-for="Input.Email"
+                               class="form-label fw-medium">
+                            Email
+                        </label>
+
+                        <input asp-for="Input.Email"
+                               class="form-control"
+                               readonly />
+
+                    </div>
 
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">
-                        Аватар
+            </section>
+
+            <section class="border rounded bg-white mb-4">
+
+                <div class="border-bottom px-3 px-md-4 py-3">
+                    <h2 class="h6 mb-0 fw-semibold">
+                        Дополнительная информация
+                    </h2>
+                </div>
+
+                <div class="p-3 p-md-4">
+
+                    <div id="attributes-container">
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-outline-primary mt-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addAttributeModal">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Добавить атрибут
+
+                    </button>
+
+                </div>
+
+            </section>
+
+            <section class="border rounded bg-white mb-4">
+
+                <div class="border-bottom px-3 px-md-4 py-3">
+                    <h2 class="h6 mb-0 fw-semibold">
+                        Проекты / Опыт работы
+                    </h2>
+                </div>
+
+                <div class="p-3 p-md-4">
+
+                    <div id="experiences-list-container">
+                    </div>
+
+                    <div id="experiences-hidden-inputs">
+                    </div>
+
+                    <button type="button"
+                            class="btn btn-outline-primary mt-3"
+                            id="btn-add-experience">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Добавить проект
+
+                    </button>
+
+                </div>
+
+            </section>
+
+
+            <div class="d-flex justify-content-end pt-2">
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Сохранить
+                </button>
+
+            </div>
+
+        </form>
+    }
+    else
+    {
+
+        <section class="border rounded bg-white">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Основная информация
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-medium">
+                        Имя
                     </label>
 
+                    <div>
+                        @Model.Input.FirstName
+                    </div>
 
-                    <span asp-validation-for="Avatar"
-                          class="text-danger"></span>
                 </div>
 
 
                 <div class="mb-4">
-                    <img src="@(Model.PhotoUrl ?? "https://abrakadabra.fun/uploads/posts/2021-12/thumbs/1640528661_1-abrakadabra-fun-p-serii-chelovek-na-avu-1.png")"
-                         alt="Аватар"
-                         width="150"
-                         height="150"
-                         class="rounded-circle object-fit-cover" />
-                </div>
 
-
-                <button type="button"
-                        class="btn btn-secondary"
-                        data-bs-toggle="modal"
-                        data-bs-target="#avatarModal">
-                    Изменить аватар
-                </button>
-
-                <div class="mb-3">
-                    <label asp-for="Input.FirstName" class="form-label">
-                        Имя
-                    </label>
-
-                    <input asp-for="Input.FirstName"
-                           class="form-control" />
-
-                    <span asp-validation-for="Input.FirstName"
-                          class="text-danger"></span>
-                </div>
-
-                <div class="mb-3">
-                    <label asp-for="Input.LastName" class="form-label">
+                    <label class="form-label fw-medium">
                         Фамилия
                     </label>
 
-                    <input asp-for="Input.LastName"
-                           class="form-control" />
+                    <div>
+                        @Model.Input.LastName
+                    </div>
 
-                    <span asp-validation-for="Input.LastName"
-                          class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Input.Age" class="form-label">
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-medium">
                         Возраст
                     </label>
 
-                    <input asp-for="Input.Age"
-                           type="number"
-                           class="form-control" />
+                    <div>
+                        @(Model.Input.Age?.ToString() ?? "Не указан")
+                    </div>
 
-                    <span asp-validation-for="Input.Age"
-                          class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Input.Location" class="form-label">
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-medium">
                         Местоположение
                     </label>
 
-                    <input asp-for="Input.Location"
-                           class="form-control" />
+                    <div>
+                        @(Model.Input.Location ?? "Не указано")
+                    </div>
 
-                    <span asp-validation-for="Input.Location"
-                          class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Input.Description" class="form-label">
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-medium">
                         О себе
                     </label>
 
-                    <textarea asp-for="Input.Description"
-                              id="profile-description-input"
-                              class="form-control"
-                              style="display:none;"
-                              rows="5"></textarea>
+                    <div>
+                        @(Model.Input.Description ?? "Не указано")
+                    </div>
 
-                    <div id="profile-description-editor"></div>
-
-                    <span asp-validation-for="Input.Description" class="text-danger"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Input.Email" class="form-label">
+
+                <div>
+
+                    <label class="form-label fw-medium">
                         Email
                     </label>
 
-                    <input asp-for="Input.Email"
-                           class="form-control"
-                           readonly />
-                </div>
-
-                <div class="card card-primary card-outline mb-4">
-                    <div class="card-header">
-                        <h3 class="card-title">Дополнительная информация</h3>
+                    <div>
+                        @Model.Input.Email
                     </div>
-                    <div class="card-body">
 
-                        <div id="attributes-container">
-                        </div>
-
-                        @if (Model.CanEdit)
-                        {
-                            <button type="button" class="btn btn-outline-primary mt-3" data-bs-toggle="modal" data-bs-target="#addAttributeModal">
-                                <i class="bi bi-plus-circle"></i> Добавить атрибут
-                            </button>
-                        }
-
-                    </div>
                 </div>
 
-                <div class="card card-primary card-outline mb-4">
-                    <div class="card-header">
-                        <h3 class="card-title">Проекты / Опыт работы</h3>
-                    </div>
-                    <div class="card-body">
-                        <div id="experiences-list-container"></div>
-                        <div id="experiences-hidden-inputs"></div>
-
-                        @if (Model.CanEdit)
-                        {
-                            <button type="button" class="btn btn-outline-primary mt-2" id="btn-add-experience">
-                                <i class="bi bi-plus-circle"></i> Добавить проект
-                            </button>
-                        }
-                    </div>
-                </div>
-
-
-
-                <button type="submit" class="btn btn-primary">
-                    Сохранить
-                </button>
-            </form>
-        }
-        else
-        {
-            <div class="mb-3">
-                <label class="form-label">
-                    Имя
-                </label>
-
-                <div class="form-control-plaintext">
-                    @Model.Input.FirstName
-                </div>
             </div>
 
-            <div class="mb-3">
-                <label class="form-label">
-                    Фамилия
-                </label>
+        </section>
+    }
 
-                <div class="form-control-plaintext">
-                    @Model.Input.LastName
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">
-                    Возраст
-                </label>
-
-                <div class="form-control-plaintext">
-                    @(Model.Input.Age?.ToString() ?? "Не указан")
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">
-                    Местоположение
-                </label>
-
-                <div class="form-control-plaintext">
-                    @(Model.Input.Location ?? "Не указано")
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">
-                    О себе
-                </label>
-
-                <div class="form-control-plaintext">
-                    @(Model.Input.Description ?? "Не указано")
-                </div>
-            </div>
-
-            <div class="mb-3">
-                <label class="form-label">
-                    Email
-                </label>
-
-                <div class="form-control-plaintext">
-                    @Model.Input.Email
-                </div>
-            </div>
-        }
-
-    </div>
 </div>
+
 
 @if (Model.CanEdit)
 {
+
     <div class="modal fade"
          id="avatarModal"
          tabindex="-1"
@@ -311,7 +439,9 @@
             <div class="modal-content">
 
                 <div class="modal-header">
-                    <h5 class="modal-title" id="avatarModalLabel">
+
+                    <h5 class="modal-title"
+                        id="avatarModalLabel">
                         Изменить аватар
                     </h5>
 
@@ -320,7 +450,9 @@
                             data-bs-dismiss="modal"
                             aria-label="Закрыть">
                     </button>
+
                 </div>
+
 
                 <div class="modal-body">
 
@@ -329,19 +461,19 @@
                           id="avatarForm">
 
                         <div id="avatarDropZone"
-                             class="border rounded p-5 text-center">
+                             class="border border-2 border-secondary-subtle rounded bg-light p-4 text-center">
 
-                            <div class="mb-3">
-                                Перетащите фото сюда
+                            <div class="mb-2">
+                                Перетащите изображение сюда
                             </div>
 
-                            <div class="text-muted mb-3">
-                                или
+                            <div class="text-body-secondary small mb-3">
+                                или выберите файл на компьютере
                             </div>
 
                             <label for="avatarInput"
-                                   class="btn btn-outline-primary">
-                                Выберите в проводнике
+                                   class="btn btn-outline-secondary">
+                                Выбрать файл
                             </label>
 
                             <input id="avatarInput"
@@ -352,22 +484,25 @@
 
                         </div>
 
+
                         <div id="avatarPreviewContainer"
                              class="text-center mt-4 d-none">
 
                             <img id="avatarPreview"
                                  src=""
                                  alt="Предпросмотр"
-                                 width="150"
-                                 height="150"
-                                 class="rounded-circle object-fit-cover" />
+                                 class="rounded-circle border"
+                                 width="128"
+                                 height="128"
+                                 style="object-fit: cover;" />
 
                         </div>
 
-                        <div class="mt-4 d-flex justify-content-end gap-2">
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
 
                             <button type="button"
-                                    class="btn btn-secondary"
+                                    class="btn btn-outline-secondary"
                                     data-bs-dismiss="modal">
                                 Отмена
                             </button>
@@ -391,95 +526,248 @@
     </div>
 }
 
+
 @if (Model.CanEdit)
 {
-    <div class="modal fade" id="addAttributeModal" tabindex="-1" aria-labelledby="addAttributeModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
+
+    <div class="modal fade"
+         id="addAttributeModal"
+         tabindex="-1"
+         aria-labelledby="addAttributeModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content">
+
                 <div class="modal-header">
-                    <h5 class="modal-title" id="addAttributeModalLabel">Выбор атрибута</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                    <h5 class="modal-title"
+                        id="addAttributeModalLabel">
+                        Добавить атрибут
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+
                 </div>
+
+
                 <div class="modal-body">
+
                     <div class="mb-3">
-                        <label class="form-label">Категория</label>
-                        <select id="category-select" class="form-select">
-                            <option value="">-- Выберите категорию --</option>
+
+                        <label class="form-label fw-medium">
+                            Категория
+                        </label>
+
+                        <select id="category-select"
+                                class="form-select">
+
+                            <option value="">
+                                Выберите категорию
+                            </option>
+
                             @foreach (var cat in Model.AvailableCategories)
                             {
-                                <option value="@cat.Id">@cat.Title</option>
+                                <option value="@cat.Id">
+                                    @cat.Title
+                                </option>
                             }
+
                         </select>
+
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Атрибут</label>
-                        <select id="attribute-select" class="form-select">
-                            <option value="">-- Выберите атрибут --</option>
+
+
+                    <div>
+
+                        <label class="form-label fw-medium">
+                            Атрибут
+                        </label>
+
+                        <select id="attribute-select"
+                                class="form-select">
+
+                            <option value="">
+                                Выберите атрибут
+                            </option>
+
                         </select>
+
                     </div>
+
                 </div>
+
+
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                    <button type="button" class="btn btn-primary" id="btn-confirm-add-attribute" disabled>Добавить на страницу</button>
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn-confirm-add-attribute"
+                            disabled>
+                        Добавить
+                    </button>
+
                 </div>
+
             </div>
+
         </div>
+
     </div>
 
-    @if (Model.CanEdit)
-    {
-        <div class="modal fade" id="experienceModal" tabindex="-1" aria-hidden="true">
-            <div class="modal-dialog modal-lg">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="experienceModalLabel">Проект / Опыт работы</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <input type="hidden" id="modal-exp-id" value="0" />
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Название проекта / Компания</label>
-                            <input type="text" id="modal-exp-company" class="form-control" />
-                        </div>
+    <div class="modal fade"
+         id="experienceModal"
+         tabindex="-1"
+         aria-hidden="true">
 
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Дата начала</label>
-                                <input type="date" id="modal-exp-start" class="form-control" />
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label fw-bold">Дата окончания</label>
-                                <input type="date" id="modal-exp-end" class="form-control" />
-                            </div>
-                        </div>
+        <div class="modal-dialog modal-lg modal-dialog-centered">
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Описание (Markdown)</label>
-                            <div id="modal-exp-desc-editor"></div>
-                        </div>
+            <div class="modal-content">
 
-                        <div class="mb-3">
-                            <label class="form-label fw-bold">Технологические теги</label>
-                            <input type="text" id="modal-exp-tags" class="form-control" placeholder="C#, ASP.NET, PostgreSQL..." />
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отмена</button>
-                        <button type="button" class="btn btn-primary" id="btn-save-exp-modal">Применить</button>
-                    </div>
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="experienceModalLabel">
+                        Проект / Опыт работы
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+
                 </div>
+
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           id="modal-exp-id"
+                           value="0" />
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-medium">
+                            Название проекта / Компания
+                        </label>
+
+                        <input type="text"
+                               id="modal-exp-company"
+                               class="form-control" />
+
+                    </div>
+
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-medium">
+                                    Дата начала
+                                </label>
+
+                                <input type="date"
+                                       id="modal-exp-start"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-medium">
+                                    Дата окончания
+                                </label>
+
+                                <input type="date"
+                                       id="modal-exp-end"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-medium">
+                            Описание (Markdown)
+                        </label>
+
+                        <div id="modal-exp-desc-editor"></div>
+
+                    </div>
+
+
+                    <div>
+
+                        <label class="form-label fw-medium">
+                            Технологические теги
+                        </label>
+
+                        <input type="text"
+                               id="modal-exp-tags"
+                               class="form-control"
+                               placeholder="C#, ASP.NET, PostgreSQL..." />
+
+                    </div>
+
+                </div>
+
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn-save-exp-modal">
+                        Применить
+                    </button>
+
+                </div>
+
             </div>
+
         </div>
-    }
+
+    </div>
 }
+
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 
 
     <script>
-        document.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("DOMContentLoaded", function () {
             const dropZone = document.getElementById("avatarDropZone")
             const input = document.getElementById("avatarInput")
             const previewContainer = document.getElementById("avatarPreviewContainer")
@@ -489,454 +777,653 @@
                 return
             }
 
-            const allowedTypes = [
-                "image/jpeg",
-                "image/png",
-                "image/webp"
-            ]
-
+            const allowedTypes = ["image/jpeg", "image/png", "image/webp"]
             const maxFileSize = 5 * 1024 * 1024
 
-            function handleFile(file) {
+            function resetInput() {
+                input.value = ""
+                previewContainer?.classList.add("d-none")
+            }
+
+            function validateFile(file) {
                 if (!file) {
-                    return
+                    return false
                 }
 
                 if (!allowedTypes.includes(file.type)) {
                     alert("Разрешены только JPG, PNG и WebP.")
-                    input.value = ""
-                    return
+                    return false
                 }
 
                 if (file.size > maxFileSize) {
                     alert("Размер изображения не должен превышать 5 МБ.")
-                    input.value = ""
-                    return
+                    return false
                 }
 
-                const dataTransfer = new DataTransfer()
+                return true
+            }
 
+            function setInputFile(file) {
+                const dataTransfer = new DataTransfer()
                 dataTransfer.items.add(file)
                 input.files = dataTransfer.files
+            }
 
+            function showPreview(file) {
                 const reader = new FileReader()
 
-                reader.onload = function(event) {
+                reader.onload = function (event) {
                     preview.src = event.target.result
-                    previewContainer.classList.remove("d-none")
+                    previewContainer?.classList.remove("d-none")
                 }
 
                 reader.readAsDataURL(file)
             }
 
-            input.addEventListener("change", function() {
+            function handleFile(file) {
+                if (!validateFile(file)) {
+                    resetInput()
+                    return
+                }
+
+                setInputFile(file)
+                showPreview(file)
+            }
+
+            input.addEventListener("change", function () {
                 handleFile(input.files[0])
             })
 
-            dropZone.addEventListener("dragover", function(event) {
+            dropZone.addEventListener("dragover", function (event) {
                 event.preventDefault()
-
                 dropZone.classList.add("bg-light")
             })
 
-            dropZone.addEventListener("dragleave", function() {
+            dropZone.addEventListener("dragleave", function () {
                 dropZone.classList.remove("bg-light")
             })
 
-            dropZone.addEventListener("drop", function(event) {
+            dropZone.addEventListener("drop", function (event) {
                 event.preventDefault()
-
                 dropZone.classList.remove("bg-light")
-
-                const file = event.dataTransfer.files[0]
-
-                handleFile(file)
+                handleFile(event.dataTransfer.files[0])
             })
         })
     </script>
 
     <script>
-        const profileAttributesData = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProfileAttributes))
+        document.addEventListener("DOMContentLoaded", function () {
+            const attributes = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProfileAttributes))
+            const container = document.getElementById("attributes-container")
+            const categorySelect = document.getElementById("category-select")
+            const attributeSelect = document.getElementById("attribute-select")
+            const addButton = document.getElementById("btn-confirm-add-attribute")
 
-        const container = document.getElementById('attributes-container')
-        const categorySelect = document.getElementById('category-select')
-        const attrSelect = document.getElementById('attribute-select')
-        const btnAdd = document.getElementById('btn-confirm-add-attribute')
+            if (!container || !categorySelect || !attributeSelect || !addButton) {
+                return
+            }
 
-        const addedAttributeIds = new Set()
+            const addedAttributeIds = new Set()
 
-        function init() {
-            profileAttributesData.forEach(attr => {
-                if (attr.Value !== null && attr.Value !== undefined && attr.Value !== "") {
-                    renderAttributeUI(attr)
+            function getAttributeInputName(attributeId) {
+                return `DynamicAttributes[${attributeId}]`
+            }
+
+            function escapeHtml(value) {
+                const div = document.createElement("div")
+                div.textContent = value ?? ""
+                return div.innerHTML
+            }
+
+            function createTextInput(attribute, inputName) {
+                return `<input type="text" name="${inputName}" class="form-control" value="${escapeHtml(attribute.Value)}" required>`
+            }
+
+            function createTextArea(attribute, inputName) {
+                return `<textarea name="${inputName}" class="form-control" rows="3" required>${escapeHtml(attribute.Value)}</textarea>`
+            }
+
+            function createNumberInput(attribute, inputName) {
+                return `<input type="number" name="${inputName}" class="form-control" value="${escapeHtml(attribute.Value)}" required>`
+            }
+
+            function createDateInput(attribute, inputName) {
+                return `<input type="date" name="${inputName}" class="form-control" value="${escapeHtml(attribute.Value)}" required>`
+            }
+
+            function parsePeriod(value) {
+                if (!value || !value.includes("/")) {
+                    return { start: "", end: "" }
                 }
-            })
-        }
 
-        function renderAttributeUI(attr) {
-            const wrapper = document.createElement('div')
-            wrapper.className = 'mb-3 d-flex align-items-start gap-3'
-            wrapper.id = `attr-wrapper-${attr.AttributeId}`
+                const [start, end] = value.split("/")
 
-            const fieldDiv = document.createElement('div')
-            fieldDiv.className = 'flex-grow-1'
-
-            const label = document.createElement('label')
-            label.className = 'form-label fw-bold'
-            label.innerText = attr.Title
-            fieldDiv.appendChild(label)
-
-            const inputName = `DynamicAttributes[${attr.AttributeId}]`
-            let inputHtml = ''
-
-            if (attr.DataTypeId === 1) {
-                inputHtml = `<input type="text" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
-            } else if (attr.DataTypeId === 2) {
-                inputHtml = `<textarea name="${inputName}" class="form-control" rows="3" required>${attr.Value || ''}</textarea>`
-            } else if (attr.DataTypeId === 3) {
-                inputHtml = `<input type="number" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
-            } else if (attr.DataTypeId === 4) {
-                inputHtml = `<input type="date" name="${inputName}" class="form-control" value="${attr.Value || ''}" required>`
-            } else if (attr.DataTypeId === 5) {
-                let sVal = '', eVal = ''
-                if (attr.Value && attr.Value.includes('/')) {
-                    const parts = attr.Value.split('/')
-                    sVal = parts[0]
-                    eVal = parts[1]
+                return {
+                    start: start ?? "",
+                    end: end ?? ""
                 }
-                inputHtml = `
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" class="form-control" value="${sVal}" onchange="updatePeriod(${attr.AttributeId}, this.parentNode)" required>
+            }
+
+            function createPeriodInput(attribute, inputName) {
+                const period = parsePeriod(attribute.Value)
+
+                return `
+                    <div class="d-flex align-items-center gap-2" data-period-container="${attribute.AttributeId}">
+                        <input type="date" class="form-control" value="${period.start}" required>
                         <span>-</span>
-                        <input type="date" class="form-control" value="${eVal}" onchange="updatePeriod(${attr.AttributeId}, this.parentNode)" required>
-                        <input type="hidden" name="${inputName}" value="${attr.Value || ''}">
+                        <input type="date" class="form-control" value="${period.end}" required>
+                        <input type="hidden" name="${inputName}" value="${escapeHtml(attribute.Value)}">
                     </div>
                 `
-            } else if (attr.DataTypeId === 6) {
-                const isChecked = attr.Value === 'true' ? 'checked' : ''
-                inputHtml = `
+            }
+
+            function createBooleanInput(attribute, inputName) {
+                const isChecked = attribute.Value === "true"
+
+                return `
                     <div class="form-check form-switch mt-2">
                         <input type="hidden" name="${inputName}" value="false">
-                        <input class="form-check-input" type="checkbox" name="${inputName}" value="true" ${isChecked} onchange="this.previousElementSibling.disabled = this.checked">
+                        <input class="form-check-input" type="checkbox" name="${inputName}" value="true" ${isChecked ? "checked" : ""}>
                         <label class="form-check-label text-muted">Да / Нет</label>
                     </div>
                 `
-            } else if (attr.DataTypeId === 7) {
-                inputHtml = `<select name="${inputName}" class="form-select" required><option value="">-- Выберите --</option>`
-                attr.Options.forEach(opt => {
-                    const selected = (attr.Value === opt) ? 'selected' : ''
-                    inputHtml += `<option value="${opt}" ${selected}>${opt}</option>`
-                })
-                inputHtml += `</select>`
             }
 
-            fieldDiv.insertAdjacentHTML('beforeend', inputHtml)
-            wrapper.appendChild(fieldDiv)
+            function createSelectInput(attribute, inputName) {
+                const options = (attribute.Options ?? [])
+                    .map(option => {
+                        const selected = attribute.Value === option ? "selected" : ""
+                        return `<option value="${escapeHtml(option)}" ${selected}>${escapeHtml(option)}</option>`
+                    })
+                    .join("")
 
-            const removeBtn = document.createElement('button')
-            removeBtn.type = 'button'
-            removeBtn.className = 'btn-close mt-4'
-            removeBtn.setAttribute('aria-label', 'Close')
-            removeBtn.onclick = () => removeAttribute(attr.AttributeId)
-
-            wrapper.appendChild(removeBtn)
-            container.appendChild(wrapper)
-
-            addedAttributeIds.add(attr.AttributeId)
-        }
-
-        window.updatePeriod = function(attrId, parentElement) {
-            const dateInputs = parentElement.querySelectorAll('input[type="date"]')
-            const hiddenInput = parentElement.querySelector('input[type="hidden"]')
-            if (dateInputs[0].value && dateInputs[1].value) {
-                hiddenInput.value = `${dateInputs[0].value}/${dateInputs[1].value}`
-            } else {
-                hiddenInput.value = ''
-            }
-        }
-
-        function removeAttribute(attrId) {
-            document.getElementById(`attr-wrapper-${attrId}`).remove()
-            addedAttributeIds.delete(attrId)
-
-            const attr = profileAttributesData.find(a => a.AttributeId === attrId)
-            if (attr) attr.Value = null
-
-            updateAttributeOptions()
-        }
-
-        categorySelect.addEventListener('change', (e) => {
-            const categoryId = parseInt(e.target.value)
-            attrSelect.innerHTML = '<option value="">-- Выберите атрибут --</option>'
-
-            if (!categoryId) {
-                attrSelect.disabled = true
-                btnAdd.disabled = true
-                return
-            }
-
-            const filtered = profileAttributesData.filter(a => a.CategoryId === categoryId && !addedAttributeIds.has(a.AttributeId))
-
-            filtered.forEach(attr => {
-                const option = document.createElement('option')
-                option.value = attr.AttributeId
-                option.innerText = attr.Title
-                attrSelect.appendChild(option)
-            })
-
-            attrSelect.disabled = filtered.length === 0
-            if (filtered.length === 0) {
-                attrSelect.innerHTML = '<option value="">-- Все атрибуты этой категории уже добавлены --</option>'
-            }
-
-            btnAdd.disabled = true
-        })
-
-        function updateAttributeOptions() {
-            categorySelect.value = ""
-            attrSelect.innerHTML = '<option value="">-- Сначала выберите категорию --</option>'
-            attrSelect.disabled = true
-            btnAdd.disabled = true
-        }
-
-        attrSelect.addEventListener('change', (e) => {
-            btnAdd.disabled = !e.target.value
-        })
-
-        btnAdd.addEventListener('click', () => {
-            const attrId = parseInt(attrSelect.value)
-            const attr = profileAttributesData.find(a => a.AttributeId === attrId)
-            if (attr) {
-                renderAttributeUI(attr)
-
-                const modalEl = document.getElementById('addAttributeModal')
-                const modal = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl)
-                modal.hide()
-
-                updateAttributeOptions()
-            }
-        })
-
-        init()
-
-
-
-
-        let experiencesList = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Experiences.Select(e => new
-            {
-                id = e.Id,
-                companyName = e.CompanyName,
-                startDate = e.StartDate.ToString("yyyy-MM-dd"),
-                endDate = e.EndDate?.ToString("yyyy-MM-dd") ?? "",
-                description = e.Description ?? "",
-                tags = string.Join(", ", e.Tags)
-        })))
-
-        const expModalEl = document.getElementById('experienceModal')
-        const expModal = expModalEl ? new bootstrap.Modal(expModalEl) : null
-        let tempClientCounter = -1
-
-        function renderExperiencesUI() {
-            const listContainer = document.getElementById('experiences-list-container')
-            const hiddenContainer = document.getElementById('experiences-hidden-inputs')
-
-            if (!listContainer || !hiddenContainer) return
-
-            listContainer.innerHTML = ''
-            hiddenContainer.innerHTML = ''
-
-            if (experiencesList.length === 0) {
-                listContainer.innerHTML = '<p class="text-muted">Проекты пока не добавлены.</p>'
-                return
-            }
-
-            experiencesList.forEach((exp, index) => {
-                const tagsHtml = exp.tags ? exp.tags.split(',').map(t => `<span class="badge bg-secondary me-1">${t.trim()}</span>`).join('') : ''
-                const dateStr = `${exp.startDate} — ${exp.endDate || 'По настоящее время'}`
-
-                const card = document.createElement('div')
-                card.className = 'mb-4 pb-3 border-bottom'
-                card.innerHTML = `
-                    <div class="d-flex justify-content-between align-items-start">
-                        <div>
-                            <h5>${exp.companyName}</h5>
-                            <p class="text-muted mb-2"><i class="bi bi-calendar3"></i> ${dateStr}</p>
-                        </div>
-                        ${ @Model.CanEdit.ToString().ToLower() ? `
-                            <div class="d-flex gap-1">
-                                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="editExperience(${exp.id})"><i class="bi bi-pencil"></i></button>
-                                <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExperience(${exp.id})"><i class="bi bi-trash"></i></button>
-                            </div>
-                        ` : '' }
-                    </div>
-                        <div class="markdown-content">
-                            ${exp.description ? marked.parse(exp.description) : ''}
-                        </div>
-                    <div>${tagsHtml}</div>
+                return `
+                    <select name="${inputName}" class="form-select" required>
+                        <option value="">-- Выберите --</option>
+                        ${options}
+                    </select>
                 `
-                listContainer.appendChild(card)
+            }
 
-                hiddenContainer.insertAdjacentHTML('beforeend', `
-                    <input type="hidden" name="ExperiencesInput[${index}].Id" value="${exp.id > 0 ? exp.id : 0}" />
-                    <input type="hidden" name="ExperiencesInput[${index}].CompanyName" value="${exp.companyName}" />
-                    <input type="hidden" name="ExperiencesInput[${index}].StartDate" value="${exp.startDate}" />
-                    <input type="hidden" name="ExperiencesInput[${index}].EndDate" value="${exp.endDate}" />
-                    <input type="hidden" name="ExperiencesInput[${index}].Description" value="${exp.description}" />
-                    <input type="hidden" name="ExperiencesInput[${index}].Tags" value="${exp.tags}" />
-                `)
-            })
-        }
+            function createInput(attribute) {
+                const inputName = getAttributeInputName(attribute.AttributeId)
 
-            document.getElementById('btn-add-experience')?.addEventListener('click', () => {
-            document.getElementById('experienceModalLabel').innerText = 'Добавление проекта'
-            document.getElementById('modal-exp-id').value = tempClientCounter--
-            document.getElementById('modal-exp-company').value = ''
-            document.getElementById('modal-exp-start').value = ''
-            document.getElementById('modal-exp-end').value = ''
-                if (descriptionEditor) {
-            descriptionEditor.setMarkdown('');
-        }
-
-            if (tagifyInstance) tagifyInstance.removeAllTags();
-
-            expModal.show()
-        })
-
-            window.editExperience = function(id) {
-            const exp = experiencesList.find(e => e.id === id)
-            if (!exp) return
-
-            document.getElementById('experienceModalLabel').innerText = 'Редактирование проекта'
-            document.getElementById('modal-exp-id').value = exp.id
-            document.getElementById('modal-exp-company').value = exp.companyName
-            document.getElementById('modal-exp-start').value = exp.startDate
-            document.getElementById('modal-exp-end').value = exp.endDate
-                if (descriptionEditor) {
-            descriptionEditor.setMarkdown(exp.description || '');
-        }
-
-            if (tagifyInstance) {
-                tagifyInstance.removeAllTags();
-                if (exp.tags) {
-                    tagifyInstance.addTags(exp.tags);
+                switch (attribute.DataTypeId) {
+                    case 1:
+                        return createTextInput(attribute, inputName)
+                    case 2:
+                        return createTextArea(attribute, inputName)
+                    case 3:
+                        return createNumberInput(attribute, inputName)
+                    case 4:
+                        return createDateInput(attribute, inputName)
+                    case 5:
+                        return createPeriodInput(attribute, inputName)
+                    case 6:
+                        return createBooleanInput(attribute, inputName)
+                    case 7:
+                        return createSelectInput(attribute, inputName)
+                    default:
+                        return ""
                 }
             }
 
-            expModal.show()
-        }
+            function createAttributeElement(attribute) {
+                const wrapper = document.createElement("div")
 
-        window.removeExperience = function(id) {
-            experiencesList = experiencesList.filter(e => e.id !== id)
-            renderExperiencesUI()
-        }
+                wrapper.className = "mb-3 d-flex align-items-start gap-3"
+                wrapper.id = `attr-wrapper-${attribute.AttributeId}`
 
-        document.getElementById('btn-save-exp-modal')?.addEventListener('click', () => {
-            const id = parseInt(document.getElementById('modal-exp-id').value)
-            const company = document.getElementById('modal-exp-company').value.trim()
-            const start = document.getElementById('modal-exp-start').value
+                wrapper.innerHTML = `
+                    <div class="flex-grow-1">
+                        <label class="form-label fw-bold">${escapeHtml(attribute.Title)}</label>
+                        ${createInput(attribute)}
+                    </div>
+                    <button type="button" class="btn-close mt-4" aria-label="Удалить атрибут"></button>
+                `
 
-            if (!company || !start) {
-                alert('Пожалуйста, заполните название проекта и дату начала.')
-                return
+                wrapper.querySelector(".btn-close").addEventListener("click", function () {
+                    removeAttribute(attribute.AttributeId)
+                })
+
+                const periodContainer = wrapper.querySelector(`[data-period-container="${attribute.AttributeId}"]`)
+
+                if (periodContainer) {
+                    periodContainer.querySelectorAll('input[type="date"]').forEach(input => {
+                        input.addEventListener("change", function () {
+                            updatePeriod(periodContainer)
+                        })
+                    })
+                }
+
+                return wrapper
             }
 
-            const tagsValue = tagifyInstance ? tagifyInstance.value.map(item => item.value).join(', ') : '';
+            function updatePeriod(container) {
+                const dates = container.querySelectorAll('input[type="date"]')
+                const hiddenInput = container.querySelector('input[type="hidden"]')
 
-            const expData = {
-            id: id,
-            companyName: company,
-            startDate: start,
-            endDate: document.getElementById('modal-exp-end').value,
-            description: descriptionEditor ? descriptionEditor.getMarkdown() : '',
-            tags: tagsValue
-        }
+                if (!dates[0].value || !dates[1].value) {
+                    hiddenInput.value = ""
+                    return
+                }
 
-            const existingIndex = experiencesList.findIndex(e => e.id === id)
-            if (existingIndex >= 0) {
-                experiencesList[existingIndex] = expData
-            } else {
-                experiencesList.push(expData)
+                hiddenInput.value = `${dates[0].value}/${dates[1].value}`
             }
 
-            renderExperiencesUI()
-            expModal.hide()
+            function renderAttribute(attribute) {
+                container.appendChild(createAttributeElement(attribute))
+                addedAttributeIds.add(attribute.AttributeId)
+            }
+
+            function removeAttribute(attributeId) {
+                document.getElementById(`attr-wrapper-${attributeId}`)?.remove()
+                addedAttributeIds.delete(attributeId)
+
+                const attribute = findAttribute(attributeId)
+
+                if (attribute) {
+                    attribute.Value = null
+                }
+
+                resetAttributeSelectors()
+            }
+
+            function findAttribute(attributeId) {
+                return attributes.find(attribute => attribute.AttributeId === attributeId)
+            }
+
+            function resetAttributeSelectors() {
+                categorySelect.value = ""
+                attributeSelect.innerHTML = '<option value="">-- Сначала выберите категорию --</option>'
+                attributeSelect.disabled = true
+                addButton.disabled = true
+            }
+
+            function fillAttributeSelect(categoryId) {
+                const availableAttributes = attributes.filter(attribute =>
+                    attribute.CategoryId === categoryId &&
+                    !addedAttributeIds.has(attribute.AttributeId)
+                )
+
+                attributeSelect.innerHTML = '<option value="">-- Выберите атрибут --</option>'
+
+                if (availableAttributes.length === 0) {
+                    attributeSelect.innerHTML = '<option value="">-- Все атрибуты этой категории уже добавлены --</option>'
+                    attributeSelect.disabled = true
+                    addButton.disabled = true
+                    return
+                }
+
+                availableAttributes.forEach(attribute => {
+                    const option = document.createElement("option")
+                    option.value = attribute.AttributeId
+                    option.textContent = attribute.Title
+                    attributeSelect.appendChild(option)
+                })
+
+                attributeSelect.disabled = false
+                addButton.disabled = true
+            }
+
+            function initializeExistingAttributes() {
+                attributes
+                    .filter(attribute => attribute.Value !== null && attribute.Value !== undefined && attribute.Value !== "")
+                    .forEach(renderAttribute)
+            }
+
+            categorySelect.addEventListener("change", function () {
+                const categoryId = Number(this.value)
+
+                if (!categoryId) {
+                    resetAttributeSelectors()
+                    return
+                }
+
+                fillAttributeSelect(categoryId)
+            })
+
+            attributeSelect.addEventListener("change", function () {
+                addButton.disabled = !this.value
+            })
+
+            addButton.addEventListener("click", function () {
+                const attributeId = Number(attributeSelect.value)
+                const attribute = findAttribute(attributeId)
+
+                if (!attribute) {
+                    return
+                }
+
+                renderAttribute(attribute)
+
+                const modalElement = document.getElementById("addAttributeModal")
+
+                if (modalElement) {
+                    const modal = bootstrap.Modal.getInstance(modalElement) ?? new bootstrap.Modal(modalElement)
+                    modal.hide()
+                }
+
+                resetAttributeSelectors()
+            })
+
+            initializeExistingAttributes()
         })
-
-        renderExperiencesUI()
     </script>
 
     <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let experiences = @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Experiences.Select(e => new
+            {
+                    id = e.Id,
+                    companyName = e.CompanyName,
+                    startDate = e.StartDate.ToString("yyyy-MM-dd"),
+                    endDate = e.EndDate?.ToString("yyyy-MM-dd") ?? "",
+                    description = e.Description ?? "",
+                    tags = string.Join(", ", e.Tags)
+            })))
 
-        const globalTagsWhitelist = @Html.Raw(ViewData["AllTagsJson"] ?? "[]");
-            const inputTagsEl = document.getElementById('modal-exp-tags');
-        if (inputTagsEl) {
-            tagifyInstance = new Tagify(inputTagsEl, {
-                whitelist: globalTagsWhitelist,
-                dropdown: {
-                    maxItems: 10,           
-                    classname: "tags-look", 
-                    enabled: 0,           
-                    closeOnSelect: false   
-                },
-                enforceWhitelist: false,   
-                delimiters: ",| ",      
-                editTags: false
-            });
-        }
+            const listContainer = document.getElementById("experiences-list-container")
+            const hiddenContainer = document.getElementById("experiences-hidden-inputs")
+            const addButton = document.getElementById("btn-add-experience")
+            const modalElement = document.getElementById("experienceModal")
+            const saveModalButton = document.getElementById("btn-save-exp-modal")
+            const modal = modalElement ? new bootstrap.Modal(modalElement) : null
+            let tempClientCounter = -1
 
-
-            let descriptionEditor = null;
-        const editorEl = document.querySelector('#modal-exp-desc-editor');
-
-        if (editorEl) {
-            descriptionEditor = new toastui.Editor({
-                el: editorEl,
-                height: '300px',
-                initialEditType: 'wysiwyg', 
-                previewStyle: 'vertical',
-                hideModeSwitch: true, 
-                toolbarItems: [
-                    ['heading', 'bold', 'italic', 'strike'],
-                    ['hr', 'quote'],
-                    ['ul', 'ol', 'task'],
-                    ['table', 'link']
-                ]
-            });
-        }
-
-        function initMarkdownEditor(containerSelector, initialValue = '', height = '250px') {
-            const el = document.querySelector(containerSelector);
-            if (!el) return null;
-
-            return new toastui.Editor({
-                el: el,
-                height: height,
-                initialEditType: 'wysiwyg',
-                initialValue: initialValue,  
-                previewStyle: 'vertical',
-                hideModeSwitch: true,
-                toolbarItems: [
-                    ['heading', 'bold', 'italic', 'strike'],
-                    ['hr', 'quote'],
-                    ['ul', 'ol', 'task'],
-                    ['table', 'link']
-                ]
-            });
-        }
-
-        const descriptionInput = document.getElementById('profile-description-input');
-
-        if (descriptionInput) {
-            const profileBioEditor = initMarkdownEditor('#profile-description-editor', descriptionInput.value, '300px');
-
-            if (profileBioEditor) {
-                profileBioEditor.on('change', () => {
-                    descriptionInput.value = profileBioEditor.getMarkdown();
-                });
+            if (!listContainer || !hiddenContainer) {
+                return
             }
-        }
 
+            function getFormValue(id) {
+                return document.getElementById(id)?.value ?? ""
+            }
 
+            function setFormValue(id, value) {
+                const element = document.getElementById(id)
+
+                if (element) {
+                    element.value = value ?? ""
+                }
+            }
+
+            function resetExperienceForm() {
+                setFormValue("modal-exp-id", tempClientCounter--)
+                setFormValue("modal-exp-company", "")
+                setFormValue("modal-exp-start", "")
+                setFormValue("modal-exp-end", "")
+
+                if (window.descriptionEditor) {
+                    window.descriptionEditor.setMarkdown("")
+                }
+
+                if (window.tagifyInstance) {
+                    window.tagifyInstance.removeAllTags()
+                }
+            }
+
+            function fillExperienceForm(experience) {
+                setFormValue("modal-exp-id", experience.id)
+                setFormValue("modal-exp-company", experience.companyName)
+                setFormValue("modal-exp-start", experience.startDate)
+                setFormValue("modal-exp-end", experience.endDate)
+
+                if (window.descriptionEditor) {
+                    window.descriptionEditor.setMarkdown(experience.description || "")
+                }
+
+                if (window.tagifyInstance) {
+                    window.tagifyInstance.removeAllTags()
+
+                    if (experience.tags) {
+                        window.tagifyInstance.addTags(experience.tags)
+                    }
+                }
+            }
+
+            function openAddModal() {
+                document.getElementById("experienceModalLabel").innerText = "Добавление проекта"
+                resetExperienceForm()
+                modal?.show()
+            }
+
+            function openEditModal(id) {
+                const experience = experiences.find(experience => experience.id === id)
+
+                if (!experience) {
+                    return
+                }
+
+                document.getElementById("experienceModalLabel").innerText = "Редактирование проекта"
+                fillExperienceForm(experience)
+                modal?.show()
+            }
+
+            function removeExperience(id) {
+                experiences = experiences.filter(experience => experience.id !== id)
+                renderExperiences()
+            }
+
+            function getTags() {
+                if (!window.tagifyInstance) {
+                    return ""
+                }
+
+                return window.tagifyInstance.value
+                    .map(item => item.value)
+                    .join(", ")
+            }
+
+            function getExperienceFromForm() {
+                return {
+                    id: Number(getFormValue("modal-exp-id")),
+                    companyName: getFormValue("modal-exp-company").trim(),
+                    startDate: getFormValue("modal-exp-start"),
+                    endDate: getFormValue("modal-exp-end"),
+                    description: window.descriptionEditor ? window.descriptionEditor.getMarkdown() : "",
+                    tags: getTags()
+                }
+            }
+
+            function validateExperience(experience) {
+                if (!experience.companyName || !experience.startDate) {
+                    alert("Пожалуйста, заполните название проекта и дату начала.")
+                    return false
+                }
+
+                return true
+            }
+
+            function saveExperience() {
+                const experience = getExperienceFromForm()
+
+                if (!validateExperience(experience)) {
+                    return
+                }
+
+                const index = experiences.findIndex(item => item.id === experience.id)
+
+                if (index >= 0) {
+                    experiences[index] = experience
+                } else {
+                    experiences.push(experience)
+                }
+
+                renderExperiences()
+                modal?.hide()
+            }
+
+            function createTagsHtml(tags) {
+                if (!tags) {
+                    return ""
+                }
+
+                return tags
+                    .split(",")
+                    .map(tag => tag.trim())
+                    .filter(Boolean)
+                    .map(tag => `<span class="badge bg-secondary me-1">${escapeHtml(tag)}</span>`)
+                    .join("")
+            }
+
+            function escapeHtml(value) {
+                const div = document.createElement("div")
+                div.textContent = value ?? ""
+                return div.innerHTML
+            }
+
+            function createExperienceCard(experience) {
+                const card = document.createElement("div")
+                const canEdit = @Model.CanEdit.ToString().ToLower()
+
+                card.className = "mb-4 pb-3 border-bottom"
+
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5>${escapeHtml(experience.companyName)}</h5>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-calendar3"></i>
+                                ${escapeHtml(experience.startDate)} —
+                                ${escapeHtml(experience.endDate || "По настоящее время")}
+                            </p>
+                        </div>
+
+                        ${canEdit ? `
+                            <div class="d-flex gap-1">
+                                <button type="button" class="btn btn-sm btn-outline-secondary js-edit-experience" data-id="${experience.id}">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                                <button type="button" class="btn btn-sm btn-outline-danger js-remove-experience" data-id="${experience.id}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        ` : ""}
+                    </div>
+
+                    <div class="markdown-content">
+                        ${experience.description ? marked.parse(experience.description) : ""}
+                    </div>
+
+                    <div>${createTagsHtml(experience.tags)}</div>
+                `
+
+                return card
+            }
+
+            function createHiddenInputs(experience, index) {
+                return `
+                    <input type="hidden" name="ExperiencesInput[${index}].Id" value="${experience.id > 0 ? experience.id : 0}">
+                    <input type="hidden" name="ExperiencesInput[${index}].CompanyName" value="${escapeHtml(experience.companyName)}">
+                    <input type="hidden" name="ExperiencesInput[${index}].StartDate" value="${experience.startDate}">
+                    <input type="hidden" name="ExperiencesInput[${index}].EndDate" value="${experience.endDate}">
+                    <input type="hidden" name="ExperiencesInput[${index}].Description" value="${escapeHtml(experience.description)}">
+                    <input type="hidden" name="ExperiencesInput[${index}].Tags" value="${escapeHtml(experience.tags)}">
+                `
+            }
+
+            function renderExperiences() {
+                listContainer.innerHTML = ""
+                hiddenContainer.innerHTML = ""
+
+                if (experiences.length === 0) {
+                    listContainer.innerHTML = '<p class="text-muted">Проекты пока не добавлены.</p>'
+                    return
+                }
+
+                experiences.forEach((experience, index) => {
+                    listContainer.appendChild(createExperienceCard(experience))
+                    hiddenContainer.insertAdjacentHTML("beforeend", createHiddenInputs(experience, index))
+                })
+            }
+
+            listContainer.addEventListener("click", function (event) {
+                const editButton = event.target.closest(".js-edit-experience")
+
+                if (editButton) {
+                    openEditModal(Number(editButton.dataset.id))
+                    return
+                }
+
+                const removeButton = event.target.closest(".js-remove-experience")
+
+                if (removeButton) {
+                    removeExperience(Number(removeButton.dataset.id))
+                }
+            })
+
+            addButton?.addEventListener("click", function () {
+                openAddModal()
+            })
+
+            saveModalButton?.addEventListener("click", function () {
+                saveExperience()
+            })
+
+            window.profileExperiences = {
+                getAll: () => experiences
+            }
+
+            renderExperiences()
+        })
+    </script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const globalTagsWhitelist = @Html.Raw(ViewData["AllTagsJson"] ?? "[]")
+            const tagsInput = document.getElementById("modal-exp-tags")
+
+            if (tagsInput) {
+                window.tagifyInstance = new Tagify(tagsInput, {
+                    whitelist: globalTagsWhitelist,
+                    dropdown: {
+                        maxItems: 10,
+                        classname: "tags-look",
+                        enabled: 0,
+                        closeOnSelect: false
+                    },
+                    enforceWhitelist: false,
+                    delimiters: ",| ",
+                    editTags: false
+                })
+            }
+
+            function createMarkdownEditor(element, initialValue = "", height = "250px") {
+                if (!element) {
+                    return null
+                }
+
+                return new toastui.Editor({
+                    el: element,
+                    height,
+                    initialEditType: "wysiwyg",
+                    initialValue,
+                    previewStyle: "vertical",
+                    hideModeSwitch: true,
+                    toolbarItems: [
+                        ["heading", "bold", "italic", "strike"],
+                        ["hr", "quote"],
+                        ["ul", "ol", "task"],
+                        ["table", "link"]
+                    ]
+                })
+            }
+
+            const experienceEditorElement = document.getElementById("modal-exp-desc-editor")
+
+            window.descriptionEditor = createMarkdownEditor(experienceEditorElement, "", "300px")
+
+            const descriptionInput = document.getElementById("profile-description-input")
+            const profileEditorElement = document.getElementById("profile-description-editor")
+
+            if (descriptionInput && profileEditorElement) {
+                const profileEditor = createMarkdownEditor(profileEditorElement, descriptionInput.value, "300px")
+
+                profileEditor?.on("change", function () {
+                    descriptionInput.value = profileEditor.getMarkdown()
+                })
+            }
+        })
     </script>
    
 }
