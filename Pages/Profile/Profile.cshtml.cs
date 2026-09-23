@@ -40,10 +40,10 @@ public class ProfileModel : PageModel
     public IFormFile? Avatar { get; set; }
 
     [BindProperty]
-    public Dictionary<int, string> DynamicAttributes { get; set; } = new();
+    public Dictionary<int, string>? DynamicAttributes { get; set; } = new();
 
     [BindProperty]
-    public List<ExperienceInputModel> ExperiencesInput { get; set; } = new();
+    public List<ExperienceInputModel>? ExperiencesInput { get; set; } = new();
 
     public bool CanEdit { get; private set; }
 
@@ -521,6 +521,16 @@ public class ProfileModel : PageModel
             Description = e.Description,
             Tags = e.ExperienceTags.Select(et => et.Tag.Title).ToList()
         }).ToList();
+
+
+
+        var allTags = await _dbContext.Tags
+            .Where(t => t.IsDisplay)
+            .Select(t => t.Title)
+            .ToListAsync();
+
+
+        ViewData["AllTagsJson"] = System.Text.Json.JsonSerializer.Serialize(allTags);
     }
 
 
