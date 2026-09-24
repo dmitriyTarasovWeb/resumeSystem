@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260922095331_AddExperienceAndTags")]
+    partial class AddExperienceAndTags
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -902,107 +905,6 @@ namespace resumeSystem.Migrations
                     b.ToTable("user_attributes", (string)null);
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<int>("PositionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_position_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("fk_user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PositionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("vacancies", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyAttribute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttributeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_attribute_id");
-
-                    b.Property<string>("AttributeValue")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("attribute_value");
-
-                    b.Property<int>("VacancyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_vacancy_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributeId");
-
-                    b.HasIndex("VacancyId");
-
-                    b.ToTable("vacancy_attributes", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_tag_id");
-
-                    b.Property<int>("VacancyId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_vacancy_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("VacancyId");
-
-                    b.ToTable("vacancy_tags", (string)null);
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1170,63 +1072,6 @@ namespace resumeSystem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Position", "Position")
-                        .WithMany()
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Position");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyAttribute", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
-                        .WithMany()
-                        .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
-                        .WithMany("VacancyAttributes")
-                        .HasForeignKey("VacancyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Attribute");
-
-                    b.Navigation("Vacancy");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyTag", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
-                        .WithMany("VacancyTags")
-                        .HasForeignKey("VacancyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tag");
-
-                    b.Navigation("Vacancy");
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.ApplicationUser", b =>
                 {
                     b.Navigation("RequiredUserAttributes");
@@ -1245,13 +1090,6 @@ namespace resumeSystem.Migrations
             modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
                 {
                     b.Navigation("ExperienceTags");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.Navigation("VacancyAttributes");
-
-                    b.Navigation("VacancyTags");
                 });
 #pragma warning restore 612, 618
         }

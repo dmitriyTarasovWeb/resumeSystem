@@ -1,0 +1,1733 @@
+﻿
+@page "/Profile/{id?}"
+@model resumeSystem.Pages.Profile.ProfileModel
+
+@{
+    ViewData["Title"] = "Профиль";
+    var canEdit = Model.CanEdit;
+    var photoUrl = Model.PhotoUrl ?? "https://abrakadabra.fun/uploads/posts/2021-12/thumbs/1640528661_1-abrakadabra-fun-p-serii-chelovek-na-avu-1.png";
+}
+
+<style>
+    .tagify {
+        border: none !important;
+        padding: 0 !important;
+        background: transparent !important;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        align-items: flex-start;
+    }
+
+    .tagify__tag {
+        background: #e9ecef !important;
+        border: none !important;
+        border-radius: 4px !important;
+        padding: 2px 8px !important;
+        margin: 0 !important;
+    }
+
+    .tagify__tag-text {
+        color: #212529 !important;
+        font-weight: 500;
+    }
+
+    .tagify__tag__removeBtn {
+        color: #6c757d !important;
+    }
+
+        .tagify__tag__removeBtn:hover {
+            background: #dc3545 !important;
+            color: #fff !important;
+        }
+
+    .tagify__input {
+        border: 1px solid #ced4da !important;
+        border-radius: 0.375rem !important;
+        padding: 8px 12px !important;
+        background-color: #fff !important;
+        flex-basis: 100% !important;
+        width: 100% !important;
+        order: 999 !important;
+        margin: 6px 0 0 0 !important;
+    }
+
+        .tagify__input:focus {
+            border-color: #86b7fe !important;
+            outline: 0 !important;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25) !important;
+        }
+
+        .tagify__input::before {
+            margin: 0 !important;
+        }
+</style>
+
+<div class="container py-4 pb-5">
+
+    <div class="mb-4">
+        <h1 class="h3 mb-1">Профиль</h1>
+    </div>
+
+    <form method="post" enctype="multipart/form-data" id="profile-form">
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Основная информация
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div class="d-flex justify-content-between align-items-start mb-4">
+
+                    <div>
+                        <div class="d-flex align-items-center gap-3">
+
+                            <img src="@photoUrl"
+                                 alt="Фото профиля"
+                                 class="rounded-circle border"
+                                 width="150"
+                                 height="150"
+                                 style="object-fit: cover;" />
+
+                            @if (canEdit)
+                            {
+                                <div>
+                                    <button type="button"
+                                            class="btn btn-outline-secondary btn-sm"
+                                            data-bs-toggle="modal"
+                                            data-bs-target="#avatarModal">
+                                        Изменить
+                                    </button>
+
+                                    <div class="text-body-secondary small mt-1">
+                                        JPG, PNG или WebP
+                                    </div>
+                                </div>
+                            }
+
+                        </div>
+
+                        @if (canEdit)
+                        {
+                            <span asp-validation-for="Avatar"
+                                  class="text-danger d-block mt-2"></span>
+                        }
+
+                    </div>
+
+                    <div class="text-end">
+                        <div class="text-body-secondary small mb-1">
+                            @Model.Role
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="row g-3">
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+
+                            <label class="form-label fw-medium">
+                                Имя
+                            </label>
+
+                            @if (canEdit)
+                            {
+                                <input asp-for="Input.FirstName"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.FirstName"
+                                      class="text-danger small"></span>
+                            }
+                            else
+                            {
+                                <div class="profile-value">
+                                    @(Model.Input.FirstName ?? "Не указано")
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+
+                            <label class="form-label fw-medium">
+                                Фамилия
+                            </label>
+
+                            @if (canEdit)
+                            {
+                                <input asp-for="Input.LastName"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.LastName"
+                                      class="text-danger small"></span>
+                            }
+                            else
+                            {
+                                <div class="profile-value">
+                                    @(Model.Input.LastName ?? "Не указано")
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+
+                            <label class="form-label fw-medium">
+                                Возраст
+                            </label>
+
+                            @if (canEdit)
+                            {
+                                <input asp-for="Input.Age"
+                                       type="number"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.Age"
+                                      class="text-danger small"></span>
+                            }
+                            else
+                            {
+                                <div class="profile-value">
+                                    @(Model.Input.Age?.ToString() ?? "Не указан")
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="mb-3">
+
+                            <label class="form-label fw-medium">
+                                Местоположение
+                            </label>
+
+                            @if (canEdit)
+                            {
+                                <input asp-for="Input.Location"
+                                       class="form-control" />
+
+                                <span asp-validation-for="Input.Location"
+                                      class="text-danger small"></span>
+                            }
+                            else
+                            {
+                                <div class="profile-value">
+                                    @(Model.Input.Location ?? "Не указано")
+                                </div>
+                            }
+
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="mb-4">
+
+                    <label class="form-label fw-medium">
+                        О себе
+                    </label>
+
+                    @if (canEdit)
+                    {
+                        <textarea asp-for="Input.Description"
+                                  id="profile-description-input"
+                                  class="form-control"
+                                  style="display:none;"
+                                  rows="5"></textarea>
+
+                        <div id="profile-description-editor"></div>
+
+                        <span asp-validation-for="Input.Description"
+                              class="text-danger small"></span>
+                    }
+                    else
+                    {
+                        <div id="profile-description-view"
+                             class="markdown-content"></div>
+
+                        <script type="application/json"
+                                id="profile-description-data">@Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.Input.Description ?? ""))</script>
+                    }
+
+                </div>
+
+                <div>
+
+                    <label class="form-label fw-medium">
+                        Email
+                    </label>
+
+                    @if (canEdit)
+                    {
+                        <input asp-for="Input.Email"
+                               class="form-control"
+                               readonly />
+                    }
+                    else
+                    {
+                        <div class="profile-value">
+                            @(Model.Input.Email ?? "Не указан")
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Дополнительная информация
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div id="attributes-container"></div>
+
+                @if (canEdit)
+                {
+                    <button type="button"
+                            class="btn btn-outline-primary mt-3"
+                            data-bs-toggle="modal"
+                            data-bs-target="#addAttributeModal">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Добавить атрибут
+
+                    </button>
+                }
+
+            </div>
+
+        </section>
+
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Проекты / Опыт работы
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div id="experiences-list-container"></div>
+
+                @if (canEdit)
+                {
+                    <div id="experiences-hidden-inputs"></div>
+
+                    <button type="button"
+                            class="btn btn-outline-primary mt-3"
+                            id="btn-add-experience">
+
+                        <i class="bi bi-plus-lg me-1"></i>
+                        Добавить проект
+
+                    </button>
+                }
+
+            </div>
+
+        </section>
+
+
+        @if (canEdit)
+        {
+            <div class="d-flex justify-content-end pt-2">
+
+                <button type="submit"
+                        class="btn btn-primary px-4">
+                    Сохранить
+                </button>
+
+            </div>
+        }
+
+    </form>
+
+</div>
+
+
+@if (canEdit)
+{
+    <div class="modal fade"
+         id="avatarModal"
+         tabindex="-1"
+         aria-labelledby="avatarModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="avatarModalLabel">
+                        Изменить аватар
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <form method="post"
+                          enctype="multipart/form-data"
+                          id="avatarForm">
+
+                        <div id="avatarDropZone"
+                             class="border border-2 border-secondary-subtle rounded bg-light p-4 text-center">
+
+                            <div class="mb-2">
+                                Перетащите изображение сюда
+                            </div>
+
+                            <div class="text-body-secondary small mb-3">
+                                или выберите файл на компьютере
+                            </div>
+
+                            <label for="avatarInput"
+                                   class="btn btn-outline-secondary">
+                                Выбрать файл
+                            </label>
+
+                            <input id="avatarInput"
+                                   name="Avatar"
+                                   type="file"
+                                   accept="image/jpeg,image/png,image/webp"
+                                   class="d-none" />
+
+                        </div>
+
+                        <div id="avatarPreviewContainer"
+                             class="text-center mt-4 d-none">
+
+                            <img id="avatarPreview"
+                                 src=""
+                                 alt="Предпросмотр"
+                                 class="rounded-circle border"
+                                 width="128"
+                                 height="128"
+                                 style="object-fit: cover;" />
+
+                        </div>
+
+                        <div class="d-flex justify-content-end gap-2 mt-4">
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    data-bs-dismiss="modal">
+                                Отмена
+                            </button>
+
+                            <button type="submit"
+                                    asp-page-handler="UploadAvatar"
+                                    class="btn btn-primary">
+                                Загрузить
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade"
+         id="addAttributeModal"
+         tabindex="-1"
+         aria-labelledby="addAttributeModalLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="addAttributeModalLabel">
+                        Добавить атрибут
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-medium">
+                            Категория
+                        </label>
+
+                        <select id="category-select"
+                                class="form-select">
+
+                            <option value="">
+                                Выберите категорию
+                            </option>
+
+                            @foreach (var cat in Model.AvailableCategories)
+                            {
+                                <option value="@cat.Id">
+                                    @cat.Title
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+                    <div>
+
+                        <label class="form-label fw-medium">
+                            Атрибут
+                        </label>
+
+                        <select id="attribute-select"
+                                class="form-select">
+
+                            <option value="">
+                                Выберите атрибут
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn-confirm-add-attribute"
+                            disabled>
+                        Добавить
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="modal fade"
+         id="experienceModal"
+         tabindex="-1"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-lg modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="experienceModalLabel">
+                        Проект / Опыт работы
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Закрыть">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <input type="hidden"
+                           id="modal-exp-id"
+                           value="0" />
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-medium">
+                            Название проекта / Компания
+                        </label>
+
+                        <input type="text"
+                               id="modal-exp-company"
+                               class="form-control" />
+
+                    </div>
+
+                    <div class="row g-3">
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-medium">
+                                    Дата начала
+                                </label>
+
+                                <input type="date"
+                                       id="modal-exp-start"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-medium">
+                                    Дата окончания
+                                </label>
+
+                                <input type="date"
+                                       id="modal-exp-end"
+                                       class="form-control" />
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-3">
+
+                        <label class="form-label fw-medium">
+                            Описание (Markdown)
+                        </label>
+
+                        <div id="modal-exp-desc-editor"></div>
+
+                    </div>
+
+                    <div>
+
+                        <label class="form-label fw-medium">
+                            Технологические теги
+                        </label>
+
+                        <input type="text"
+                               id="modal-exp-tags"
+                               class="form-control"
+                               placeholder="C#, ASP.NET, PostgreSQL..." />
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-outline-secondary"
+                            data-bs-dismiss="modal">
+                        Отмена
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn-save-exp-modal">
+                        Применить
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+}
+
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const canEdit = @Model.CanEdit.ToString().ToLower()
+
+            const attributes = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(Model.ProfileAttributes)
+            )
+
+            let experiences = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.Experiences.Select(e => new
+                    {
+                        id = e.Id,
+                        companyName = e.CompanyName,
+                        startDate = e.StartDate.ToString("yyyy-MM-dd"),
+                        endDate = e.EndDate?.ToString("yyyy-MM-dd") ?? "",
+                        description = e.Description ?? "",
+                        tags = string.Join(", ", e.Tags)
+                    })
+                )
+            )
+
+            function escapeHtml(value) {
+                const div = document.createElement("div")
+                div.textContent = value ?? ""
+                return div.innerHTML
+            }
+
+            function escapeAttribute(value) {
+                return escapeHtml(value)
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;")
+            }
+
+            function renderMarkdown(value) {
+                if (!value) {
+                    return ""
+                }
+
+                return typeof marked !== "undefined"
+                    ? marked.parse(value)
+                    : escapeHtml(value).replace(/\n/g, "<br>")
+            }
+
+            function createTagsHtml(tags) {
+                if (!tags) {
+                    return ""
+                }
+
+                return tags
+                    .split(",")
+                    .map(tag => tag.trim())
+                    .filter(Boolean)
+                    .map(tag => `<span class="badge bg-secondary me-1">${escapeHtml(tag)}</span>`)
+                    .join("")
+            }
+
+            function initializeAvatarUpload() {
+                if (!canEdit) {
+                    return
+                }
+
+                const dropZone = document.getElementById("avatarDropZone")
+                const input = document.getElementById("avatarInput")
+                const previewContainer = document.getElementById("avatarPreviewContainer")
+                const preview = document.getElementById("avatarPreview")
+
+                if (!dropZone || !input) {
+                    return
+                }
+
+                const allowedTypes = [
+                    "image/jpeg",
+                    "image/png",
+                    "image/webp"
+                ]
+
+                const maxFileSize = 5 * 1024 * 1024
+
+                function resetInput() {
+                    input.value = ""
+                    previewContainer?.classList.add("d-none")
+                }
+
+                function validateFile(file) {
+                    if (!file) {
+                        return false
+                    }
+
+                    if (!allowedTypes.includes(file.type)) {
+                        alert("Разрешены только JPG, PNG и WebP.")
+                        return false
+                    }
+
+                    if (file.size > maxFileSize) {
+                        alert("Размер изображения не должен превышать 5 МБ.")
+                        return false
+                    }
+
+                    return true
+                }
+
+                function setInputFile(file) {
+                    const dataTransfer = new DataTransfer()
+                    dataTransfer.items.add(file)
+                    input.files = dataTransfer.files
+                }
+
+                function showPreview(file) {
+                    const reader = new FileReader()
+
+                    reader.onload = function (event) {
+                        preview.src = event.target.result
+                        previewContainer?.classList.remove("d-none")
+                    }
+
+                    reader.readAsDataURL(file)
+                }
+
+                function handleFile(file) {
+                    if (!validateFile(file)) {
+                        resetInput()
+                        return
+                    }
+
+                    setInputFile(file)
+                    showPreview(file)
+                }
+
+                input.addEventListener("change", function () {
+                    handleFile(input.files[0])
+                })
+
+                dropZone.addEventListener("dragover", function (event) {
+                    event.preventDefault()
+                    dropZone.classList.add("bg-light")
+                })
+
+                dropZone.addEventListener("dragleave", function () {
+                    dropZone.classList.remove("bg-light")
+                })
+
+                dropZone.addEventListener("drop", function (event) {
+                    event.preventDefault()
+                    dropZone.classList.remove("bg-light")
+                    handleFile(event.dataTransfer.files[0])
+                })
+            }
+
+            function initializeProfileDescription() {
+                const dataElement = document.getElementById("profile-description-data")
+                const view = document.getElementById("profile-description-view")
+
+                if (!canEdit && dataElement && view) {
+                    let description = ""
+
+                    try {
+                        description = JSON.parse(dataElement.textContent || '""')
+                    } catch {
+                        description = ""
+                    }
+
+                    if (!description.trim()) {
+                        view.innerHTML = '<span class="text-body-secondary">Не указано</span>'
+                        return
+                    }
+
+                    view.innerHTML = renderMarkdown(description)
+                    return
+                }
+
+                const descriptionInput = document.getElementById("profile-description-input")
+                const editorElement = document.getElementById("profile-description-editor")
+
+                if (!canEdit || !descriptionInput || !editorElement) {
+                    return
+                }
+
+                const editor = createMarkdownEditor(
+                    editorElement,
+                    descriptionInput.value,
+                    "300px"
+                )
+
+                editor?.on("change", function () {
+                    descriptionInput.value = editor.getMarkdown()
+                })
+            }
+
+            function createMarkdownEditor(element, initialValue = "", height = "250px") {
+                if (!element || typeof toastui === "undefined") {
+                    return null
+                }
+
+                return new toastui.Editor({
+                    el: element,
+                    height,
+                    initialEditType: "wysiwyg",
+                    initialValue,
+                    previewStyle: "vertical",
+                    hideModeSwitch: true,
+                    toolbarItems: [
+                        ["heading", "bold", "italic", "strike"],
+                        ["hr", "quote"],
+                        ["ul", "ol", "task"],
+                        ["table", "link"]
+                    ]
+                })
+            }
+
+            function createAttributeValue(attribute) {
+                if (
+                    attribute.Value === null ||
+                    attribute.Value === undefined ||
+                    attribute.Value === ""
+                ) {
+                    return '<span class="text-body-secondary">Не указано</span>'
+                }
+
+                if (attribute.DataTypeId === 6) {
+                    return attribute.Value === "true" ? "Да" : "Нет"
+                }
+
+                if (attribute.DataTypeId === 5) {
+                    const period = parsePeriod(attribute.Value)
+
+                    if (!period.start && !period.end) {
+                        return '<span class="text-body-secondary">Не указано</span>'
+                    }
+
+                    return `
+                        ${escapeHtml(period.start || "Не указано")} —
+                        ${escapeHtml(period.end || "По настоящее время")}
+                    `
+                }
+
+                return escapeHtml(attribute.Value)
+            }
+
+            function parsePeriod(value) {
+                if (!value || !value.includes("/")) {
+                    return {
+                        start: "",
+                        end: ""
+                    }
+                }
+
+                const [start, end] = value.split("/")
+
+                return {
+                    start: start ?? "",
+                    end: end ?? ""
+                }
+            }
+
+            function getAttributeInputName(attributeId) {
+                return `DynamicAttributes[${attributeId}]`
+            }
+
+            function createTextInput(attribute) {
+                return `
+                    <input
+                        type="text"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+            function createTextArea(attribute) {
+                return `
+                    <textarea
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        rows="3"
+                        required>${escapeHtml(attribute.Value)}</textarea>
+                `
+            }
+
+            function createNumberInput(attribute) {
+                return `
+                    <input
+                        type="number"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+            function createDateInput(attribute) {
+                return `
+                    <input
+                        type="date"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+            function createPeriodInput(attribute) {
+                const period = parsePeriod(attribute.Value)
+                const inputName = getAttributeInputName(attribute.AttributeId)
+
+                return `
+                    <div
+                        class="d-flex align-items-center gap-2"
+                        data-period-container="${attribute.AttributeId}">
+                        <input
+                            type="date"
+                            class="form-control"
+                            value="${escapeAttribute(period.start)}"
+                            required>
+                        <span>-</span>
+                        <input
+                            type="date"
+                            class="form-control"
+                            value="${escapeAttribute(period.end)}"
+                            required>
+                        <input
+                            type="hidden"
+                            name="${inputName}"
+                            value="${escapeAttribute(attribute.Value)}">
+                    </div>
+                `
+            }
+
+            function createBooleanInput(attribute) {
+                const inputName = getAttributeInputName(attribute.AttributeId)
+                const isChecked = attribute.Value === "true"
+
+                return `
+                    <div class="form-check form-switch mt-2">
+                        <input
+                            type="hidden"
+                            name="${inputName}"
+                            value="false">
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="${inputName}"
+                            value="true"
+                            ${isChecked ? "checked" : ""}>
+                        <label class="form-check-label text-muted">
+                            Да / Нет
+                        </label>
+                    </div>
+                `
+            }
+
+            function createSelectInput(attribute) {
+                const options = (attribute.Options ?? [])
+                    .map(option => {
+                        const selected = attribute.Value === option ? "selected" : ""
+
+                        return `
+                            <option
+                                value="${escapeAttribute(option)}"
+                                ${selected}>
+                                ${escapeHtml(option)}
+                            </option>
+                        `
+                    })
+                    .join("")
+
+                return `
+                    <select
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-select"
+                        required>
+                        <option value="">-- Выберите --</option>
+                        ${options}
+                    </select>
+                `
+            }
+
+            function createAttributeInput(attribute) {
+                switch (attribute.DataTypeId) {
+                    case 1:
+                        return createTextInput(attribute)
+                    case 2:
+                        return createTextArea(attribute)
+                    case 3:
+                        return createNumberInput(attribute)
+                    case 4:
+                        return createDateInput(attribute)
+                    case 5:
+                        return createPeriodInput(attribute)
+                    case 6:
+                        return createBooleanInput(attribute)
+                    case 7:
+                        return createSelectInput(attribute)
+                    default:
+                        return ""
+                }
+            }
+
+            function createAttributeElement(attribute) {
+                const wrapper = document.createElement("div")
+
+                wrapper.className = "mb-3"
+                wrapper.id = `attr-wrapper-${attribute.AttributeId}`
+
+                if (!canEdit) {
+                    wrapper.innerHTML = `
+                        <div class="row g-2">
+                            <div class="col-md-4">
+                                <div class="text-body-secondary small">
+                                    ${escapeHtml(attribute.Title)}
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                <div class="fw-medium">
+                                    ${createAttributeValue(attribute)}
+                                </div>
+                            </div>
+                        </div>
+                    `
+
+                    return wrapper
+                }
+
+                wrapper.className = "mb-3 d-flex align-items-start gap-3"
+
+                wrapper.innerHTML = `
+                    <div class="flex-grow-1">
+                        <label class="form-label fw-bold">
+                            ${escapeHtml(attribute.Title)}
+                        </label>
+                        ${createAttributeInput(attribute)}
+                    </div>
+                    <button
+                        type="button"
+                        class="btn-close mt-4"
+                        aria-label="Удалить атрибут">
+                    </button>
+                `
+
+                wrapper
+                    .querySelector(".btn-close")
+                    ?.addEventListener("click", function () {
+                        removeAttribute(attribute.AttributeId)
+                    })
+
+                const periodContainer = wrapper.querySelector(
+                    `[data-period-container="${attribute.AttributeId}"]`
+                )
+
+                if (periodContainer) {
+                    periodContainer
+                        .querySelectorAll('input[type="date"]')
+                        .forEach(input => {
+                            input.addEventListener("change", function () {
+                                updatePeriod(periodContainer)
+                            })
+                        })
+                }
+
+                return wrapper
+            }
+
+            function updatePeriod(container) {
+                const dates = container.querySelectorAll('input[type="date"]')
+                const hiddenInput = container.querySelector('input[type="hidden"]')
+
+                if (!dates[0].value || !dates[1].value) {
+                    hiddenInput.value = ""
+                    return
+                }
+
+                hiddenInput.value = `${dates[0].value}/${dates[1].value}`
+            }
+
+            function findAttribute(attributeId) {
+                return attributes.find(
+                    attribute => attribute.AttributeId === attributeId
+                )
+            }
+
+            const attributesContainer = document.getElementById("attributes-container")
+
+            function renderAttributes() {
+                if (!attributesContainer) {
+                    return
+                }
+
+                attributesContainer.innerHTML = ""
+
+                const visibleAttributes = attributes.filter(attribute => {
+                    if (canEdit) {
+                        return addedAttributeIds.has(attribute.AttributeId)
+                    }
+
+                    return attribute.Value !== null &&
+                           attribute.Value !== undefined &&
+                           attribute.Value !== ""
+                })
+
+                if (visibleAttributes.length === 0) {
+                    attributesContainer.innerHTML = `
+                        <p class="text-body-secondary mb-0">
+                            ${canEdit
+                                ? "Атрибуты не добавлены."
+                                : "Дополнительная информация не указана."}
+                        </p>
+                    `
+                    return
+                }
+
+                visibleAttributes.forEach(attribute => {
+                    attributesContainer.appendChild(
+                        createAttributeElement(attribute)
+                    )
+                })
+            }
+
+            const categorySelect = document.getElementById("category-select")
+            const attributeSelect = document.getElementById("attribute-select")
+            const addAttributeButton = document.getElementById("btn-confirm-add-attribute")
+
+            const addedAttributeIds = new Set(
+                attributes
+                    .filter(
+                        attribute =>
+                            attribute.Value !== null &&
+                            attribute.Value !== undefined &&
+                            attribute.Value !== ""
+                    )
+                    .map(attribute => attribute.AttributeId)
+            )
+
+            function resetAttributeSelectors() {
+                if (!categorySelect || !attributeSelect || !addAttributeButton) {
+                    return
+                }
+
+                categorySelect.value = ""
+                attributeSelect.innerHTML =
+                    '<option value="">-- Сначала выберите категорию --</option>'
+
+                attributeSelect.disabled = true
+                addAttributeButton.disabled = true
+            }
+
+            function fillAttributeSelect(categoryId) {
+                if (!categorySelect || !attributeSelect || !addAttributeButton) {
+                    return
+                }
+
+                const availableAttributes = attributes.filter(
+                    attribute =>
+                        attribute.CategoryId === categoryId &&
+                        !addedAttributeIds.has(attribute.AttributeId)
+                )
+
+                attributeSelect.innerHTML =
+                    '<option value="">-- Выберите атрибут --</option>'
+
+                if (availableAttributes.length === 0) {
+                    attributeSelect.innerHTML =
+                        '<option value="">-- Все атрибуты этой категории уже добавлены --</option>'
+
+                    attributeSelect.disabled = true
+                    addAttributeButton.disabled = true
+                    return
+                }
+
+                availableAttributes.forEach(attribute => {
+                    const option = document.createElement("option")
+
+                    option.value = attribute.AttributeId
+                    option.textContent = attribute.Title
+                    attributeSelect.appendChild(option)
+                })
+
+                attributeSelect.disabled = false
+                addAttributeButton.disabled = true
+            }
+
+            function initializeAttributeEditing() {
+                if (!canEdit) {
+                    return
+                }
+
+                categorySelect?.addEventListener("change", function () {
+                    const categoryId = Number(this.value)
+
+                    if (!categoryId) {
+                        resetAttributeSelectors()
+                        return
+                    }
+
+                    fillAttributeSelect(categoryId)
+                })
+
+                attributeSelect?.addEventListener("change", function () {
+                    if (addAttributeButton) {
+                        addAttributeButton.disabled = !this.value
+                    }
+                })
+
+                addAttributeButton?.addEventListener("click", function () {
+                    const attributeId = Number(attributeSelect.value)
+                    const attribute = findAttribute(attributeId)
+
+                    if (!attribute) {
+                        return
+                    }
+
+                    addedAttributeIds.add(attribute.AttributeId)
+                    renderAttributes()
+
+                    const modalElement = document.getElementById("addAttributeModal")
+
+                    if (modalElement) {
+                        const modal =
+                            bootstrap.Modal.getInstance(modalElement) ??
+                            new bootstrap.Modal(modalElement)
+
+                        modal.hide()
+                    }
+
+                    resetAttributeSelectors()
+                })
+            }
+
+            function removeAttribute(attributeId) {
+                if (!canEdit) {
+                    return
+                }
+
+                addedAttributeIds.delete(attributeId)
+
+                const attribute = findAttribute(attributeId)
+
+                if (attribute) {
+                    attribute.Value = null
+                }
+
+                renderAttributes()
+                resetAttributeSelectors()
+            }
+
+            function createExperienceCard(experience) {
+                const card = document.createElement("div")
+
+                card.className = "mb-4 pb-3 border-bottom"
+
+                card.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="mb-1">
+                                ${escapeHtml(experience.companyName)}
+                            </h5>
+                            <p class="text-muted mb-2">
+                                <i class="bi bi-calendar3"></i>
+                                ${escapeHtml(experience.startDate)} —
+                                ${escapeHtml(experience.endDate || "По настоящее время")}
+                            </p>
+                        </div>
+                        ${
+                            canEdit
+                                ? `
+                                    <div class="d-flex gap-1">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-secondary js-edit-experience"
+                                            data-id="${experience.id}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-outline-danger js-remove-experience"
+                                            data-id="${experience.id}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                `
+                                : ""
+                        }
+                    </div>
+                    ${
+                        experience.description
+                            ? `
+                                <div class="markdown-content mb-2">
+                                    ${renderMarkdown(experience.description)}
+                                </div>
+                            `
+                            : ""
+                    }
+                    <div>
+                        ${createTagsHtml(experience.tags)}
+                    </div>
+                `
+
+                return card
+            }
+
+            function createHiddenInputs(experience, index) {
+                if (!canEdit) {
+                    return ""
+                }
+
+                return `
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].Id"
+                        value="${experience.id > 0 ? experience.id : 0}">
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].CompanyName"
+                        value="${escapeAttribute(experience.companyName)}">
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].StartDate"
+                        value="${escapeAttribute(experience.startDate)}">
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].EndDate"
+                        value="${escapeAttribute(experience.endDate)}">
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].Description"
+                        value="${escapeAttribute(experience.description)}">
+                    <input
+                        type="hidden"
+                        name="ExperiencesInput[${index}].Tags"
+                        value="${escapeAttribute(experience.tags)}">
+                `
+            }
+
+            const experiencesContainer =
+                document.getElementById("experiences-list-container")
+
+            const hiddenExperiencesContainer =
+                document.getElementById("experiences-hidden-inputs")
+
+            function renderExperiences() {
+                if (!experiencesContainer) {
+                    return
+                }
+
+                experiencesContainer.innerHTML = ""
+
+                if (hiddenExperiencesContainer) {
+                    hiddenExperiencesContainer.innerHTML = ""
+                }
+
+                if (experiences.length === 0) {
+                    experiencesContainer.innerHTML = `
+                        <p class="text-muted mb-0">
+                            Проекты пока не добавлены.
+                        </p>
+                    `
+                    return
+                }
+
+                experiences.forEach((experience, index) => {
+                    experiencesContainer.appendChild(
+                        createExperienceCard(experience)
+                    )
+
+                    if (hiddenExperiencesContainer) {
+                        hiddenExperiencesContainer.insertAdjacentHTML(
+                            "beforeend",
+                            createHiddenInputs(experience, index)
+                        )
+                    }
+                })
+            }
+
+            let tempClientCounter = -1
+
+            function getFormValue(id) {
+                return document.getElementById(id)?.value ?? ""
+            }
+
+            function setFormValue(id, value) {
+                const element = document.getElementById(id)
+
+                if (element) {
+                    element.value = value ?? ""
+                }
+            }
+
+            function getTags() {
+                if (!window.tagifyInstance) {
+                    return ""
+                }
+
+                return window.tagifyInstance.value
+                    .map(item => item.value)
+                    .join(", ")
+            }
+
+            function resetExperienceForm() {
+                setFormValue("modal-exp-id", tempClientCounter--)
+                setFormValue("modal-exp-company", "")
+                setFormValue("modal-exp-start", "")
+                setFormValue("modal-exp-end", "")
+
+                window.descriptionEditor?.setMarkdown("")
+                window.tagifyInstance?.removeAllTags()
+            }
+
+            function fillExperienceForm(experience) {
+                setFormValue("modal-exp-id", experience.id)
+                setFormValue("modal-exp-company", experience.companyName)
+                setFormValue("modal-exp-start", experience.startDate)
+                setFormValue("modal-exp-end", experience.endDate)
+
+                window.descriptionEditor?.setMarkdown(
+                    experience.description || ""
+                )
+
+                window.tagifyInstance?.removeAllTags()
+
+                if (experience.tags) {
+                    window.tagifyInstance?.addTags(experience.tags)
+                }
+            }
+
+            function openAddExperienceModal() {
+                if (!canEdit) {
+                    return
+                }
+
+                const label = document.getElementById("experienceModalLabel")
+
+                if (label) {
+                    label.innerText = "Добавление проекта"
+                }
+
+                resetExperienceForm()
+                window.experienceModal?.show()
+            }
+
+            function openEditExperienceModal(id) {
+                if (!canEdit) {
+                    return
+                }
+
+                const experience = experiences.find(
+                    experience => experience.id === id
+                )
+
+                if (!experience) {
+                    return
+                }
+
+                const label = document.getElementById("experienceModalLabel")
+
+                if (label) {
+                    label.innerText = "Редактирование проекта"
+                }
+
+                fillExperienceForm(experience)
+                window.experienceModal?.show()
+            }
+
+            function removeExperience(id) {
+                if (!canEdit) {
+                    return
+                }
+
+                experiences = experiences.filter(
+                    experience => experience.id !== id
+                )
+
+                renderExperiences()
+            }
+
+            function getExperienceFromForm() {
+                return {
+                    id: Number(getFormValue("modal-exp-id")),
+                    companyName: getFormValue("modal-exp-company").trim(),
+                    startDate: getFormValue("modal-exp-start"),
+                    endDate: getFormValue("modal-exp-end"),
+                    description: window.descriptionEditor
+                        ? window.descriptionEditor.getMarkdown()
+                        : "",
+                    tags: getTags()
+                }
+            }
+
+            function validateExperience(experience) {
+                if (!experience.companyName || !experience.startDate) {
+                    alert("Пожалуйста, заполните название проекта и дату начала.")
+                    return false
+                }
+
+                return true
+            }
+
+            function saveExperience() {
+                if (!canEdit) {
+                    return
+                }
+
+                const experience = getExperienceFromForm()
+
+                if (!validateExperience(experience)) {
+                    return
+                }
+
+                const index = experiences.findIndex(
+                    item => item.id === experience.id
+                )
+
+                if (index >= 0) {
+                    experiences[index] = experience
+                } else {
+                    experiences.push(experience)
+                }
+
+                renderExperiences()
+                window.experienceModal?.hide()
+            }
+
+            function initializeExperienceEditing() {
+                if (!canEdit) {
+                    return
+                }
+
+                const listContainer =
+                    document.getElementById("experiences-list-container")
+
+                listContainer?.addEventListener("click", function (event) {
+                    const editButton =
+                        event.target.closest(".js-edit-experience")
+
+                    if (editButton) {
+                        openEditExperienceModal(
+                            Number(editButton.dataset.id)
+                        )
+                        return
+                    }
+
+                    const removeButton =
+                        event.target.closest(".js-remove-experience")
+
+                    if (removeButton) {
+                        removeExperience(
+                            Number(removeButton.dataset.id)
+                        )
+                    }
+                })
+
+                document
+                    .getElementById("btn-add-experience")
+                    ?.addEventListener("click", openAddExperienceModal)
+
+                document
+                    .getElementById("btn-save-exp-modal")
+                    ?.addEventListener("click", saveExperience)
+            }
+
+            function initializeExperienceModal() {
+                if (!canEdit) {
+                    return
+                }
+
+                const modalElement =
+                    document.getElementById("experienceModal")
+
+                if (!modalElement || typeof bootstrap === "undefined") {
+                    return
+                }
+
+                window.experienceModal =
+                    bootstrap.Modal.getInstance(modalElement) ??
+                    new bootstrap.Modal(modalElement)
+            }
+
+            function initializeTagify() {
+                if (!canEdit) {
+                    return
+                }
+
+                const tagsInput =
+                    document.getElementById("modal-exp-tags")
+
+                if (!tagsInput || typeof Tagify === "undefined") {
+                    return
+                }
+
+                const globalTagsWhitelist =
+                    @Html.Raw(ViewData["AllTagsJson"] ?? "[]")
+
+                window.tagifyInstance = new Tagify(tagsInput, {
+                    whitelist: globalTagsWhitelist,
+                    dropdown: {
+                        maxItems: 10,
+                        classname: "tags-look",
+                        enabled: 0,
+                        closeOnSelect: false
+                    },
+                    enforceWhitelist: false,
+                    delimiters: ",| ",
+                    editTags: false
+                })
+            }
+
+            function initializeExperienceEditor() {
+                if (!canEdit) {
+                    return
+                }
+
+                const element =
+                    document.getElementById("modal-exp-desc-editor")
+
+                if (!element) {
+                    return
+                }
+
+                window.descriptionEditor =
+                    createMarkdownEditor(
+                        element,
+                        "",
+                        "300px"
+                    )
+            }
+
+            renderAttributes()
+            renderExperiences()
+
+            initializeAvatarUpload()
+            initializeProfileDescription()
+
+            initializeAttributeEditing()
+
+            initializeExperienceModal()
+            initializeExperienceEditor()
+            initializeTagify()
+            initializeExperienceEditing()
+
+            window.profileExperiences = {
+                getAll: () => experiences
+            }
+        })
+    </script>
+}
