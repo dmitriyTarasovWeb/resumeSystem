@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260924102630_AddVacancies")]
+    partial class AddVacancies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -904,12 +907,12 @@ namespace resumeSystem.Migrations
 
             modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("integer")
                         .HasColumnName("pk");
 
-
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
@@ -964,9 +967,8 @@ namespace resumeSystem.Migrations
                         .HasColumnType("text")
                         .HasColumnName("attribute_value");
 
-                    b.Property<Guid>("VacancyId")
-                        .HasColumnType("uuid")
-
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("integer")
                         .HasColumnName("fk_vacancy_id");
 
                     b.HasKey("Id");
@@ -991,9 +993,8 @@ namespace resumeSystem.Migrations
                         .HasColumnType("integer")
                         .HasColumnName("fk_tag_id");
 
-                    b.Property<Guid>("VacancyId")
-                        .HasColumnType("uuid")
-
+                    b.Property<int>("VacancyId")
+                        .HasColumnType("integer")
                         .HasColumnName("fk_vacancy_id");
 
                     b.HasKey("Id");

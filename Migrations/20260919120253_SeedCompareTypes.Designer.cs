@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260919120253_SeedCompareTypes")]
+    partial class SeedCompareTypes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -255,64 +258,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("DataTypeId");
 
                     b.ToTable("attributes", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CategoryId = 1,
-                            DataTypeId = 1,
-                            IsDisplay = true,
-                            Title = "Любимый язык программирования"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CategoryId = 1,
-                            DataTypeId = 2,
-                            IsDisplay = true,
-                            Title = "О себе"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CategoryId = 1,
-                            DataTypeId = 3,
-                            IsDisplay = true,
-                            Title = "Количество лет опыта"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CategoryId = 1,
-                            DataTypeId = 4,
-                            IsDisplay = true,
-                            Title = "Дата начала карьеры"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CategoryId = 1,
-                            DataTypeId = 5,
-                            IsDisplay = true,
-                            Title = "Период работы"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CategoryId = 1,
-                            DataTypeId = 6,
-                            IsDisplay = true,
-                            Title = "Готов к удалённой работе"
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CategoryId = 1,
-                            DataTypeId = 7,
-                            IsDisplay = true,
-                            Title = "Уровень английского"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.AttributeOption", b =>
@@ -338,44 +283,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("AttributeId");
 
                     b.ToTable("attribute_options", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            AttributeId = 7,
-                            Options = "A1"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            AttributeId = 7,
-                            Options = "A2"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            AttributeId = 7,
-                            Options = "B1"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            AttributeId = 7,
-                            Options = "B2"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            AttributeId = 7,
-                            Options = "C1"
-                        },
-                        new
-                        {
-                            Id = 6,
-                            AttributeId = 7,
-                            Options = "C2"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.Category", b =>
@@ -399,14 +306,6 @@ namespace resumeSystem.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("categories", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            IsDisplay = true,
-                            Title = "Общие"
-                        });
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.CompareType", b =>
@@ -545,269 +444,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("DataTypeId");
 
                     b.ToTable("data_type_compare_types", (string)null);
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            CompareTypeId = 1,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 2,
-                            CompareTypeId = 2,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 3,
-                            CompareTypeId = 3,
-                            DataTypeId = 1
-                        },
-                        new
-                        {
-                            Id = 4,
-                            CompareTypeId = 1,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 5,
-                            CompareTypeId = 2,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 6,
-                            CompareTypeId = 3,
-                            DataTypeId = 2
-                        },
-                        new
-                        {
-                            Id = 7,
-                            CompareTypeId = 1,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 8,
-                            CompareTypeId = 2,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 9,
-                            CompareTypeId = 4,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 10,
-                            CompareTypeId = 5,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 11,
-                            CompareTypeId = 6,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 12,
-                            CompareTypeId = 7,
-                            DataTypeId = 3
-                        },
-                        new
-                        {
-                            Id = 13,
-                            CompareTypeId = 1,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 14,
-                            CompareTypeId = 2,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 15,
-                            CompareTypeId = 4,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 16,
-                            CompareTypeId = 5,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 17,
-                            CompareTypeId = 6,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 18,
-                            CompareTypeId = 7,
-                            DataTypeId = 4
-                        },
-                        new
-                        {
-                            Id = 19,
-                            CompareTypeId = 1,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 20,
-                            CompareTypeId = 2,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 21,
-                            CompareTypeId = 4,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 22,
-                            CompareTypeId = 5,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 23,
-                            CompareTypeId = 6,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 24,
-                            CompareTypeId = 7,
-                            DataTypeId = 5
-                        },
-                        new
-                        {
-                            Id = 25,
-                            CompareTypeId = 1,
-                            DataTypeId = 6
-                        },
-                        new
-                        {
-                            Id = 26,
-                            CompareTypeId = 2,
-                            DataTypeId = 6
-                        },
-                        new
-                        {
-                            Id = 27,
-                            CompareTypeId = 1,
-                            DataTypeId = 7
-                        },
-                        new
-                        {
-                            Id = 28,
-                            CompareTypeId = 2,
-                            DataTypeId = 7
-                        });
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("CompanyName")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("company_name");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<DateTime?>("EndDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("end_date");
-
-                    b.Property<int?>("PositionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_position_id");
-
-                    b.Property<DateTime>("StartDate")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("start_date");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("fk_user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PositionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("experience", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.ExperienceTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ExperienceId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_experience_id");
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_tag_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExperienceId");
-
-                    b.HasIndex("TagId");
-
-                    b.ToTable("experience_tags", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Position", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDisplay")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_display");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("name");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("positions", (string)null);
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>
@@ -847,29 +483,6 @@ namespace resumeSystem.Migrations
                     b.ToTable("required_user_attributes", (string)null);
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<bool>("IsDisplay")
-                        .HasColumnType("boolean")
-                        .HasColumnName("is_display");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("tags", (string)null);
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.UserAttribute", b =>
                 {
                     b.Property<int>("Id")
@@ -900,109 +513,6 @@ namespace resumeSystem.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("user_attributes", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("pk");
-
-
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("text")
-                        .HasColumnName("description");
-
-                    b.Property<int>("PositionId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_position_id");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("title");
-
-                    b.Property<DateTime?>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("updated_at");
-
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("fk_user_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("PositionId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("vacancies", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyAttribute", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AttributeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_attribute_id");
-
-                    b.Property<string>("AttributeValue")
-                        .IsRequired()
-                        .HasColumnType("text")
-                        .HasColumnName("attribute_value");
-
-                    b.Property<Guid>("VacancyId")
-                        .HasColumnType("uuid")
-
-                        .HasColumnName("fk_vacancy_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AttributeId");
-
-                    b.HasIndex("VacancyId");
-
-                    b.ToTable("vacancy_attributes", (string)null);
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyTag", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("TagId")
-                        .HasColumnType("integer")
-                        .HasColumnName("fk_tag_id");
-
-                    b.Property<Guid>("VacancyId")
-                        .HasColumnType("uuid")
-
-                        .HasColumnName("fk_vacancy_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("TagId");
-
-                    b.HasIndex("VacancyId");
-
-                    b.ToTable("vacancy_tags", (string)null);
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1105,43 +615,6 @@ namespace resumeSystem.Migrations
                     b.Navigation("DataType");
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Position", "Position")
-                        .WithMany("Experiences")
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Position");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.ExperienceTag", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Experience", "Experience")
-                        .WithMany("ExperienceTags")
-                        .HasForeignKey("ExperienceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
-                        .WithMany("ExperienceTags")
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Experience");
-
-                    b.Navigation("Tag");
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>
                 {
                     b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
@@ -1172,88 +645,9 @@ namespace resumeSystem.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Position", "Position")
-                        .WithMany()
-                        .HasForeignKey("PositionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Position");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyAttribute", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
-                        .WithMany()
-                        .HasForeignKey("AttributeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
-                        .WithMany("VacancyAttributes")
-                        .HasForeignKey("VacancyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Attribute");
-
-                    b.Navigation("Vacancy");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.VacancyTag", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
-                        .WithMany()
-                        .HasForeignKey("TagId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
-                        .WithMany("VacancyTags")
-                        .HasForeignKey("VacancyId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Tag");
-
-                    b.Navigation("Vacancy");
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.ApplicationUser", b =>
                 {
                     b.Navigation("RequiredUserAttributes");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
-                {
-                    b.Navigation("ExperienceTags");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Position", b =>
-                {
-                    b.Navigation("Experiences");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
-                {
-                    b.Navigation("ExperienceTags");
-                });
-
-            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
-                {
-                    b.Navigation("VacancyAttributes");
-
-                    b.Navigation("VacancyTags");
                 });
 #pragma warning restore 612, 618
         }

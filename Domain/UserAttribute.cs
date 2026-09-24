@@ -1,16 +1,19 @@
 ﻿namespace resumeSystem.Domain;
 
+
 using DomainAttribute = resumeSystem.Domain.Attribute;
-public class VacancyAttribute
+
+public class UserAttribute
 {
     public int Id { get; set; }
-    public Guid VacancyId { get; set; }
+
+    public string UserId { get; set; } = null!;
 
     public int AttributeId { get; set; }
 
-    public string AttributeValue { get; set; } = string.Empty;
+    public string Value { get; set; } = null!;
 
-    public Vacancy Vacancy { get; set; } = null!;
+    public ApplicationUser User { get; set; } = null!;
 
     public DomainAttribute Attribute { get; set; } = null!;
 }

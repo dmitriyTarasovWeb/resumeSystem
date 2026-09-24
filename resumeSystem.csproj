@@ -10,6 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CloudinaryDotNet" Version="1.29.3" />
     <PackageReference Include="Gridify" Version="2.19.1" />
     <PackageReference Include="Markdig" Version="1.3.2" />
     <PackageReference Include="MediatR" Version="14.2.0" />
@@ -28,6 +29,7 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="Domain\ViewModels\" />
     <Folder Include="Authorization\" />
+    <Folder Include="Pages\Vacancies\" />
   </ItemGroup>
 
 </Project>

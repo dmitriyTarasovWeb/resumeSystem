@@ -2,7 +2,7 @@
 
 public class Vacancy
 {
-    public Guid Id { get; set; } = Guid.NewGuid();
+    public int Id { get; set; }
     public string UserId { get; set; } = null!;
     public int PositionId { get; set; }
 
