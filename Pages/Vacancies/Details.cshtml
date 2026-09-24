@@ -1,0 +1,204 @@
+﻿@page "/Vacancies/Details/{id:guid}"
+@model resumeSystem.Pages.Vacancies.DetailsModel
+
+@{
+    ViewData["Title"] = Model.Vacancy.Title;
+}
+
+<div class="container py-4 pb-5">
+
+    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+
+        <div>
+
+            <div class="text-body-secondary mb-2">
+                Вакансия
+            </div>
+
+            <h1 class="h2 mb-2">
+                @Model.Vacancy.Title
+            </h1>
+
+            <div class="fs-5 text-body-secondary">
+                @Model.Vacancy.PositionName
+            </div>
+
+        </div>
+
+        @if (Model.CanEdit)
+        {
+            <div class="d-flex gap-2">
+
+                <a asp-page="/Vacancies/Create"
+                   asp-route-id="@Model.Vacancy.Id"
+                   class="btn btn-primary">
+                    Редактировать
+                </a>
+
+                <form method="post"
+                      asp-page-handler="Delete"
+                      onsubmit="return confirm('Удалить эту вакансию?');">
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.Vacancy.Id" />
+
+                    <button type="submit"
+                            class="btn btn-danger">
+                        Удалить
+                    </button>
+
+                </form>
+
+            </div>
+        }
+
+    </div>
+
+
+    <section class="border rounded bg-white mb-4">
+
+        <div class="border-bottom px-3 px-md-4 py-3">
+
+            <h2 class="h6 mb-0 fw-semibold">
+                Описание вакансии
+            </h2>
+
+        </div>
+
+        <div class="p-3 p-md-4">
+
+            @if (!string.IsNullOrWhiteSpace(Model.Vacancy.Description))
+            {
+                <div class="vacancy-description">
+                    @Html.Raw(
+                        Markdig.Markdown.ToHtml(
+                            Model.Vacancy.Description
+                        )
+                    )
+                </div>
+            }
+            else
+            {
+                <div class="text-body-secondary">
+                    Описание отсутствует.
+                </div>
+            }
+
+        </div>
+
+    </section>
+
+
+    <section class="border rounded bg-white mb-4">
+
+        <div class="border-bottom px-3 px-md-4 py-3">
+
+            <h2 class="h6 mb-0 fw-semibold">
+                Требуемые атрибуты
+            </h2>
+
+        </div>
+
+        <div class="p-3 p-md-4">
+
+            @if (Model.Attributes.Count == 0)
+            {
+                <div class="text-body-secondary">
+                    Атрибуты не указаны.
+                </div>
+            }
+            else
+            {
+                <div class="table-responsive">
+
+                    <table class="table table-sm align-middle mb-0">
+
+                        <thead>
+                            <tr>
+                                <th>Атрибут</th>
+                                <th>Тип</th>
+                                <th>Значение</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var attr in Model.Attributes)
+                            {
+                                <tr>
+
+                                    <td class="fw-medium">
+                                        @attr.Title
+                                    </td>
+
+                                    <td>
+                                        @attr.DataTypeName
+                                    </td>
+
+                                    <td>
+                                        @attr.Value
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+            }
+
+        </div>
+
+    </section>
+
+
+    <section class="border rounded bg-white mb-4">
+
+        <div class="border-bottom px-3 px-md-4 py-3">
+
+            <h2 class="h6 mb-0 fw-semibold">
+                Теги
+            </h2>
+
+        </div>
+
+        <div class="p-3 px-md-4 py-3">
+
+            @if (Model.Tags.Count == 0)
+            {
+                <span class="text-body-secondary">
+                    Теги не указаны.
+                </span>
+            }
+            else
+            {
+                <div class="d-flex flex-wrap gap-2">
+
+                    @foreach (var tag in Model.Tags)
+                    {
+                        <span class="badge text-bg-secondary">
+                            @tag
+                        </span>
+                    }
+
+                </div>
+            }
+
+        </div>
+
+    </section>
+
+
+    <div>
+
+        <a asp-page="/Index"
+           class="btn btn-outline-secondary">
+            Назад к вакансиям
+        </a>
+
+    </div>
+
+</div>

@@ -1,10 +1,153 @@
 ﻿@page
-@model IndexModel
+@model resumeSystem.Pages.IndexModel
+
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Вакансии";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<link rel="stylesheet"
+      href="https://cdn.datatables.net/2.0.8/css/dataTables.dataTables.min.css" />
+
+<div class="container py-4 pb-5">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+            <h1 class="h3 mb-1">
+                Вакансии
+            </h1>
+
+            <p class="text-body-secondary mb-0">
+                Все доступные вакансии
+            </p>
+        </div>
+
+        @if (User.IsInRole("Recruiter") ||
+             User.IsInRole("Administrator"))
+        {
+            <a asp-page="/Vacancies/Create"
+               class="btn btn-primary">
+                Создать вакансию
+            </a>
+        }
+
+    </div>
+
+
+    <div class="card shadow-sm">
+
+        <div class="card-body">
+
+            <div class="table-responsive">
+
+                <table id="vacancies-table"
+                       class="display w-100">
+
+                    <thead>
+                        <tr>
+                            <th>Вакансия</th>
+                            <th>Должность</th>
+                            <th>Описание</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var vacancy in Model.Vacancies)
+                        {
+                            <tr>
+
+                                <td>
+                                    <a asp-page="/Vacancies/Details"
+                                       asp-route-id="@vacancy.Id"
+                                       class="text-decoration-none fw-semibold">
+                                        @vacancy.Title
+                                    </a>
+                                </td>
+
+                                <td>
+                                    @vacancy.PositionName
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(vacancy.Description))
+                                    {
+                                        var description =
+                                            vacancy.Description.Length > 150
+                                                ? vacancy.Description[..150] + "..."
+                                                : vacancy.Description;
+
+                                        @description
+                                    }
+                                    else
+                                    {
+                                        <span class="text-body-secondary">
+                                            —
+                                        </span>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
+
+
+@section Scripts {
+
+    <script src="https://cdn.datatables.net/2.0.8/js/dataTables.min.js"></script>
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const table =
+                document.getElementById("vacancies-table")
+
+            if (!table) {
+                return
+            }
+
+            new DataTable(table, {
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "Все"]
+                ],
+
+                language: {
+                    search: "Поиск:",
+                    lengthMenu: "Показывать _MENU_",
+                    info: "Показано _START_–_END_ из _TOTAL_",
+                    infoEmpty: "Вакансий нет",
+                    zeroRecords: "Ничего не найдено",
+                    emptyTable: "Вакансий нет",
+                    paginate: {
+                        first: "Первая",
+                        last: "Последняя",
+                        next: "Следующая",
+                        previous: "Предыдущая"
+                    }
+                },
+
+                order: [
+                    [0, "asc"]
+                ]
+            })
+
+        })
+
+    </script>
+
+}

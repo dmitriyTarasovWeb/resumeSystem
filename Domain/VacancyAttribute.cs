@@ -4,7 +4,8 @@ using DomainAttribute = resumeSystem.Domain.Attribute;
 public class VacancyAttribute
 {
     public int Id { get; set; }
-    public int VacancyId { get; set; }
+    public Guid VacancyId { get; set; }
+
     public int AttributeId { get; set; }
 
     public string AttributeValue { get; set; } = string.Empty;
