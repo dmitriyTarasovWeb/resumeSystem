@@ -1,0 +1,1167 @@
+﻿@page "/Vacancies/Create/{id:guid?}"
+@model resumeSystem.Pages.Vacancies.CreateModel
+
+@{
+    ViewData["Title"] =
+        Model.IsEditMode
+            ? "Редактирование вакансии"
+            : "Создание вакансии";
+}
+
+<div class="container py-4 pb-5">
+
+    <div class="mb-4">
+        <h1 class="h3 mb-1">
+            @(Model.IsEditMode
+                ? "Редактирование вакансии"
+                : "Создание вакансии")
+        </h1>
+    </div>
+
+    <form method="post"
+          id="vacancy-form">
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Основная информация
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div class="mb-3">
+
+                    <label asp-for="Input.Title"
+                           class="form-label fw-medium">
+                    </label>
+
+                    <input asp-for="Input.Title"
+                           class="form-control"
+                           placeholder="Например, Senior Business Analyst" />
+
+                    <span asp-validation-for="Input.Title"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+                <div class="mb-3">
+
+                    <label asp-for="Input.PositionId"
+                           class="form-label fw-medium">
+                        Должность
+                    </label>
+
+                    <select asp-for="Input.PositionId"
+                            id="position-select"
+                            class="form-select">
+
+                        <option value="">
+                            -- Выберите должность --
+                        </option>
+
+                        @foreach (var position in Model.AvailablePositions)
+                        {
+                            <option value="@position.Id">
+                                @position.Name
+                            </option>
+                        }
+
+                        <option value="0">
+                            + Добавить новую должность
+                        </option>
+
+                    </select>
+
+                    <span asp-validation-for="Input.PositionId"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+                <div id="new-position-container"
+                     class="mb-3 d-none">
+
+                    <label asp-for="Input.NewPositionName"
+                           class="form-label fw-medium">
+                        Новая должность
+                    </label>
+
+                    <input asp-for="Input.NewPositionName"
+                           id="new-position-name"
+                           class="form-control"
+                           placeholder="Например, Data Analyst" />
+
+                    <span asp-validation-for="Input.NewPositionName"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+
+                <div>
+
+                    <label class="form-label fw-medium">
+                        Описание вакансии
+                    </label>
+
+                    <textarea asp-for="Input.Description"
+                              id="description-input"
+                              style="display:none;"
+                              rows="8"></textarea>
+
+                    <div id="description-editor"></div>
+
+                    <span asp-validation-for="Input.Description"
+                          class="text-danger small">
+                    </span>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Атрибуты вакансии
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <div id="attributes-container"></div>
+
+                <button type="button"
+                        class="btn btn-outline-primary mt-3"
+                        data-bs-toggle="modal"
+                        data-bs-target="#addAttributeModal">
+
+                    <i class="bi bi-plus-lg me-1"></i>
+
+                    Добавить атрибут
+
+                </button>
+
+                <div asp-validation-summary="All"
+                     class="text-danger small mt-3">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+                <h2 class="h6 mb-0 fw-semibold">
+                    Теги
+                </h2>
+            </div>
+
+            <div class="p-3 p-md-4">
+
+                <input type="text"
+                       id="vacancy-tags-input"
+                       class="form-control"
+                       placeholder="C#, ASP.NET, PostgreSQL..." />
+
+                <input asp-for="Input.Tags"
+                       type="hidden"
+                       id="vacancy-tags-value" />
+
+            </div>
+
+        </section>
+
+
+        <div class="d-flex justify-content-end pt-2">
+
+            <button type="submit"
+                    class="btn btn-primary px-4">
+                @(Model.IsEditMode
+                    ? "Сохранить изменения"
+                    : "Сохранить")
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="modal fade"
+     id="addAttributeModal"
+     tabindex="-1"
+     aria-labelledby="addAttributeModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h5 class="modal-title"
+                    id="addAttributeModalLabel">
+                    Добавить атрибут
+                </h5>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть">
+                </button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <div class="mb-3">
+
+                    <label class="form-label fw-medium">
+                        Категория
+                    </label>
+
+                    <select id="category-select"
+                            class="form-select">
+
+                        <option value="">
+                            Выберите категорию
+                        </option>
+
+                        @foreach (var category in Model.AvailableCategories)
+                        {
+                            <option value="@category.Id">
+                                @category.Title
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <div>
+
+                    <label class="form-label fw-medium">
+                        Атрибут
+                    </label>
+
+                    <select id="attribute-select"
+                            class="form-select"
+                            disabled>
+
+                        <option value="">
+                            -- Сначала выберите категорию --
+                        </option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+            <div class="modal-footer">
+
+                <button type="button"
+                        class="btn btn-outline-secondary"
+                        data-bs-dismiss="modal">
+                    Отмена
+                </button>
+
+                <button type="button"
+                        class="btn btn-primary"
+                        id="btn-confirm-add-attribute"
+                        disabled>
+                    Добавить
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const attributes = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.AvailableAttributes
+                )
+            )
+
+            const initialTags = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.Input.Tags ?? ""
+                )
+            )
+
+
+            function escapeHtml(value) {
+
+                const div = document.createElement("div")
+
+                div.textContent = value ?? ""
+
+                return div.innerHTML
+            }
+
+
+            function escapeAttribute(value) {
+
+                return escapeHtml(value)
+                    .replace(/"/g, "&quot;")
+                    .replace(/'/g, "&#039;")
+            }
+
+
+            function getAttributeInputName(attributeId) {
+
+                return `Input.DynamicAttributes[${attributeId}]`
+            }
+
+
+            function parsePeriod(value) {
+
+                if (!value || !value.includes("/")) {
+
+                    return {
+                        start: "",
+                        end: ""
+                    }
+                }
+
+                const [start, end] = value.split("/")
+
+                return {
+                    start: start ?? "",
+                    end: end ?? ""
+                }
+            }
+
+
+            function createTextInput(attribute) {
+
+                return `
+                    <input
+                        type="text"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+
+            function createTextArea(attribute) {
+
+                return `
+                    <textarea
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        rows="4"
+                        required>${escapeHtml(attribute.Value)}</textarea>
+                `
+            }
+
+
+            function createNumberInput(attribute) {
+
+                return `
+                    <input
+                        type="number"
+                        step="any"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+
+            function createDateInput(attribute) {
+
+                return `
+                    <input
+                        type="date"
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-control"
+                        value="${escapeAttribute(attribute.Value)}"
+                        required>
+                `
+            }
+
+
+            function createPeriodInput(attribute) {
+
+                const period = parsePeriod(attribute.Value)
+
+                const inputName =
+                    getAttributeInputName(attribute.AttributeId)
+
+                return `
+                    <div
+                        class="d-flex align-items-center gap-2"
+                        data-period-container="${attribute.AttributeId}">
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            value="${escapeAttribute(period.start)}"
+                            required>
+
+                        <span>-</span>
+
+                        <input
+                            type="date"
+                            class="form-control"
+                            value="${escapeAttribute(period.end)}"
+                            required>
+
+                        <input
+                            type="hidden"
+                            name="${inputName}"
+                            value="${escapeAttribute(attribute.Value)}">
+
+                    </div>
+                `
+            }
+
+
+            function createBooleanInput(attribute) {
+
+                const inputName =
+                    getAttributeInputName(attribute.AttributeId)
+
+                const isChecked =
+                    attribute.Value === "true"
+
+                return `
+                    <div class="form-check form-switch mt-2">
+
+                        <input
+                            type="hidden"
+                            name="${inputName}"
+                            value="false">
+
+                        <input
+                            class="form-check-input"
+                            type="checkbox"
+                            name="${inputName}"
+                            value="true"
+                            ${isChecked ? "checked" : ""}>
+
+                        <label class="form-check-label text-muted">
+                            Да / Нет
+                        </label>
+
+                    </div>
+                `
+            }
+
+
+            function createSelectInput(attribute) {
+
+                const options = (attribute.Options ?? [])
+                    .map(option => {
+
+                        const selected =
+                            attribute.Value === option
+                                ? "selected"
+                                : ""
+
+                        return `
+                            <option
+                                value="${escapeAttribute(option)}"
+                                ${selected}>
+                                ${escapeHtml(option)}
+                            </option>
+                        `
+                    })
+                    .join("")
+
+
+                return `
+                    <select
+                        name="${getAttributeInputName(attribute.AttributeId)}"
+                        class="form-select"
+                        required>
+
+                        <option value="">
+                            -- Выберите --
+                        </option>
+
+                        ${options}
+
+                    </select>
+                `
+            }
+
+
+            function createAttributeInput(attribute) {
+
+                switch (attribute.DataTypeId) {
+
+                    case 1:
+                        return createTextInput(attribute)
+
+                    case 2:
+                        return createTextArea(attribute)
+
+                    case 3:
+                        return createNumberInput(attribute)
+
+                    case 4:
+                        return createDateInput(attribute)
+
+                    case 5:
+                        return createPeriodInput(attribute)
+
+                    case 6:
+                        return createBooleanInput(attribute)
+
+                    case 7:
+                        return createSelectInput(attribute)
+
+                    default:
+                        return ""
+                }
+            }
+
+
+            function createAttributeElement(attribute) {
+
+                const wrapper =
+                    document.createElement("div")
+
+                wrapper.className =
+                    "mb-3 d-flex align-items-start gap-3"
+
+                wrapper.id =
+                    `attr-wrapper-${attribute.AttributeId}`
+
+                wrapper.innerHTML = `
+                    <div class="flex-grow-1">
+
+                        <label class="form-label fw-bold">
+                            ${escapeHtml(attribute.Title)}
+                        </label>
+
+                        ${createAttributeInput(attribute)}
+
+                    </div>
+
+                    <button
+                        type="button"
+                        class="btn-close mt-4"
+                        aria-label="Удалить атрибут">
+                    </button>
+                `
+
+
+                wrapper
+                    .querySelector(".btn-close")
+                    ?.addEventListener("click", function () {
+
+                        removeAttribute(
+                            attribute.AttributeId
+                        )
+                    })
+
+
+                const periodContainer =
+                    wrapper.querySelector(
+                        `[data-period-container="${attribute.AttributeId}"]`
+                    )
+
+
+                if (periodContainer) {
+
+                    periodContainer
+                        .querySelectorAll('input[type="date"]')
+                        .forEach(input => {
+
+                            input.addEventListener(
+                                "change",
+                                function () {
+
+                                    updatePeriod(
+                                        periodContainer
+                                    )
+                                }
+                            )
+                        })
+                }
+
+
+                return wrapper
+            }
+
+
+            function updatePeriod(container) {
+
+                const dates =
+                    container.querySelectorAll(
+                        'input[type="date"]'
+                    )
+
+                const hiddenInput =
+                    container.querySelector(
+                        'input[type="hidden"]'
+                    )
+
+
+                if (!dates[0].value ||
+                    !dates[1].value) {
+
+                    hiddenInput.value = ""
+
+                    return
+                }
+
+
+                hiddenInput.value =
+                    `${dates[0].value}/${dates[1].value}`
+            }
+
+
+            function findAttribute(attributeId) {
+
+                return attributes.find(
+                    attribute =>
+                        attribute.AttributeId === attributeId
+                )
+            }
+
+
+            const attributesContainer =
+                document.getElementById(
+                    "attributes-container"
+                )
+
+
+            const addedAttributeIds =
+                new Set(
+                    attributes
+                        .filter(attribute =>
+                            attribute.Value !== null &&
+                            attribute.Value !== undefined &&
+                            attribute.Value !== ""
+                        )
+                        .map(attribute =>
+                            attribute.AttributeId
+                        )
+                )
+
+
+            function renderAttributes() {
+
+                if (!attributesContainer) {
+                    return
+                }
+
+
+                attributesContainer.innerHTML = ""
+
+
+                const visibleAttributes =
+                    attributes.filter(attribute =>
+                        addedAttributeIds.has(
+                            attribute.AttributeId
+                        )
+                    )
+
+
+                if (visibleAttributes.length === 0) {
+
+                    attributesContainer.innerHTML = `
+                        <p class="text-body-secondary mb-0">
+                            Атрибуты не добавлены.
+                        </p>
+                    `
+
+                    return
+                }
+
+
+                visibleAttributes.forEach(attribute => {
+
+                    attributesContainer.appendChild(
+                        createAttributeElement(
+                            attribute
+                        )
+                    )
+                })
+            }
+
+
+            const categorySelect =
+                document.getElementById(
+                    "category-select"
+                )
+
+
+            const attributeSelect =
+                document.getElementById(
+                    "attribute-select"
+                )
+
+
+            const addAttributeButton =
+                document.getElementById(
+                    "btn-confirm-add-attribute"
+                )
+
+
+            function resetAttributeSelectors() {
+
+                if (!categorySelect ||
+                    !attributeSelect ||
+                    !addAttributeButton) {
+
+                    return
+                }
+
+
+                categorySelect.value = ""
+
+                attributeSelect.innerHTML =
+                    '<option value="">-- Сначала выберите категорию --</option>'
+
+                attributeSelect.disabled = true
+
+                addAttributeButton.disabled = true
+            }
+
+
+            function fillAttributeSelect(categoryId) {
+
+                if (!attributeSelect ||
+                    !addAttributeButton) {
+
+                    return
+                }
+
+
+                const availableAttributes =
+                    attributes.filter(attribute =>
+                        attribute.CategoryId === categoryId &&
+                        !addedAttributeIds.has(
+                            attribute.AttributeId
+                        )
+                    )
+
+
+                attributeSelect.innerHTML =
+                    '<option value="">-- Выберите атрибут --</option>'
+
+
+                if (availableAttributes.length === 0) {
+
+                    attributeSelect.innerHTML =
+                        '<option value="">-- Все атрибуты этой категории уже добавлены --</option>'
+
+                    attributeSelect.disabled = true
+                    addAttributeButton.disabled = true
+
+                    return
+                }
+
+
+                availableAttributes.forEach(attribute => {
+
+                    const option =
+                        document.createElement("option")
+
+                    option.value =
+                        attribute.AttributeId
+
+                    option.textContent =
+                        attribute.Title
+
+                    attributeSelect.appendChild(option)
+                })
+
+
+                attributeSelect.disabled = false
+                addAttributeButton.disabled = true
+            }
+
+
+            categorySelect?.addEventListener(
+                "change",
+                function () {
+
+                    const categoryId =
+                        Number(this.value)
+
+                    if (!categoryId) {
+
+                        resetAttributeSelectors()
+
+                        return
+                    }
+
+                    fillAttributeSelect(
+                        categoryId
+                    )
+                }
+            )
+
+
+            attributeSelect?.addEventListener(
+                "change",
+                function () {
+
+                    if (addAttributeButton) {
+
+                        addAttributeButton.disabled =
+                            !this.value
+                    }
+                }
+            )
+
+
+            addAttributeButton?.addEventListener(
+                "click",
+                function () {
+
+                    const attributeId =
+                        Number(attributeSelect.value)
+
+                    const attribute =
+                        findAttribute(attributeId)
+
+
+                    if (!attribute) {
+                        return
+                    }
+
+
+                    addedAttributeIds.add(
+                        attribute.AttributeId
+                    )
+
+
+                    renderAttributes()
+
+
+                    const modalElement =
+                        document.getElementById(
+                            "addAttributeModal"
+                        )
+
+
+                    if (modalElement &&
+                        typeof bootstrap !== "undefined") {
+
+                        const modal =
+                            bootstrap.Modal.getInstance(
+                                modalElement
+                            ) ??
+                            new bootstrap.Modal(
+                                modalElement
+                            )
+
+                        modal.hide()
+                    }
+
+
+                    resetAttributeSelectors()
+                }
+            )
+
+
+            function removeAttribute(attributeId) {
+
+                addedAttributeIds.delete(
+                    attributeId
+                )
+
+
+                const attribute =
+                    findAttribute(attributeId)
+
+
+                if (attribute) {
+
+                    attribute.Value = null
+                }
+
+
+                renderAttributes()
+
+                resetAttributeSelectors()
+            }
+
+
+            function initializePosition() {
+
+                const select =
+                    document.getElementById(
+                        "position-select"
+                    )
+
+                const container =
+                    document.getElementById(
+                        "new-position-container"
+                    )
+
+                const input =
+                    document.getElementById(
+                        "new-position-name"
+                    )
+
+
+                if (!select ||
+                    !container ||
+                    !input) {
+
+                    return
+                }
+
+
+                function update() {
+
+                    const isNewPosition =
+                        select.value === "0"
+
+
+                    container.classList.toggle(
+                        "d-none",
+                        !isNewPosition
+                    )
+
+
+                    input.required =
+                        isNewPosition
+                }
+
+
+                if (
+                    input.value.trim() &&
+                    (!select.value ||
+                     select.value !== "0")
+                ) {
+                    select.value = "0"
+                }
+
+
+                select.addEventListener(
+                    "change",
+                    update
+                )
+
+
+                update()
+            }
+
+
+            function createMarkdownEditor(
+                element,
+                initialValue = "",
+                height = "300px"
+            ) {
+
+                if (!element ||
+                    typeof toastui === "undefined") {
+
+                    return null
+                }
+
+
+                return new toastui.Editor({
+
+                    el: element,
+
+                    height,
+
+                    initialEditType: "wysiwyg",
+
+                    initialValue,
+
+                    previewStyle: "vertical",
+
+                    hideModeSwitch: true,
+
+                    toolbarItems: [
+                        ["heading", "bold", "italic", "strike"],
+                        ["hr", "quote"],
+                        ["ul", "ol", "task"],
+                        ["table", "link"]
+                    ]
+
+                })
+            }
+
+
+            function initializeDescriptionEditor() {
+
+                const input =
+                    document.getElementById(
+                        "description-input"
+                    )
+
+                const element =
+                    document.getElementById(
+                        "description-editor"
+                    )
+
+
+                if (!input || !element) {
+                    return
+                }
+
+
+                window.vacancyDescriptionEditor =
+                    createMarkdownEditor(
+                        element,
+                        input.value,
+                        "350px"
+                    )
+            }
+
+
+            function initializeTags() {
+
+                const input =
+                    document.getElementById(
+                        "vacancy-tags-input"
+                    )
+
+                if (!input ||
+                    typeof Tagify === "undefined") {
+
+                    return
+                }
+
+
+                const globalTagsWhitelist =
+                    @Html.Raw(
+                        ViewData["AllTagsJson"] ?? "[]"
+                    )
+
+
+                window.vacancyTagify =
+                    new Tagify(
+                        input,
+                        {
+                            whitelist:
+                                globalTagsWhitelist,
+
+                            dropdown: {
+                                maxItems: 10,
+                                classname: "tags-look",
+                                enabled: 0,
+                                closeOnSelect: false
+                            },
+
+                            enforceWhitelist: false,
+
+                            delimiters: ",| ",
+
+                            editTags: false
+                        }
+                    )
+
+
+                if (initialTags) {
+
+                    window.vacancyTagify.addTags(
+                        initialTags
+                            .split(",")
+                            .map(tag => tag.trim())
+                            .filter(Boolean)
+                    )
+                }
+            }
+
+
+            const form =
+                document.getElementById(
+                    "vacancy-form"
+                )
+
+
+            form?.addEventListener(
+                "submit",
+                function () {
+
+                    const descriptionInput =
+                        document.getElementById(
+                            "description-input"
+                        )
+
+
+                    if (
+                        descriptionInput &&
+                        window.vacancyDescriptionEditor
+                    ) {
+
+                        descriptionInput.value =
+                            window.vacancyDescriptionEditor
+                                .getMarkdown()
+                    }
+
+
+                    const tagsValue =
+                        document.getElementById(
+                            "vacancy-tags-value"
+                        )
+
+
+                    if (
+                        tagsValue &&
+                        window.vacancyTagify
+                    ) {
+
+                        tagsValue.value =
+                            window.vacancyTagify.value
+                                .map(item => item.value)
+                                .join(", ")
+                    }
+
+
+                    document
+                        .querySelectorAll(
+                            "[data-period-container]"
+                        )
+                        .forEach(container => {
+
+                            updatePeriod(container)
+                        })
+                }
+            )
+
+
+            renderAttributes()
+
+            initializePosition()
+            initializeDescriptionEditor()
+            initializeTags()
+
+        })
+
+    </script>
+}

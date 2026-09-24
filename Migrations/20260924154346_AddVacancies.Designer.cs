@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260924154346_AddVacancies")]
+    partial class AddVacancies
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -170,21 +173,12 @@ namespace resumeSystem.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("text");
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone");
-
                     b.Property<string>("Email")
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
                     b.Property<bool>("EmailConfirmed")
                         .HasColumnType("boolean");
-
-                    b.Property<string>("FirstName")
-                        .HasColumnType("text");
-
-                    b.Property<string>("LastName")
-                        .HasColumnType("text");
 
                     b.Property<bool>("LockoutEnabled")
                         .HasColumnType("boolean");
@@ -231,8 +225,6 @@ namespace resumeSystem.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-<<<<<<< Updated upstream
-=======
             modelBuilder.Entity("resumeSystem.Domain.Attribute", b =>
                 {
                     b.Property<int>("Id")
@@ -1012,7 +1004,6 @@ namespace resumeSystem.Migrations
                     b.ToTable("vacancy_tags", (string)null);
                 });
 
->>>>>>> Stashed changes
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
@@ -1062,6 +1053,206 @@ namespace resumeSystem.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Attribute", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Category", "Category")
+                        .WithMany()
+                        .HasForeignKey("CategoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.DataType", "DataType")
+                        .WithMany()
+                        .HasForeignKey("DataTypeId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.Navigation("Category");
+
+                    b.Navigation("DataType");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.AttributeOption", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attribute");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.DataTypeCompareType", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.CompareType", "CompareType")
+                        .WithMany()
+                        .HasForeignKey("CompareTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.DataType", "DataType")
+                        .WithMany()
+                        .HasForeignKey("DataTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CompareType");
+
+                    b.Navigation("DataType");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Position", "Position")
+                        .WithMany("Experiences")
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.ExperienceTag", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Experience", "Experience")
+                        .WithMany("ExperienceTags")
+                        .HasForeignKey("ExperienceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
+                        .WithMany("ExperienceTags")
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Experience");
+
+                    b.Navigation("Tag");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.RequiredUserAttributes", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithOne("RequiredUserAttributes")
+                        .HasForeignKey("resumeSystem.Domain.RequiredUserAttributes", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.UserAttribute", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attribute");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Position", "Position")
+                        .WithMany()
+                        .HasForeignKey("PositionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Position");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.VacancyAttribute", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
+                        .WithMany()
+                        .HasForeignKey("AttributeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
+                        .WithMany("VacancyAttributes")
+                        .HasForeignKey("VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Attribute");
+
+                    b.Navigation("Vacancy");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.VacancyTag", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Tag", "Tag")
+                        .WithMany()
+                        .HasForeignKey("TagId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.Vacancy", "Vacancy")
+                        .WithMany("VacancyTags")
+                        .HasForeignKey("VacancyId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Tag");
+
+                    b.Navigation("Vacancy");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.ApplicationUser", b =>
+                {
+                    b.Navigation("RequiredUserAttributes");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Experience", b =>
+                {
+                    b.Navigation("ExperienceTags");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Position", b =>
+                {
+                    b.Navigation("Experiences");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
+                {
+                    b.Navigation("ExperienceTags");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.Vacancy", b =>
+                {
+                    b.Navigation("VacancyAttributes");
+
+                    b.Navigation("VacancyTags");
                 });
 #pragma warning restore 612, 618
         }
