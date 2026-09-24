@@ -29,6 +29,10 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<Experience> Experiences { get; set; }
     public DbSet<ExperienceTag> ExperienceTags { get; set; }
 
+    public DbSet<Vacancy> Vacancies { get; set; }
+    public DbSet<VacancyTag> VacancyTags { get; set; }
+    public DbSet<VacancyAttribute> VacancyAttributes { get; set; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -499,6 +503,59 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .WithMany(t => t.ExperienceTags)
                 .HasForeignKey(e => e.TagId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+
+        builder.Entity<Vacancy>(entity =>
+        {
+            entity.ToTable("vacancies");
+
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+
+            entity.Property(e => e.UserId).HasColumnName("fk_user_id");
+            entity.Property(e => e.PositionId).HasColumnName("fk_position_id");
+
+            entity.Property(e => e.Title).HasColumnName("title");
+            entity.Property(e => e.Description).HasColumnName("description");
+            entity.Property(e => e.CreatedAt).HasColumnName("created_at");
+            entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+
+            entity.HasOne(e => e.User)
+                .WithMany()
+                .HasForeignKey(e => e.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Position)
+                .WithMany()
+                .HasForeignKey(e => e.PositionId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        builder.Entity<VacancyTag>(entity =>
+        {
+            entity.ToTable("vacancy_tags");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+            entity.Property(e => e.VacancyId).HasColumnName("fk_vacancy_id");
+            entity.Property(e => e.TagId).HasColumnName("fk_tag_id");
+
+            entity.HasOne(e => e.Vacancy).WithMany(v => v.VacancyTags).HasForeignKey(e => e.VacancyId).OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(e => e.Tag).WithMany().HasForeignKey(e => e.TagId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<VacancyAttribute>(entity =>
+        {
+            entity.ToTable("vacancy_attributes");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.Id).HasColumnName("pk");
+            entity.Property(e => e.VacancyId).HasColumnName("fk_vacancy_id");
+            entity.Property(e => e.AttributeId).HasColumnName("fk_attribute_id");
+            entity.Property(e => e.AttributeValue).HasColumnName("attribute_value");
+
+            entity.HasOne(e => e.Vacancy).WithMany(v => v.VacancyAttributes).HasForeignKey(e => e.VacancyId).OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Attribute).WithMany().HasForeignKey(e => e.AttributeId).OnDelete(DeleteBehavior.Cascade);
         });
 
     }

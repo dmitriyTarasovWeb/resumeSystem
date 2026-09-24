@@ -1177,17 +1177,22 @@
 
                 attributesContainer.innerHTML = ""
 
-                const visibleAttributes = attributes.filter(
-                    attribute =>
-                        attribute.Value !== null &&
-                        attribute.Value !== undefined &&
-                        attribute.Value !== ""
-                )
+                const visibleAttributes = attributes.filter(attribute => {
+                    if (canEdit) {
+                        return addedAttributeIds.has(attribute.AttributeId)
+                    }
+
+                    return attribute.Value !== null &&
+                           attribute.Value !== undefined &&
+                           attribute.Value !== ""
+                })
 
                 if (visibleAttributes.length === 0) {
                     attributesContainer.innerHTML = `
                         <p class="text-body-secondary mb-0">
-                            Дополнительная информация не указана.
+                            ${canEdit
+                                ? "Атрибуты не добавлены."
+                                : "Дополнительная информация не указана."}
                         </p>
                     `
                     return
