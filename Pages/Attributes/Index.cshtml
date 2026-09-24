@@ -1,0 +1,797 @@
+﻿@page "/Attributes"
+@model resumeSystem.Pages.Attributes.IndexModel
+
+@{
+    ViewData["Title"] = "Библиотека атрибутов";
+}
+
+<div class="container py-4 pb-5">
+
+    <div class="mb-4">
+
+        <h1 class="h3 mb-1">
+            Библиотека атрибутов
+        </h1>
+    </div>
+    <div class="d-flex flex-wrap gap-2 mb-4">
+
+        <button type="button"
+                class="btn btn-primary"
+                id="btn-tab-create">
+            Добавление атрибута
+        </button>
+
+        <button type="button"
+                class="btn btn-outline-primary"
+                id="btn-tab-edit">
+            Редактирование атрибута
+        </button>
+
+        <button type="button"
+                class="btn btn-outline-primary"
+                id="btn-tab-categories">
+            Категории
+        </button>
+
+    </div>
+
+
+    <div id="create-section">
+
+        <section class="border rounded bg-white">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+
+                <h2 class="h6 mb-0 fw-semibold">
+                    Добавление атрибута
+                </h2>
+
+            </div>
+
+
+            <form method="post"
+                  asp-page-handler="Create">
+
+                <div class="p-3 p-md-4">
+
+                    <div class="row g-3">
+
+                        <div class="col-md-4">
+
+                            <label asp-for="CreateInput.CategoryId"
+                                   class="form-label fw-medium">
+                                Категория
+                            </label>
+
+                            <select asp-for="CreateInput.CategoryId"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Выберите категорию --
+                                </option>
+
+                                @foreach (var category in Model.AvailableCategories)
+                                {
+                                    <option value="@category.Id">
+                                        @category.Title
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="CreateInput.CategoryId"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label asp-for="CreateInput.Title"
+                                   class="form-label fw-medium">
+                                Название атрибута
+                            </label>
+
+                            <input asp-for="CreateInput.Title"
+                                   class="form-control"
+                                   placeholder="Например, Навыки презентации" />
+
+                            <span asp-validation-for="CreateInput.Title"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="col-md-4">
+
+                            <label asp-for="CreateInput.DataTypeId"
+                                   class="form-label fw-medium">
+                                Тип данных
+                            </label>
+
+                            <select asp-for="CreateInput.DataTypeId"
+                                    id="create-data-type-select"
+                                    class="form-select">
+
+                                <option value="">
+                                    -- Выберите тип --
+                                </option>
+
+                                @foreach (var dataType in Model.AvailableDataTypes)
+                                {
+                                    <option value="@dataType.Id">
+                                        @dataType.DataTypeName
+                                    </option>
+                                }
+
+                            </select>
+
+                            <span asp-validation-for="CreateInput.DataTypeId"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div id="create-options-section"
+                         class="mt-4 d-none">
+
+                        <label class="form-label fw-medium">
+                            Варианты для One of many
+                        </label>
+
+                        <div id="create-options-container">
+
+                            <div class="input-group mb-2 option-row">
+
+                                <input type="text"
+                                       name="CreateInput.Options"
+                                       class="form-control"
+                                       placeholder="Например, A1" />
+
+                                <button type="button"
+                                        class="btn btn-outline-danger btn-remove-option">
+                                    Удалить
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        <button type="button"
+                                class="btn btn-outline-secondary"
+                                id="btn-add-create-option">
+                            + Добавить вариант
+                        </button>
+
+                    </div>
+
+
+                    <span asp-validation-for="CreateInput.Options"
+                          class="text-danger small">
+                    </span>
+
+
+                    <div class="d-flex justify-content-end mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Добавить атрибут
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </section>
+
+    </div>
+
+
+    <div id="edit-section"
+         class="d-none">
+
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+
+                <h2 class="h6 mb-0 fw-semibold">
+                    Выбор атрибута
+                </h2>
+
+            </div>
+
+
+            <div class="p-3 p-md-4">
+
+                <div class="row g-3">
+
+                    <div class="col-md-5">
+
+                        <label class="form-label fw-medium">
+                            Категория
+                        </label>
+
+                        <select id="manage-category-select"
+                                class="form-select">
+
+                            <option value="">
+                                -- Выберите категорию --
+                            </option>
+
+                            @foreach (var category in Model.AvailableCategories)
+                            {
+                                <option value="@category.Id">
+                                    @category.Title
+                                </option>
+                            }
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-7">
+
+                        <label class="form-label fw-medium">
+                            Атрибут
+                        </label>
+
+                        <select id="manage-attribute-select"
+                                class="form-select"
+                                disabled>
+
+                            <option value="">
+                                -- Сначала выберите категорию --
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                </div>
+
+
+                <div class="d-flex gap-2 mt-4">
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btn-edit-attribute"
+                            disabled>
+                        Изменить
+                    </button>
+
+
+                    <form method="post"
+                          asp-page-handler="Delete"
+                          id="delete-attribute-form">
+
+                        <input type="hidden"
+                               name="id"
+                               id="delete-attribute-id" />
+
+                        <button type="submit"
+                                class="btn btn-danger"
+                                id="btn-delete-attribute"
+                                disabled>
+                            Удалить
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        @if (Model.IsEditMode)
+        {
+            <section class="border rounded bg-white">
+
+                <div class="border-bottom px-3 px-md-4 py-3">
+
+                    <h2 class="h6 mb-0 fw-semibold">
+                        Редактирование атрибута
+                    </h2>
+
+                </div>
+
+                <form method="post"
+                      asp-page-handler="Update">
+
+                    <input type="hidden"
+                           asp-for="EditInput.Id" />
+
+                    <div class="p-3 p-md-4">
+
+                        <div class="row g-3">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="EditInput.CategoryId"
+                                       class="form-label fw-medium">
+                                    Категория
+                                </label>
+
+                                <select asp-for="EditInput.CategoryId"
+                                        class="form-select">
+
+                                    <option value="">
+                                        -- Выберите категорию --
+                                    </option>
+
+                                    @foreach (var category in Model.AvailableCategories)
+                                    {
+                                        <option value="@category.Id">
+                                            @category.Title
+                                        </option>
+                                    }
+
+                                </select>
+
+                                <span asp-validation-for="EditInput.CategoryId"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                            <div class="col-md-6">
+
+                                <label asp-for="EditInput.Title"
+                                       class="form-label fw-medium">
+                                    Название атрибута
+                                </label>
+
+                                <input asp-for="EditInput.Title"
+                                       class="form-control" />
+
+                                <span asp-validation-for="EditInput.Title"
+                                      class="text-danger small">
+                                </span>
+
+                            </div>
+
+                        </div>
+
+                        <div class="d-flex gap-2 mt-4">
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+                                Сохранить изменения
+                            </button>
+
+                            <a asp-page="/Attributes"
+                               class="btn btn-outline-secondary">
+                                Отмена
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </section>
+        }
+
+    </div>
+
+
+    <div id="categories-section"
+         class="d-none">
+
+        <section class="border rounded bg-white">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+
+                <h2 class="h6 mb-0 fw-semibold">
+                    Категории
+                </h2>
+
+            </div>
+
+
+            <form method="post"
+                  asp-page-handler="CreateCategory">
+
+                <div class="p-3 p-md-4">
+
+                    <label asp-for="NewCategoryTitle"
+                           class="form-label fw-medium">
+                        Новая категория
+                    </label>
+
+                    <input asp-for="NewCategoryTitle"
+                           class="form-control"
+                           placeholder="Например, Сертификации" />
+
+                    <span asp-validation-for="NewCategoryTitle"
+                          class="text-danger small">
+                    </span>
+
+
+                    <div class="d-flex justify-content-end mt-4">
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Добавить категорию
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+
+            <div class="border-top p-3 p-md-4">
+
+                <h3 class="h6 mb-3">
+                    Существующие категории
+                </h3>
+
+                @if (Model.AvailableCategories.Count == 0)
+                {
+                    <div class="text-body-secondary">
+                        Категорий нет.
+                    </div>
+                }
+                else
+                {
+                    <div class="d-flex flex-wrap gap-2">
+
+                        @foreach (var category in Model.AvailableCategories)
+                        {
+                            <span class="badge text-bg-secondary">
+                                @category.Title
+                            </span>
+                        }
+
+                    </div>
+                }
+
+            </div>
+
+        </section>
+
+    </div>
+
+</div>
+
+
+@section Scripts {
+
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const attributes = @Html.Raw(
+                System.Text.Json.JsonSerializer.Serialize(
+                    Model.AvailableAttributes
+                )
+            )
+
+            const createSection = document.getElementById("create-section")
+            const editSection = document.getElementById("edit-section")
+            const categoriesSection = document.getElementById("categories-section")
+
+            const createTabButton = document.getElementById("btn-tab-create")
+            const editTabButton = document.getElementById("btn-tab-edit")
+            const categoriesTabButton = document.getElementById("btn-tab-categories")
+
+            function showSection(section) {
+                createSection?.classList.add("d-none")
+                editSection?.classList.add("d-none")
+                categoriesSection?.classList.add("d-none")
+
+                createTabButton?.classList.remove("btn-primary")
+                createTabButton?.classList.add("btn-outline-primary")
+
+                editTabButton?.classList.remove("btn-primary")
+                editTabButton?.classList.add("btn-outline-primary")
+
+                categoriesTabButton?.classList.remove("btn-primary")
+                categoriesTabButton?.classList.add("btn-outline-primary")
+
+                if (section === "create") {
+                    createSection?.classList.remove("d-none")
+                    createTabButton?.classList.remove("btn-outline-primary")
+                    createTabButton?.classList.add("btn-primary")
+                }
+
+                if (section === "edit") {
+                    editSection?.classList.remove("d-none")
+                    editTabButton?.classList.remove("btn-outline-primary")
+                    editTabButton?.classList.add("btn-primary")
+                }
+
+                if (section === "categories") {
+                    categoriesSection?.classList.remove("d-none")
+                    categoriesTabButton?.classList.remove("btn-outline-primary")
+                    categoriesTabButton?.classList.add("btn-primary")
+                }
+            }
+
+            createTabButton?.addEventListener("click", function () {
+                showSection("create")
+            })
+
+            editTabButton?.addEventListener("click", function () {
+                showSection("edit")
+            })
+
+            categoriesTabButton?.addEventListener("click", function () {
+                showSection("categories")
+            })
+
+
+            const manageCategorySelect = document.getElementById("manage-category-select")
+            const manageAttributeSelect = document.getElementById("manage-attribute-select")
+            const editButton = document.getElementById("btn-edit-attribute")
+            const deleteButton = document.getElementById("btn-delete-attribute")
+            const deleteAttributeId = document.getElementById("delete-attribute-id")
+
+            function fillManageAttributeSelect(categoryId) {
+
+                if (!manageAttributeSelect) {
+                    return
+                }
+
+                const categoryAttributes = attributes.filter(attribute =>
+                    attribute.CategoryId === categoryId
+                )
+
+                manageAttributeSelect.innerHTML =
+                    '<option value="">-- Выберите атрибут --</option>'
+
+                manageAttributeSelect.disabled = categoryAttributes.length === 0
+
+                categoryAttributes.forEach(attribute => {
+
+                    const option = document.createElement("option")
+
+                    option.value = attribute.Id
+                    option.textContent = attribute.Title
+
+                    manageAttributeSelect.appendChild(option)
+                })
+
+                if (editButton) {
+                    editButton.disabled = true
+                }
+
+                if (deleteButton) {
+                    deleteButton.disabled = true
+                }
+
+                if (deleteAttributeId) {
+                    deleteAttributeId.value = ""
+                }
+            }
+
+
+            function updateManageButtons() {
+
+                const attributeId = Number(manageAttributeSelect?.value)
+                const hasAttribute = Number.isInteger(attributeId) && attributeId > 0
+
+                if (editButton) {
+                    editButton.disabled = !hasAttribute
+                }
+
+                if (deleteButton) {
+                    deleteButton.disabled = !hasAttribute
+                }
+
+                if (deleteAttributeId) {
+                    deleteAttributeId.value = hasAttribute ? attributeId : ""
+                }
+            }
+
+
+            manageCategorySelect?.addEventListener("change", function () {
+
+                const categoryId = Number(this.value)
+
+                if (!categoryId) {
+
+                    manageAttributeSelect.innerHTML =
+                        '<option value="">-- Сначала выберите категорию --</option>'
+
+                    manageAttributeSelect.disabled = true
+
+                    if (editButton) {
+                        editButton.disabled = true
+                    }
+
+                    if (deleteButton) {
+                        deleteButton.disabled = true
+                    }
+
+                    if (deleteAttributeId) {
+                        deleteAttributeId.value = ""
+                    }
+
+                    return
+                }
+
+                fillManageAttributeSelect(categoryId)
+            })
+
+
+            manageAttributeSelect?.addEventListener("change", function () {
+                updateManageButtons()
+            })
+
+
+            editButton?.addEventListener("click", function () {
+
+                const attributeId = Number(manageAttributeSelect.value)
+
+                if (!attributeId) {
+                    return
+                }
+
+                window.location.href = `/Attributes?editId=${attributeId}`
+            })
+
+
+            document.getElementById("delete-attribute-form")?.addEventListener("submit", function (event) {
+
+                if (!confirm("Пометить этот атрибут как удалённый?")) {
+                    event.preventDefault()
+                }
+            })
+
+
+            function toggleOptions(selectId, sectionId) {
+
+                const select = document.getElementById(selectId)
+                const section = document.getElementById(sectionId)
+
+                if (!select || !section) {
+                    return
+                }
+
+                function update() {
+
+                    const isOneOfMany = Number(select.value) === 7
+
+                    section.classList.toggle("d-none", !isOneOfMany)
+                }
+
+                select.addEventListener("change", update)
+
+                update()
+            }
+
+
+            function attachRemoveHandler(row) {
+
+                const button = row.querySelector(".btn-remove-option")
+
+                button?.addEventListener("click", function () {
+                    row.remove()
+                })
+            }
+
+
+            function addOption(containerId, inputName, placeholder) {
+
+                const container = document.getElementById(containerId)
+
+                if (!container) {
+                    return
+                }
+
+                const row = document.createElement("div")
+
+                row.className = "input-group mb-2 option-row"
+
+                row.innerHTML = `
+                    <input type="text"
+                           name="${inputName}"
+                           class="form-control"
+                           placeholder="${placeholder}">
+
+                    <button type="button"
+                            class="btn btn-outline-danger btn-remove-option">
+                        Удалить
+                    </button>
+                `
+
+                container.appendChild(row)
+
+                attachRemoveHandler(row)
+            }
+
+
+            document.querySelectorAll(".btn-remove-option").forEach(button => {
+
+                button.addEventListener("click", function () {
+                    this.closest(".option-row")?.remove()
+                })
+            })
+
+
+            document.getElementById("btn-add-create-option")?.addEventListener("click", function () {
+
+                addOption(
+                    "create-options-container",
+                    "CreateInput.Options",
+                    "Например, A1"
+                )
+            })
+
+
+            document.getElementById("btn-add-edit-option")?.addEventListener("click", function () {
+
+                addOption(
+                    "edit-options-container",
+                    "EditInput.Options",
+                    "Например, A1"
+                )
+            })
+
+
+            toggleOptions(
+                "create-data-type-select",
+                "create-options-section"
+            )
+
+
+            toggleOptions(
+                "edit-data-type-select",
+                "edit-options-section"
+            )
+
+
+            @if (Model.IsEditMode)
+            {
+                <text>
+                    showSection("edit")
+
+                    const editAttribute = attributes.find(attribute =>
+                        attribute.Id === @Model.EditInput.Id
+                    )
+
+                    if (editAttribute) {
+
+                        if (manageCategorySelect) {
+                            manageCategorySelect.value = editAttribute.CategoryId
+                            fillManageAttributeSelect(editAttribute.CategoryId)
+                        }
+
+                        if (manageAttributeSelect) {
+                            manageAttributeSelect.value = editAttribute.Id
+                            updateManageButtons()
+                        }
+                    }
+                </text>
+            }
+            else if (ViewData["ActiveTab"]?.ToString() == "categories")
+            {
+                <text>
+                    showSection("categories")
+                </text>
+            }
+            else
+            {
+                <text>
+                    showSection("create")
+                </text>
+            }
+
+        })
+    </script>
+}
