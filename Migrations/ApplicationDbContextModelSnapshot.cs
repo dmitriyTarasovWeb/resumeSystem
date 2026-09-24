@@ -909,8 +909,6 @@ namespace resumeSystem.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("pk");
 
-
-
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at");
@@ -966,7 +964,6 @@ namespace resumeSystem.Migrations
 
                     b.Property<Guid>("VacancyId")
                         .HasColumnType("uuid")
-
                         .HasColumnName("fk_vacancy_id");
 
                     b.HasKey("Id");
@@ -993,7 +990,6 @@ namespace resumeSystem.Migrations
 
                     b.Property<Guid>("VacancyId")
                         .HasColumnType("uuid")
-
                         .HasColumnName("fk_vacancy_id");
 
                     b.HasKey("Id");

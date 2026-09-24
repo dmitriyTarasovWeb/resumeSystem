@@ -29,7 +29,6 @@
     <Folder Include="Data\Migrations\" />
     <Folder Include="Domain\ViewModels\" />
     <Folder Include="Authorization\" />
-    <Folder Include="Pages\Vacancies\" />
   </ItemGroup>
 
 </Project>

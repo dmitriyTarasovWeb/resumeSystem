@@ -11,10 +11,6 @@
 
         <div>
 
-            <div class="text-body-secondary mb-2">
-                Вакансия
-            </div>
-
             <h1 class="h2 mb-2">
                 @Model.Vacancy.Title
             </h1>
@@ -61,7 +57,7 @@
         <div class="border-bottom px-3 px-md-4 py-3">
 
             <h2 class="h6 mb-0 fw-semibold">
-                Описание вакансии
+                Описание
             </h2>
 
         </div>
@@ -95,7 +91,7 @@
         <div class="border-bottom px-3 px-md-4 py-3">
 
             <h2 class="h6 mb-0 fw-semibold">
-                Требуемые атрибуты
+                Атрибуты
             </h2>
 
         </div>
@@ -114,13 +110,6 @@
 
                     <table class="table table-sm align-middle mb-0">
 
-                        <thead>
-                            <tr>
-                                <th>Атрибут</th>
-                                <th>Тип</th>
-                                <th>Значение</th>
-                            </tr>
-                        </thead>
 
                         <tbody>
 
@@ -130,10 +119,6 @@
 
                                     <td class="fw-medium">
                                         @attr.Title
-                                    </td>
-
-                                    <td>
-                                        @attr.DataTypeName
                                     </td>
 
                                     <td>
