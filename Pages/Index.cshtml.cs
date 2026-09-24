@@ -18,9 +18,10 @@ public class IndexModel : PageModel
                 Id = v.Id,
                 Title = v.Title,
                 PositionName = v.Position.Name,
-                Description = v.Description
+                CreatedAt = v.CreatedAt,
+                UpdatedAt = v.UpdatedAt
             })
-            .OrderByDescending(v => v.Id)
+            .OrderByDescending(v => v.UpdatedAt ?? v.CreatedAt)
             .ToListAsync();
     }
 
@@ -32,7 +33,12 @@ public class IndexModel : PageModel
 
         public string PositionName { get; set; } = string.Empty;
 
-        public string? Description { get; set; }
+        public DateTime CreatedAt { get; set; }
+
+        public DateTime? UpdatedAt { get; set; }
+
+        public DateTime DisplayDate =>
+            UpdatedAt ?? CreatedAt;
     }
 
     public IndexModel(ApplicationDbContext dbContext)

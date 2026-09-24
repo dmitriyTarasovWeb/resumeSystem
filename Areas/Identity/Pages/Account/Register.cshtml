@@ -1,108 +1,255 @@
 ﻿@page "/Registration"
 @model RegisterModel
+
 @{
-    ViewData["Title"] = "Register";
+    ViewData["Title"] = "Регистрация";
 }
 
-<h1>@ViewData["Title"]</h1>
+<div class="container py-5">
 
-<div class="row">
-    <div class="col-md-4">
-        <form id="registerForm" asp-route-returnUrl="@Model.ReturnUrl" method="post">
-            <h2>Create a new account.</h2>
-            <hr />
-            <div asp-validation-summary="ModelOnly" class="text-danger" role="alert"></div>
+    <div class="row justify-content-center">
 
-            <div class="form-floating mb-3">
-                <input asp-for="Input.FirstName" class="form-control" />
-                <label asp-for="Input.FirstName"></label>
-                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
-            </div>
+        <div class="col-12 col-md-8 col-lg-5">
 
-            <div class="form-floating mb-3">
-                <input asp-for="Input.LastName" class="form-control" />
-                <label asp-for="Input.LastName"></label>
-                <span asp-validation-for="Input.LastName" class="text-danger"></span>
-            </div>
+            <div class="border rounded bg-white">
 
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com" />
-                <label asp-for="Input.Email">Email</label>
-                <span asp-validation-for="Input.Email" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.Password">Password</label>
-                <span asp-validation-for="Input.Password" class="text-danger"></span>
-            </div>
-            <div class="form-floating mb-3">
-                <input asp-for="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password" />
-                <label asp-for="Input.ConfirmPassword">Confirm Password</label>
-                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
-            </div>
-            <div class="mb-3">
-                <div class="form-check">
-                    <input asp-for="Input.AccountType"
-                           class="form-check-input"
-                           type="radio"
-                           value="Candidate"
-                           id="candidate">
+                <div class="border-bottom px-4 py-3">
 
-                    <label class="form-check-label" for="candidate">
-                        Ищу работу
-                    </label>
-                </div>
+                    <h1 class="h5 mb-1 fw-semibold">
+                        Регистрация
+                    </h1>
 
-                <div class="form-check">
-                    <input asp-for="Input.AccountType"
-                           class="form-check-input"
-                           type="radio"
-                           value="Recruiter"
-                           id="recruiter">
-
-                    <label class="form-check-label" for="recruiter">
-                        Рекрутер
-                    </label>
-                </div>
-
-                <span asp-validation-for="Input.AccountType"
-                      class="text-danger"></span>
-            </div>
-
-            <button id="registerSubmit" type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
-        </form>
-    </div>
-    <div class="col-md-6 col-md-offset-2">
-        <section>
-            <h3>Use another service to register.</h3>
-            <hr />
-            @{
-                if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                {
-                    <div>
-                        <p>
-                            There are no external authentication services configured. See this <a href="https://go.microsoft.com/fwlink/?LinkID=532715">article
-                            about setting up this ASP.NET application to support logging in via external services</a>.
-                        </p>
+                    <div class="text-body-secondary small">
+                        Создайте новую учётную запись
                     </div>
-                }
-                else
-                {
-                    <form id="external-account" asp-page="./ExternalLogin" asp-route-returnUrl="@Model.ReturnUrl" method="post" class="form-horizontal">
-                        <div>
-                            <p>
-                                @foreach (var provider in Model.ExternalLogins!)
-                                {
-                                    <button type="submit" class="btn btn-primary" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
-                                }
-                            </p>
+
+                </div>
+
+
+                <div class="p-4">
+
+                    <form id="registerForm"
+                          asp-route-returnUrl="@Model.ReturnUrl"
+                          method="post">
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger"
+                             role="alert">
                         </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Input.FirstName"
+                                   class="form-label fw-medium">
+                            </label>
+
+                            <input asp-for="Input.FirstName"
+                                   class="form-control"
+                                   autocomplete="given-name" />
+
+                            <span asp-validation-for="Input.FirstName"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Input.LastName"
+                                   class="form-label fw-medium">
+                            </label>
+
+                            <input asp-for="Input.LastName"
+                                   class="form-control"
+                                   autocomplete="family-name" />
+
+                            <span asp-validation-for="Input.LastName"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Input.Email"
+                                   class="form-label fw-medium">
+                                Email
+                            </label>
+
+                            <input asp-for="Input.Email"
+                                   class="form-control"
+                                   autocomplete="username"
+                                   aria-required="true"
+                                   placeholder="name@example.com" />
+
+                            <span asp-validation-for="Input.Email"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Input.Password"
+                                   class="form-label fw-medium">
+                                Пароль
+                            </label>
+
+                            <input asp-for="Input.Password"
+                                   class="form-control"
+                                   autocomplete="new-password"
+                                   aria-required="true"
+                                   placeholder="Введите пароль" />
+
+                            <span asp-validation-for="Input.Password"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label asp-for="Input.ConfirmPassword"
+                                   class="form-label fw-medium">
+                                Подтвердите пароль
+                            </label>
+
+                            <input asp-for="Input.ConfirmPassword"
+                                   class="form-control"
+                                   autocomplete="new-password"
+                                   aria-required="true"
+                                   placeholder="Повторите пароль" />
+
+                            <span asp-validation-for="Input.ConfirmPassword"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <div class="mb-4">
+
+                            <div class="form-label fw-medium mb-2">
+                                Тип аккаунта
+                            </div>
+
+                            <div class="form-check mb-2">
+
+                                <input asp-for="Input.AccountType"
+                                       class="form-check-input"
+                                       type="radio"
+                                       value="Candidate"
+                                       id="candidate">
+
+                                <label class="form-check-label"
+                                       for="candidate">
+                                    Ищу работу
+                                </label>
+
+                            </div>
+
+
+                            <div class="form-check">
+
+                                <input asp-for="Input.AccountType"
+                                       class="form-check-input"
+                                       type="radio"
+                                       value="Recruiter"
+                                       id="recruiter">
+
+                                <label class="form-check-label"
+                                       for="recruiter">
+                                    Рекрутер
+                                </label>
+
+                            </div>
+
+                            <span asp-validation-for="Input.AccountType"
+                                  class="text-danger small">
+                            </span>
+
+                        </div>
+
+
+                        <button id="registerSubmit"
+                                type="submit"
+                                class="btn btn-primary w-100">
+                            Зарегистрироваться
+                        </button>
+
                     </form>
-                }
-            }
-        </section>
+
+                </div>
+
+            </div>
+
+
+            <div class="text-center text-body-secondary small my-4">
+                или
+            </div>
+
+
+            <div class="border rounded bg-white">
+
+                <div class="border-bottom px-4 py-3">
+
+                    <h2 class="h6 mb-0 fw-semibold">
+                        Регистрация через другой сервис
+                    </h2>
+
+                </div>
+
+
+                <div class="p-4">
+
+                    @{
+                        if ((Model.ExternalLogins?.Count ?? 0) == 0)
+                        {
+                            <p class="text-body-secondary small mb-0">
+                                Внешние способы регистрации не настроены.
+                            </p>
+                        }
+                        else
+                        {
+                            <form id="external-account"
+                                  asp-page="./ExternalLogin"
+                                  asp-route-returnUrl="@Model.ReturnUrl"
+                                  method="post">
+
+                                <div class="d-grid gap-2">
+
+                                    @foreach (var provider in Model.ExternalLogins!)
+                                    {
+                                        <button type="submit"
+                                                class="btn btn-outline-secondary"
+                                                name="provider"
+                                                value="@provider.Name"
+                                                title="Зарегистрироваться через @provider.DisplayName">
+                                            @provider.DisplayName
+                                        </button>
+                                    }
+
+                                </div>
+
+                            </form>
+                        }
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
 </div>
+
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
