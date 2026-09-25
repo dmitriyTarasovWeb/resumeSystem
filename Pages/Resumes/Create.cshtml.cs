@@ -39,6 +39,8 @@ public class CreateModel : PageModel
 
     public List<ResumeExperienceViewModel> Experiences { get; set; } = new();
 
+    public string ResumeUserId { get; set; } = string.Empty;
+
     public async Task<IActionResult> OnGetAsync(Guid vacancyId)
     {
         var currentUser = await _userManager.GetUserAsync(User);
@@ -73,7 +75,7 @@ public class CreateModel : PageModel
             CanEdit = true;
         }
 
-
+        ResumeUserId = resume?.UserId ?? currentUser.Id;
 
 
         var vacancy = await _dbContext.Vacancies

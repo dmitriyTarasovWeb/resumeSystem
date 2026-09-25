@@ -25,7 +25,7 @@ public class DetailsModel : PageModel
     public List<VacancyAttributeViewModel> Attributes { get; set; } = new();
 
     public List<string> Tags { get; set; } = new();
-
+    public List<VacancyApplicantViewModel> Applications { get; set; } = new();
     public bool CanEdit =>
         User.IsInRole("Recruiter") ||
         User.IsInRole("Administrator");
@@ -69,6 +69,27 @@ public class DetailsModel : PageModel
             .Select(x => x.Tag.Title)
             .OrderBy(x => x)
             .ToListAsync();
+
+        if (User.IsInRole("Recruiter") ||
+            User.IsInRole("Administrator"))
+        {
+            Applications = await _dbContext.VacancyResumes
+                .Where(x => x.VacancyId == id)
+                .Select(x => new VacancyApplicantViewModel
+                {
+                    ResumeId = x.ResumeId,
+                    UserId = x.Resume.UserId,
+                    FirstName = x.Resume.User.RequiredUserAttributes != null
+                        ? x.Resume.User.RequiredUserAttributes.Name
+                        : string.Empty,
+                    LastName = x.Resume.User.RequiredUserAttributes != null
+                        ? x.Resume.User.RequiredUserAttributes.SecondName
+                        : string.Empty,
+                    ApplyTime = x.ApplyTime
+                })
+                .OrderByDescending(x => x.ApplyTime)
+                .ToListAsync();
+        }
 
         var currentUser = await _userManager.GetUserAsync(User);
 
@@ -208,5 +229,18 @@ public class DetailsModel : PageModel
         public string Value { get; set; } = string.Empty;
 
         public string DataTypeName { get; set; } = string.Empty;
+    }
+
+    public class VacancyApplicantViewModel
+    {
+        public int ResumeId { get; set; }
+
+        public string UserId { get; set; } = string.Empty;
+
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
+        public DateTime ApplyTime { get; set; }
     }
 }
