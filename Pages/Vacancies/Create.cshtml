@@ -91,6 +91,25 @@
             </div>
         </section>
 
+        <div class="mb-3">
+
+            <label asp-for="Input.MaxProjects"
+                   class="form-label fw-medium">
+                Максимальное количество проектов
+            </label>
+
+            <input asp-for="Input.MaxProjects"
+                   type="number"
+                   min="0"
+                   max="100"
+                   class="form-control" />
+
+            <span asp-validation-for="Input.MaxProjects"
+                  class="text-danger small">
+            </span>
+
+        </div>
+
         <div class="d-flex justify-content-end pt-2">
             <button type="submit" class="btn btn-primary px-4">
                 @(Model.IsEditMode ? "Сохранить изменения" : "Сохранить")

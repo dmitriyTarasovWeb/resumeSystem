@@ -30,6 +30,10 @@ public class DetailsModel : PageModel
         User.IsInRole("Recruiter") ||
         User.IsInRole("Administrator");
 
+    public bool CanApply { get; private set; }
+
+    public bool HasApplied { get; private set; }
+
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
         var vacancy = await _dbContext.Vacancies
@@ -66,7 +70,82 @@ public class DetailsModel : PageModel
             .OrderBy(x => x)
             .ToListAsync();
 
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser != null)
+        {
+            CanApply =
+                User.IsInRole("Candidate") ||
+                User.IsInRole("Administrator");
+
+            var resume = await _dbContext.Resumes
+                .FirstOrDefaultAsync(r =>
+                    r.UserId == currentUser.Id &&
+                    r.PositionId == vacancy.PositionId);
+
+            if (resume != null)
+            {
+                HasApplied = await _dbContext.VacancyResumes
+                    .AnyAsync(vr =>
+                        vr.VacancyId == vacancy.Id &&
+                        vr.ResumeId == resume.Id);
+            }
+        }
+
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostApplyAsync(Guid id)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser == null)
+        {
+            return Challenge();
+        }
+
+        if (!User.IsInRole("Candidate") &&
+            !User.IsInRole("Administrator"))
+        {
+            return Forbid();
+        }
+
+        var vacancy = await _dbContext.Vacancies
+            .Include(v => v.Position)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        if (vacancy == null)
+        {
+            return NotFound();
+        }
+
+        var resume = await _dbContext.Resumes
+            .FirstOrDefaultAsync(r =>
+                r.UserId == currentUser.Id &&
+                r.PositionId == vacancy.PositionId);
+
+        if (resume == null)
+        {
+            return RedirectToPage(
+                "/Resumes/Create",
+                new { vacancyId = vacancy.Id });
+        }
+
+        var alreadyApplied = await _dbContext.VacancyResumes
+            .AnyAsync(vr =>
+                vr.VacancyId == vacancy.Id &&
+                vr.ResumeId == resume.Id);
+
+        if (alreadyApplied)
+        {
+            return RedirectToPage(
+                "/Vacancies/Details",
+                new { id = vacancy.Id });
+        }
+
+        return RedirectToPage(
+            "/Resumes/Details",
+            new { id = resume.Id, vacancyId = vacancy.Id });
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid id)
@@ -101,8 +180,7 @@ public class DetailsModel : PageModel
 
         if (vacancyTags.Count > 0)
         {
-            _dbContext.VacancyTags.RemoveRange(
-                vacancyTags);
+            _dbContext.VacancyTags.RemoveRange(vacancyTags);
         }
 
         _dbContext.Vacancies.Remove(vacancy);

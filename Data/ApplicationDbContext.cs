@@ -33,6 +33,11 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<VacancyTag> VacancyTags { get; set; }
     public DbSet<VacancyAttribute> VacancyAttributes { get; set; }
 
+    public DbSet<Resume> Resumes { get; set; } = null!;
+    public DbSet<ResumeAttribute> ResumeAttributes { get; set; } = null!;
+    public DbSet<VacancyResume> VacancyResumes { get; set; } = null!;
+    public DbSet<ResumeExperience> ResumeExperiences { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -520,6 +525,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.Property(e => e.Description).HasColumnName("description");
             entity.Property(e => e.CreatedAt).HasColumnName("created_at");
             entity.Property(e => e.UpdatedAt).HasColumnName("updated_at");
+            entity.Property(x => x.MaxProjects).HasColumnName("max_projects");
 
             entity.HasOne(e => e.User)
                 .WithMany()
@@ -556,6 +562,113 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(e => e.Vacancy).WithMany(v => v.VacancyAttributes).HasForeignKey(e => e.VacancyId).OnDelete(DeleteBehavior.Cascade);
 
             entity.HasOne(e => e.Attribute).WithMany().HasForeignKey(e => e.AttributeId).OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<Resume>(entity =>
+        {
+            entity.ToTable("resumes");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("pk");
+
+            entity.Property(x => x.PositionId)
+                .HasColumnName("position_id");
+
+            entity.Property(x => x.UserId)
+                .HasColumnName("user_id");
+
+            entity.HasOne(x => x.Position)
+                .WithMany()
+                .HasForeignKey(x => x.PositionId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ResumeAttribute>(entity =>
+        {
+            entity.ToTable("resume_attributes");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("pk");
+
+            entity.Property(x => x.ResumeId)
+                .HasColumnName("resume_id");
+
+            entity.Property(x => x.UserAttributeId)
+                .HasColumnName("user_attribute_id");
+
+            entity.HasOne(x => x.Resume)
+                .WithMany(x => x.ResumeAttributes)
+                .HasForeignKey(x => x.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.UserAttribute)
+                .WithMany()
+                .HasForeignKey(x => x.UserAttributeId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<VacancyResume>(entity =>
+        {
+            entity.ToTable("vacancy_resumes");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("pk");
+
+            entity.Property(x => x.ResumeId)
+                .HasColumnName("resume_id");
+
+            entity.Property(x => x.VacancyId)
+                .HasColumnName("vacancy_id");
+
+            entity.Property(x => x.ApplyTime)
+                .HasColumnName("apply_time");
+
+            entity.HasOne(x => x.Resume)
+                .WithMany(x => x.VacancyResumes)
+                .HasForeignKey(x => x.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Vacancy)
+                .WithMany()
+                .HasForeignKey(x => x.VacancyId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ResumeExperience>(entity =>
+        {
+            entity.ToTable("resume_experiences");
+
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id)
+                .HasColumnName("pk");
+
+            entity.Property(x => x.ResumeId)
+                .HasColumnName("resume_id");
+
+            entity.Property(x => x.ExperienceId)
+                .HasColumnName("experience_id");
+
+            entity.HasOne(x => x.Resume)
+                .WithMany(x => x.ResumeExperiences)
+                .HasForeignKey(x => x.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.Experience)
+                .WithMany()
+                .HasForeignKey(x => x.ExperienceId)
+                .OnDelete(DeleteBehavior.Cascade);
         });
 
     }

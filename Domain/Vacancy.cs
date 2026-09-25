@@ -7,6 +7,8 @@ public class Vacancy
     public string UserId { get; set; } = null!;
     public int PositionId { get; set; }
 
+    public int MaxProjects { get; set; } = 3;
+
     public string Title { get; set; } = null!;
     public string? Description { get; set; }
 

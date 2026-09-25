@@ -7,7 +7,7 @@
 
 <div class="container py-4 pb-5">
 
-    <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
+        <div class="d-flex justify-content-between align-items-start gap-3 mb-4">
 
         <div>
 
@@ -21,10 +21,30 @@
 
         </div>
 
-        @if (Model.CanEdit)
-        {
-            <div class="d-flex gap-2">
+        <div class="d-flex gap-2 flex-wrap">
 
+            @if (Model.CanApply)
+            {
+                <form method="post"
+                      asp-page-handler="Apply">
+
+                    <input type="hidden"
+                           name="id"
+                           value="@Model.Vacancy.Id" />
+
+                    <button type="submit"
+                            class="btn btn-success"
+                            @(Model.HasApplied ? "disabled" : null)>
+                        @(Model.HasApplied
+                            ? "Отклик отправлен"
+                            : "Откликнуться")
+                    </button>
+
+                </form>
+            }
+
+            @if (Model.CanEdit)
+            {
                 <a asp-page="/Vacancies/Create"
                    asp-route-id="@Model.Vacancy.Id"
                    class="btn btn-primary">
@@ -45,9 +65,9 @@
                     </button>
 
                 </form>
+            }
 
-            </div>
-        }
+        </div>
 
     </div>
 

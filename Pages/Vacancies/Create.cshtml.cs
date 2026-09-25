@@ -59,6 +59,7 @@ public class CreateModel : PageModel
             Input.PositionId = vacancy.Position.Id;
             Input.PositionName = vacancy.Position.Name;
             Input.Description = vacancy.Description;
+            Input.MaxProjects = vacancy.MaxProjects;
 
 
             Input.DynamicAttributes =
@@ -129,14 +130,13 @@ public class CreateModel : PageModel
                 return NotFound();
             }
 
-            vacancy.Title =
-                Input.Title.Trim();
+            vacancy.Title = Input.Title.Trim();
 
-            vacancy.Description =
-                Input.Description;
+            vacancy.Description = Input.Description;
 
-            vacancy.Position =
-                position;
+            vacancy.Position = position;
+
+            vacancy.MaxProjects = Input.MaxProjects;
 
             var existingVacancyAttributes =
                 await _dbContext.VacancyAttributes
@@ -171,15 +171,13 @@ public class CreateModel : PageModel
                 UserId = currentUser.Id,
                 Position = position,
                 Title = Input.Title.Trim(),
-                Description = Input.Description
+                Description = Input.Description,
+                MaxProjects = Input.MaxProjects
             };
-
 
             _dbContext.Vacancies.Add(vacancy);
 
-
             AddVacancyAttributes(vacancy);
-
 
             await AddVacancyTagsAsync(vacancy);
         }
@@ -542,6 +540,11 @@ public class CreateModel : PageModel
         [StringLength(300)]
         [Display(Name = "Название вакансии")]
         public string Title { get; set; } = string.Empty;
+
+        [Range(0, 100, ErrorMessage = "Количество проектов должно быть от 0 до 100.")]
+        [Display(Name = "Максимальное количество проектов")]
+        public int MaxProjects { get; set; } = 3;
+
 
         public int? PositionId { get; set; }
         public string? PositionName { get; set; }
