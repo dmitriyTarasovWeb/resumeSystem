@@ -44,12 +44,51 @@ public class CreateModel : PageModel
 
         var vacancy = await _dbContext.Vacancies
             .Include(v => v.Position)
+            .Include(v => v.VacancyTags)
+                .ThenInclude(vt => vt.Tag)
             .FirstOrDefaultAsync(v => v.Id == vacancyId);
 
         if (vacancy == null)
         {
             return NotFound();
         }
+
+        var vacancyTagTitles = vacancy.VacancyTags
+            .Select(vt => vt.Tag.Title)
+            .Where(title => !string.IsNullOrWhiteSpace(title))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var userExperiences = await _dbContext.Experiences
+            .Include(e => e.ExperienceTags)
+                .ThenInclude(et => et.Tag)
+            .Where(e => e.UserId == currentUser.Id)
+            .ToListAsync();
+
+        Experiences = userExperiences
+            .Select(experience => new
+            {
+                Experience = experience,
+                MatchCount = experience.ExperienceTags
+                    .Select(et => et.Tag.Title)
+                    .Count(title => vacancyTagTitles.Contains(title))
+            })
+            .Where(x => x.MatchCount > 0)
+            .OrderByDescending(x => x.MatchCount)
+            .Take(vacancy.MaxProjects)
+            .Select(x => new ResumeExperienceViewModel
+            {
+                Id = x.Experience.Id,
+                CompanyName = x.Experience.CompanyName,
+                StartDate = x.Experience.StartDate,
+                EndDate = x.Experience.EndDate,
+                Description = x.Experience.Description,
+                Tags = x.Experience.ExperienceTags
+                    .Select(et => et.Tag.Title)
+                    .ToList()
+            })
+            .ToList();
+
+
 
         var requiredAttributes = await _dbContext.RequiredUserAttributes
             .FirstOrDefaultAsync(x => x.UserId == currentUser.Id);
@@ -89,28 +128,6 @@ public class CreateModel : PageModel
                 Value = x.Options
             })
             .ToListAsync();
-
-
-        var userExperiences = await _dbContext.Experiences
-            .Include(e => e.ExperienceTags)
-                .ThenInclude(et => et.Tag)
-            .Where(e => e.UserId == currentUser.Id)
-            .OrderByDescending(e => e.StartDate)
-            .ToListAsync();
-
-        Experiences = userExperiences
-            .Select(e => new ResumeExperienceViewModel
-            {
-                Id = e.Id,
-                CompanyName = e.CompanyName,
-                StartDate = e.StartDate,
-                EndDate = e.EndDate,
-                Description = e.Description,
-                Tags = e.ExperienceTags
-                    .Select(et => et.Tag.Title)
-                    .ToList()
-            })
-            .ToList();
 
         Vacancy = new ResumeVacancyViewModel
         {
