@@ -83,6 +83,7 @@ public class ProfileModel : PageModel
 
         if (!await HasEditPermissionAsync(currentUser!, targetUser!)) return Forbid();
 
+        ModelState.Remove("");
         if (!ModelState.IsValid)
         {
             Input.Email = targetUser!.Email ?? string.Empty;
@@ -167,7 +168,7 @@ public class ProfileModel : PageModel
 
     private async Task ProcessDynamicAttributesAsync(string targetUserId)
     {
-        if (DynamicAttributes == null || !DynamicAttributes.Any()) return;
+        DynamicAttributes ??= new Dictionary<int, string>();
 
         var existingUserAttributes = await _dbContext.UserAttributes
             .Where(ua => ua.UserId == targetUserId)
@@ -187,13 +188,14 @@ public class ProfileModel : PageModel
         }
 
         var newAttributes = DynamicAttributes
+            .Where(attr => !string.IsNullOrWhiteSpace(attr.Value))
             .Select(attr => new UserAttribute
             {
                 UserId = targetUserId,
                 AttributeId = attr.Key,
                 Value = CleanCheckboxValue(attr.Value)
             })
-            .Where(x => !string.IsNullOrWhiteSpace(x.Value));
+            .ToList();
 
         _dbContext.UserAttributes.AddRange(newAttributes);
     }
