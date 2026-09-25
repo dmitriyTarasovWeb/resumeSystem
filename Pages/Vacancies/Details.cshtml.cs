@@ -25,10 +25,14 @@ public class DetailsModel : PageModel
     public List<VacancyAttributeViewModel> Attributes { get; set; } = new();
 
     public List<string> Tags { get; set; } = new();
-
+    public List<VacancyApplicantViewModel> Applications { get; set; } = new();
     public bool CanEdit =>
         User.IsInRole("Recruiter") ||
         User.IsInRole("Administrator");
+
+    public bool CanApply { get; private set; }
+
+    public bool HasApplied { get; private set; }
 
     public async Task<IActionResult> OnGetAsync(Guid id)
     {
@@ -66,7 +70,103 @@ public class DetailsModel : PageModel
             .OrderBy(x => x)
             .ToListAsync();
 
+        if (User.IsInRole("Recruiter") ||
+            User.IsInRole("Administrator"))
+        {
+            Applications = await _dbContext.VacancyResumes
+                .Where(x => x.VacancyId == id)
+                .Select(x => new VacancyApplicantViewModel
+                {
+                    ResumeId = x.ResumeId,
+                    UserId = x.Resume.UserId,
+                    FirstName = x.Resume.User.RequiredUserAttributes != null
+                        ? x.Resume.User.RequiredUserAttributes.Name
+                        : string.Empty,
+                    LastName = x.Resume.User.RequiredUserAttributes != null
+                        ? x.Resume.User.RequiredUserAttributes.SecondName
+                        : string.Empty,
+                    ApplyTime = x.ApplyTime
+                })
+                .OrderByDescending(x => x.ApplyTime)
+                .ToListAsync();
+        }
+
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser != null)
+        {
+            CanApply =
+                User.IsInRole("Candidate") ||
+                User.IsInRole("Administrator");
+
+            var resume = await _dbContext.Resumes
+                .FirstOrDefaultAsync(r =>
+                    r.UserId == currentUser.Id &&
+                    r.PositionId == vacancy.PositionId);
+
+            if (resume != null)
+            {
+                HasApplied = await _dbContext.VacancyResumes
+                    .AnyAsync(vr =>
+                        vr.VacancyId == vacancy.Id &&
+                        vr.ResumeId == resume.Id);
+            }
+        }
+
         return Page();
+    }
+
+    public async Task<IActionResult> OnPostApplyAsync(Guid id)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser == null)
+        {
+            return Challenge();
+        }
+
+        if (!User.IsInRole("Candidate") &&
+            !User.IsInRole("Administrator"))
+        {
+            return Forbid();
+        }
+
+        var vacancy = await _dbContext.Vacancies
+            .Include(v => v.Position)
+            .FirstOrDefaultAsync(v => v.Id == id);
+
+        if (vacancy == null)
+        {
+            return NotFound();
+        }
+
+        var resume = await _dbContext.Resumes
+            .FirstOrDefaultAsync(r =>
+                r.UserId == currentUser.Id &&
+                r.PositionId == vacancy.PositionId);
+
+        if (resume == null)
+        {
+            return RedirectToPage(
+                "/Resumes/Create",
+                new { vacancyId = vacancy.Id });
+        }
+
+        var alreadyApplied = await _dbContext.VacancyResumes
+            .AnyAsync(vr =>
+                vr.VacancyId == vacancy.Id &&
+                vr.ResumeId == resume.Id);
+
+        if (alreadyApplied)
+        {
+            return RedirectToPage(
+                "/Vacancies/Details",
+                new { id = vacancy.Id });
+        }
+
+        return RedirectToPage(
+            "/Resumes/Create",
+            new { id = resume.Id, vacancyId = vacancy.Id });
     }
 
     public async Task<IActionResult> OnPostDeleteAsync(Guid id)
@@ -101,8 +201,7 @@ public class DetailsModel : PageModel
 
         if (vacancyTags.Count > 0)
         {
-            _dbContext.VacancyTags.RemoveRange(
-                vacancyTags);
+            _dbContext.VacancyTags.RemoveRange(vacancyTags);
         }
 
         _dbContext.Vacancies.Remove(vacancy);
@@ -130,5 +229,18 @@ public class DetailsModel : PageModel
         public string Value { get; set; } = string.Empty;
 
         public string DataTypeName { get; set; } = string.Empty;
+    }
+
+    public class VacancyApplicantViewModel
+    {
+        public int ResumeId { get; set; }
+
+        public string UserId { get; set; } = string.Empty;
+
+        public string FirstName { get; set; } = string.Empty;
+
+        public string LastName { get; set; } = string.Empty;
+
+        public DateTime ApplyTime { get; set; }
     }
 }

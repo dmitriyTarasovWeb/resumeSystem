@@ -56,8 +56,10 @@ public class CreateModel : PageModel
             }
 
             Input.Title = vacancy.Title;
-            Input.Description = vacancy.Description;
             Input.PositionId = vacancy.Position.Id;
+            Input.PositionName = vacancy.Position.Name;
+            Input.Description = vacancy.Description;
+            Input.MaxProjects = vacancy.MaxProjects;
 
 
             Input.DynamicAttributes =
@@ -99,7 +101,7 @@ public class CreateModel : PageModel
             return Page();
         }
 
-        var position = await ResolvePositionAsync();
+        var position = await ResolvePositionAsync(Input.PositionName);
 
         if (position == null)
         {
@@ -128,14 +130,13 @@ public class CreateModel : PageModel
                 return NotFound();
             }
 
-            vacancy.Title =
-                Input.Title.Trim();
+            vacancy.Title = Input.Title.Trim();
 
-            vacancy.Description =
-                Input.Description;
+            vacancy.Description = Input.Description;
 
-            vacancy.Position =
-                position;
+            vacancy.Position = position;
+
+            vacancy.MaxProjects = Input.MaxProjects;
 
             var existingVacancyAttributes =
                 await _dbContext.VacancyAttributes
@@ -170,15 +171,13 @@ public class CreateModel : PageModel
                 UserId = currentUser.Id,
                 Position = position,
                 Title = Input.Title.Trim(),
-                Description = Input.Description
+                Description = Input.Description,
+                MaxProjects = Input.MaxProjects
             };
-
 
             _dbContext.Vacancies.Add(vacancy);
 
-
             AddVacancyAttributes(vacancy);
-
 
             await AddVacancyTagsAsync(vacancy);
         }
@@ -190,53 +189,32 @@ public class CreateModel : PageModel
             new { id = vacancy.Id });
     }
 
-    private async Task<Position?> ResolvePositionAsync()
+    private async Task<Position?> ResolvePositionAsync(string positionName)
     {
-        if (Input.PositionId.HasValue && Input.PositionId.Value > 0)
+        var normalizedName = positionName.Trim();
+
+        if (string.IsNullOrWhiteSpace(normalizedName))
         {
-            var existingPosition = await _dbContext.Positions
-                .FirstOrDefaultAsync(p =>
-                    p.Id == Input.PositionId.Value &&
-                    p.IsDisplay);
-
-            if (existingPosition == null)
-            {
-                ModelState.AddModelError(
-                    "Input.PositionId",
-                    "Выбранная должность не найдена.");
-
-                return null;
-            }
-
-            return existingPosition;
-        }
-
-        if (string.IsNullOrWhiteSpace(Input.NewPositionName))
-        {
-            ModelState.AddModelError(
-                "Input.NewPositionName",
-                "Выберите существующую должность или введите новую.");
-
+            ModelState.AddModelError("Input.PositionName", "Введите должность.");
             return null;
         }
 
-        var positionName = Input.NewPositionName.Trim();
+        var position = await _dbContext.Positions
+            .FirstOrDefaultAsync(x => x.Name.ToLower() == normalizedName.ToLower());
 
-        var existingByName = await _dbContext.Positions
-            .FirstOrDefaultAsync(p =>
-                p.IsDisplay &&
-                p.Name.ToLower() == positionName.ToLower());
-
-        if (existingByName != null)
+        if (position != null)
         {
-            return existingByName;
+            return position;
         }
 
-        return new Position
+        position = new Position
         {
-            Name = positionName,
-            IsDisplay = true
+            Name = normalizedName
         };
+
+        _dbContext.Positions.Add(position);
+
+        return position;
     }
 
     private async Task<bool> ValidateDynamicAttributesAsync()
@@ -563,10 +541,13 @@ public class CreateModel : PageModel
         [Display(Name = "Название вакансии")]
         public string Title { get; set; } = string.Empty;
 
-        public int? PositionId { get; set; }
+        [Range(0, 100, ErrorMessage = "Количество проектов должно быть от 0 до 100.")]
+        [Display(Name = "Максимальное количество проектов")]
+        public int MaxProjects { get; set; } = 3;
 
-        [StringLength(200)]
-        public string? NewPositionName { get; set; }
+
+        public int? PositionId { get; set; }
+        public string? PositionName { get; set; }
 
         [Display(Name = "Описание вакансии")]
         public string? Description { get; set; }

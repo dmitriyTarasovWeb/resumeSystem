@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using resumeSystem.Data;
@@ -11,9 +12,11 @@ using resumeSystem.Data;
 namespace resumeSystem.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260925025100_AddResumes")]
+    partial class AddResumes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -900,32 +903,6 @@ namespace resumeSystem.Migrations
                     b.ToTable("resume_attributes", (string)null);
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.ResumeExperience", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer")
-                        .HasColumnName("pk");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ExperienceId")
-                        .HasColumnType("integer")
-                        .HasColumnName("experience_id");
-
-                    b.Property<int>("ResumeId")
-                        .HasColumnType("integer")
-                        .HasColumnName("resume_id");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ExperienceId");
-
-                    b.HasIndex("ResumeId");
-
-                    b.ToTable("resume_experiences", (string)null);
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -995,10 +972,6 @@ namespace resumeSystem.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("text")
                         .HasColumnName("description");
-
-                    b.Property<int>("MaxProjects")
-                        .HasColumnType("integer")
-                        .HasColumnName("max_projects");
 
                     b.Property<int>("PositionId")
                         .HasColumnType("integer")
@@ -1300,25 +1273,6 @@ namespace resumeSystem.Migrations
                     b.Navigation("UserAttribute");
                 });
 
-            modelBuilder.Entity("resumeSystem.Domain.ResumeExperience", b =>
-                {
-                    b.HasOne("resumeSystem.Domain.Experience", "Experience")
-                        .WithMany()
-                        .HasForeignKey("ExperienceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("resumeSystem.Domain.Resume", "Resume")
-                        .WithMany("ResumeExperiences")
-                        .HasForeignKey("ResumeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Experience");
-
-                    b.Navigation("Resume");
-                });
-
             modelBuilder.Entity("resumeSystem.Domain.UserAttribute", b =>
                 {
                     b.HasOne("resumeSystem.Domain.Attribute", "Attribute")
@@ -1432,8 +1386,6 @@ namespace resumeSystem.Migrations
             modelBuilder.Entity("resumeSystem.Domain.Resume", b =>
                 {
                     b.Navigation("ResumeAttributes");
-
-                    b.Navigation("ResumeExperiences");
 
                     b.Navigation("VacancyResumes");
                 });
