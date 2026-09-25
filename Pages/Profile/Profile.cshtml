@@ -294,6 +294,71 @@
         </section>
 
 
+        <section class="border rounded bg-white mb-4">
+
+            <div class="border-bottom px-3 px-md-4 py-3">
+
+                <h2 class="h6 mb-0 fw-semibold">
+                    Резюме
+                </h2>
+
+            </div>
+
+
+            <div class="p-3 p-md-4">
+
+                <div class="table-responsive">
+
+                    <table id="resumes-table"
+                           class="table table-striped table-hover align-middle w-100"
+                           style="table-layout: fixed;">
+
+                        <thead>
+
+                            <tr>
+
+                                <th class="text-start">
+                                    Должность
+                                </th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody>
+
+                            @foreach (var resume in Model.Resumes)
+                            {
+                                <tr data-url="@(
+                                    resume.VacancyId.HasValue
+                                        ? Url.Page(
+                                            "/Resumes/Create",
+                                            new
+                                            {
+                                                vacancyId = resume.VacancyId.Value
+                                            })
+                                        : null
+                                )"
+                                    style="cursor: pointer;">
+
+                                    <td class="text-start fw-semibold">
+                                        @resume.PositionName
+                                    </td>
+
+                                </tr>
+                            }
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
         @if (canEdit)
         {
             <div class="d-flex justify-content-end pt-2">
@@ -1674,5 +1739,43 @@
                 getAll: () => experiences
             }
         })
+
+
+        const resumesTable = document.getElementById("resumes-table")
+
+            if (resumesTable) {
+
+                new DataTable(resumesTable, {
+                    autoWidth: false,
+                    pageLength: 10,
+
+                    lengthMenu: [
+                        [10, 25, 50, 100, -1],
+                        [10, 25, 50, 100, "Все"]
+                    ],
+
+                    order: [[0, "asc"]]
+                })
+
+
+                const resumesTbody = resumesTable.querySelector("tbody")
+
+                resumesTbody?.addEventListener("click", function (event) {
+
+                    const row = event.target.closest("tr")
+
+                    if (!row) {
+                        return
+                    }
+
+                    const url = row.dataset.url
+
+                    if (url) {
+                        window.location.href = url
+                    }
+
+                })
+
+            }
     </script>
 }

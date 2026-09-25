@@ -144,7 +144,7 @@ public class DetailsModel : PageModel
         }
 
         return RedirectToPage(
-            "/Resumes/Details",
+            "/Resumes/Create",
             new { id = resume.Id, vacancyId = vacancy.Id });
     }
 

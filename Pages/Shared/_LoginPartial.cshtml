@@ -10,7 +10,7 @@
 
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
-        @if (User.IsInRole("Admin") || User.IsInRole("Recruiter"))
+        @if (User.IsInRole("Administrator") || User.IsInRole("Recruiter"))
         {
             <li class="nav-item ms-lg-3">
                 <a class="btn btn-outline-primary btn-sm mt-1" asp-area="" asp-page="/Vacancies/Create">

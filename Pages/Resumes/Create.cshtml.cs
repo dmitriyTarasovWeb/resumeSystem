@@ -23,11 +23,12 @@ public class CreateModel : PageModel
     }
 
     [BindProperty]
-    public List<int> SelectedExperienceIds { get; set; } = new();
+    public RequiredUserAttributesViewModel RequiredAttributes { get; set; } = null!;
 
+    [BindProperty]
+    public Dictionary<int, string> DynamicAttributes { get; set; } = new();
     public ResumeVacancyViewModel Vacancy { get; set; } = null!;
 
-    public RequiredUserAttributesViewModel RequiredAttributes { get; set; } = null!;
 
     public List<ResumeAttributeViewModel> Attributes { get; set; } = new();
 
@@ -168,6 +169,201 @@ public class CreateModel : PageModel
         return Page();
     }
 
+
+    public async Task<IActionResult> OnPostAsync(Guid vacancyId)
+    {
+        var currentUser = await _userManager.GetUserAsync(User);
+
+        if (currentUser == null)
+        {
+            return Challenge();
+        }
+
+        var vacancy = await _dbContext.Vacancies
+            .Include(v => v.VacancyTags)
+                .ThenInclude(vt => vt.Tag)
+            .FirstOrDefaultAsync(v => v.Id == vacancyId);
+
+        if (vacancy == null)
+        {
+            return NotFound();
+        }
+
+        var requiredAttributes = await _dbContext.RequiredUserAttributes
+            .FirstOrDefaultAsync(x => x.UserId == currentUser.Id);
+
+        if (requiredAttributes == null)
+        {
+            return NotFound();
+        }
+
+        requiredAttributes.Name =
+            RequiredAttributes.FirstName?.Trim() ?? string.Empty;
+
+        requiredAttributes.SecondName =
+            RequiredAttributes.LastName?.Trim() ?? string.Empty;
+
+        requiredAttributes.Age =
+            RequiredAttributes.Age;
+
+        requiredAttributes.Location =
+            RequiredAttributes.Location?.Trim();
+
+        requiredAttributes.Description =
+            RequiredAttributes.Description;
+
+        await ProcessResumeDynamicAttributesAsync(
+            currentUser.Id,
+            vacancyId);
+
+        var vacancyTagTitles = vacancy.VacancyTags
+            .Select(vt => vt.Tag.Title)
+            .Where(title => !string.IsNullOrWhiteSpace(title))
+            .ToHashSet(StringComparer.OrdinalIgnoreCase);
+
+        var userExperiences = await _dbContext.Experiences
+            .Include(e => e.ExperienceTags)
+                .ThenInclude(et => et.Tag)
+            .Where(e => e.UserId == currentUser.Id)
+            .ToListAsync();
+
+        var selectedExperiences = userExperiences
+            .Select(experience => new
+            {
+                Experience = experience,
+                MatchCount = experience.ExperienceTags
+                    .Select(et => et.Tag.Title)
+                    .Count(title => vacancyTagTitles.Contains(title))
+            })
+            .Where(x => x.MatchCount > 0)
+            .OrderByDescending(x => x.MatchCount)
+            .Take(vacancy.MaxProjects)
+            .Select(x => x.Experience)
+            .ToList();
+
+        var resume = await _dbContext.Resumes
+            .FirstOrDefaultAsync(r =>
+                r.UserId == currentUser.Id &&
+                r.PositionId == vacancy.PositionId);
+
+        if (resume == null)
+        {
+            resume = new Resume
+            {
+                UserId = currentUser.Id,
+                PositionId = vacancy.PositionId
+            };
+
+            _dbContext.Resumes.Add(resume);
+        }
+
+        var existingResumeExperiences = await _dbContext.ResumeExperiences
+            .Where(x => x.ResumeId == resume.Id)
+            .ToListAsync();
+
+        if (existingResumeExperiences.Count > 0)
+        {
+            _dbContext.ResumeExperiences.RemoveRange(
+                existingResumeExperiences);
+        }
+
+        var resumeExperiences = selectedExperiences
+            .Select(experience => new ResumeExperience
+            {
+                Resume = resume,
+                ExperienceId = experience.Id
+            })
+            .ToList();
+
+        if (resumeExperiences.Count > 0)
+        {
+            _dbContext.ResumeExperiences.AddRange(
+                resumeExperiences);
+        }
+
+        var vacancyResume = await _dbContext.VacancyResumes
+            .FirstOrDefaultAsync(x =>
+                x.ResumeId == resume.Id &&
+                x.VacancyId == vacancy.Id);
+
+        if (vacancyResume == null)
+        {
+            vacancyResume = new VacancyResume
+            {
+                Resume = resume,
+                VacancyId = vacancy.Id,
+                ApplyTime = DateTime.UtcNow
+            };
+
+            _dbContext.VacancyResumes.Add(vacancyResume);
+        }
+
+        await _dbContext.SaveChangesAsync();
+
+        return RedirectToPage(
+            "/Vacancies/Details",
+            new { id = vacancy.Id });
+    }
+
+
+    private async Task ProcessResumeDynamicAttributesAsync(
+    string userId,
+    Guid vacancyId)
+    {
+        DynamicAttributes ??= new Dictionary<int, string>();
+
+        var vacancyAttributeIds = await _dbContext.VacancyAttributes
+            .Where(x => x.Vacancy.Id == vacancyId)
+            .Select(x => x.AttributeId)
+            .ToListAsync();
+
+        var postedAttributes = DynamicAttributes
+            .Where(x => vacancyAttributeIds.Contains(x.Key))
+            .ToDictionary(
+                x => x.Key,
+                x => x.Value ?? string.Empty);
+
+        if (postedAttributes.Count == 0)
+        {
+            return;
+        }
+
+        var existingUserAttributes = await _dbContext.UserAttributes
+            .Where(x =>
+                x.UserId == userId &&
+                postedAttributes.Keys.Contains(x.AttributeId))
+            .ToListAsync();
+
+        var existingByAttributeId = existingUserAttributes
+            .ToDictionary(x => x.AttributeId);
+
+        var newAttributes = new List<UserAttribute>();
+
+        foreach (var item in postedAttributes)
+        {
+            var value = item.Value.Trim();
+
+            if (existingByAttributeId.TryGetValue(item.Key, out var existingAttribute))
+            {
+                existingAttribute.Value = value;
+            }
+            else
+            {
+                newAttributes.Add(new UserAttribute
+                {
+                    UserId = userId,
+                    AttributeId = item.Key,
+                    Value = value
+                });
+            }
+        }
+
+        if (newAttributes.Count > 0)
+        {
+            _dbContext.UserAttributes.AddRange(newAttributes);
+        }
+    }
+
     private class VacancyAttributeData
     {
         public int AttributeId { get; set; }
@@ -244,4 +440,6 @@ public class CreateModel : PageModel
 
         public List<string> Tags { get; set; } = new();
     }
+
+
 }

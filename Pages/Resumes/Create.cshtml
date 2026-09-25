@@ -5,6 +5,11 @@
     ViewData["Title"] = "Формирование резюме";
 }
 
+<form method="post">
+    <input type="hidden"
+           name="vacancyId"
+           value="@Model.Vacancy.Id" />
+
 <div class="container py-4 pb-5">
 
     <div class="mb-4">
@@ -61,9 +66,10 @@
                     </label>
 
                     <input type="text"
-                           class="form-control"
-                           value="@Model.RequiredAttributes.FirstName"
-                           required />
+                       name="RequiredAttributes.FirstName"
+                       class="form-control"
+                       value="@Model.RequiredAttributes.FirstName"
+                       required />
 
                 </div>
 
@@ -75,9 +81,10 @@
                     </label>
 
                     <input type="text"
-                           class="form-control"
-                           value="@Model.RequiredAttributes.LastName"
-                           required />
+                       name="RequiredAttributes.LastName"
+                       class="form-control"
+                       value="@Model.RequiredAttributes.LastName"
+                       required />
 
                 </div>
 
@@ -89,9 +96,10 @@
                     </label>
 
                     <input type="number"
-                           class="form-control"
-                           value="@Model.RequiredAttributes.Age"
-                           required />
+                       name="RequiredAttributes.Age"
+                       class="form-control"
+                       value="@Model.RequiredAttributes.Age"
+                       required />
 
                 </div>
 
@@ -103,9 +111,10 @@
                     </label>
 
                     <input type="text"
-                           class="form-control"
-                           value="@Model.RequiredAttributes.Location"
-                           required />
+                       name="RequiredAttributes.Location"
+                       class="form-control"
+                       value="@Model.RequiredAttributes.Location"
+                       required />
 
                 </div>
 
@@ -118,9 +127,10 @@
                     О себе
                 </label>
 
-                <textarea class="form-control"
-                          rows="5"
-                          required>@Model.RequiredAttributes.Description</textarea>
+                <textarea name="RequiredAttributes.Description"
+                  class="form-control"
+                  rows="5"
+                  required>@Model.RequiredAttributes.Description</textarea>
 
             </div>
 
@@ -201,11 +211,17 @@
                                 var periodParts = (attr.Value ?? "")
                                     .Split('/', StringSplitOptions.None);
 
-                                <div class="d-flex align-items-center gap-2">
+                                <div class="d-flex align-items-center gap-2"
+                                     data-period-container="@attr.AttributeId">
+
+                                    <input type="hidden"
+                                           name="DynamicAttributes[@attr.AttributeId]"
+                                           value="@attr.Value" />
 
                                     <input type="date"
                                            class="form-control"
                                            value="@(periodParts.Length > 0 ? periodParts[0] : "")"
+                                           data-period-start
                                            required />
 
                                     <span>-</span>
@@ -213,6 +229,7 @@
                                     <input type="date"
                                            class="form-control"
                                            value="@(periodParts.Length > 1 ? periodParts[1] : "")"
+                                           data-period-end
                                            required />
 
                                 </div>
@@ -223,6 +240,10 @@
                             case 6:
 
                                 <div class="form-check form-switch">
+
+                                    <input type="hidden"
+                                           name="DynamicAttributes[@attr.AttributeId]"
+                                           value="false" />
 
                                     <input type="checkbox"
                                            class="form-check-input"
@@ -354,11 +375,50 @@
         </a>
 
 
-        <button type="button"
-                class="btn btn-primary">
-            Сохранить резюме
+        <button type="submit" class="btn btn-primary">
+            Создать резюме
         </button>
 
     </div>
 
 </div>
+</div>
+
+
+
+
+
+    <script>
+        document.querySelectorAll("[data-period-container]").forEach(container => {
+            const startInput = container.querySelector("[data-period-start]")
+            const endInput = container.querySelector("[data-period-end]")
+            const hiddenInput = container.querySelector('input[type="hidden"]')
+
+            function updatePeriod() {
+                if (!startInput.value || !endInput.value) {
+                    hiddenInput.value = ""
+                    return
+                }
+
+                hiddenInput.value = `${startInput.value}/${endInput.value}`
+            }
+
+            startInput.addEventListener("change", updatePeriod)
+            endInput.addEventListener("change", updatePeriod)
+        })
+
+        document.querySelector("form").addEventListener("submit", () => {
+            document.querySelectorAll("[data-period-container]").forEach(container => {
+                const startInput = container.querySelector("[data-period-start]")
+                const endInput = container.querySelector("[data-period-end]")
+                const hiddenInput = container.querySelector('input[type="hidden"]')
+
+                if (startInput.value && endInput.value) {
+                    hiddenInput.value = `${startInput.value}/${endInput.value}`
+                } else {
+                    hiddenInput.value = ""
+                }
+            })
+        })
+    </script>
+</form>

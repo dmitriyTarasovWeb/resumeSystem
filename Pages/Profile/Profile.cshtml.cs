@@ -50,7 +50,7 @@ public class ProfileModel : PageModel
     public List<ProfileAttributeViewModel> ProfileAttributes { get; set; } = new();
     public List<Category> AvailableCategories { get; set; } = new();
     public List<ExperienceViewModel> Experiences { get; set; } = new();
-
+    public List<ResumeViewModel> Resumes { get; set; } = new();
     public async Task<IActionResult> OnGetAsync()
     {
         var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
@@ -341,6 +341,21 @@ public class ProfileModel : PageModel
             Tags = e.ExperienceTags.Select(et => et.Tag.Title).ToList()
         }).ToList();
 
+        var userResumes = await _dbContext.Resumes
+            .Include(r => r.Position)
+            .Where(r => r.UserId == targetUser.Id)
+            .OrderBy(r => r.Position.Name)
+            .ToListAsync();
+
+        Resumes = userResumes
+            .Select(r => new ResumeViewModel
+            {
+                Id = r.Id,
+                PositionId = r.PositionId,
+                PositionName = r.Position.Name
+            })
+            .ToList();
+
         var allTags = await _dbContext.Tags
             .Where(t => t.IsDisplay)
             .Select(t => t.Title)
@@ -402,5 +417,13 @@ public class ProfileModel : PageModel
         public string? Description { get; set; }
 
         public string Email { get; set; } = string.Empty;
+    }
+
+    public class ResumeViewModel
+    {
+        public int Id { get; set; }
+        public int PositionId { get; set; }
+        public string PositionName { get; set; } = string.Empty;
+        public Guid? VacancyId { get; set; }
     }
 }
