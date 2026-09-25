@@ -8,6 +8,17 @@
 {
     @if (User.Identity != null && User.Identity.IsAuthenticated)
     {
+        @if (User.IsInRole("Administrator"))
+        {
+            <li class="nav-item">
+                <a class="btn btn-light btn-sm" asp-page="/Admin/Users">
+                    Управление пользователями
+                </a>
+            </li>
+        }
+
+
+
         @if (User.IsInRole("Administrator") || User.IsInRole("Recruiter"))
         {
             <li class="nav-item">
@@ -28,6 +39,9 @@
                 </a>
             </li>
         }
+
+
+        
     }
 
     <li class="nav-item">
