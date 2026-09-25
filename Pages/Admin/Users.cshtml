@@ -78,8 +78,12 @@
                                                value="@user.Id" />
                                     </td>
 
-                                    <td class="text-start">
-                                        @user.Email
+                                    <td class="text-start fw-semibold">
+                                        <a asp-page="/Profile/Profile"
+                                           asp-route-id="@user.Id"
+                                           class="text-decoration-none">
+                                            @user.Email
+                                        </a>
                                     </td>
 
                                     <td class="text-start">
