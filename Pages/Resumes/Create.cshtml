@@ -139,11 +139,13 @@
                     О себе
                 </label>
 
-                <textarea name="RequiredAttributes.Description"
-                  class="form-control"
-                  rows="5"
-                  @(Model.CanEdit ? null : "readonly")
-                  required>@Model.RequiredAttributes.Description</textarea>
+                <div class="form-control bg-light">
+                    @Html.Raw(
+                        Markdig.Markdown.ToHtml(
+                            Model.RequiredAttributes.Description ?? string.Empty
+                        )
+                    )
+                </div>
 
             </div>
 
@@ -272,7 +274,7 @@
                                        @(Model.CanEdit ? null : "disabled") />
 
                                     <label class="form-check-label">
-                                        Да / Нет
+                                        Нет / Да
                                     </label>
 
                                 </div>
@@ -357,8 +359,12 @@
 
                             @if (!string.IsNullOrWhiteSpace(experience.Description))
                             {
-                                <div class="mb-2">
-                                    @experience.Description
+                                <div class="form-control bg-light">
+                                    @Html.Raw(
+                                        Markdig.Markdown.ToHtml(
+                                            experience.Description ?? string.Empty
+                                        )
+                                    )
                                 </div>
                             }
 
