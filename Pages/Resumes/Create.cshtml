@@ -69,6 +69,7 @@
                        name="RequiredAttributes.FirstName"
                        class="form-control"
                        value="@Model.RequiredAttributes.FirstName"
+                       @(Model.CanEdit ? null : "readonly")
                        required />
 
                 </div>
@@ -84,6 +85,7 @@
                        name="RequiredAttributes.LastName"
                        class="form-control"
                        value="@Model.RequiredAttributes.LastName"
+                       @(Model.CanEdit ? null : "readonly")
                        required />
 
                 </div>
@@ -99,6 +101,7 @@
                        name="RequiredAttributes.Age"
                        class="form-control"
                        value="@Model.RequiredAttributes.Age"
+                       @(Model.CanEdit ? null : "readonly")
                        required />
 
                 </div>
@@ -114,6 +117,7 @@
                        name="RequiredAttributes.Location"
                        class="form-control"
                        value="@Model.RequiredAttributes.Location"
+                       @(Model.CanEdit ? null : "readonly")
                        required />
 
                 </div>
@@ -130,6 +134,7 @@
                 <textarea name="RequiredAttributes.Description"
                   class="form-control"
                   rows="5"
+                  @(Model.CanEdit ? null : "readonly")
                   required>@Model.RequiredAttributes.Description</textarea>
 
             </div>
@@ -176,6 +181,7 @@
                                        name="DynamicAttributes[@attr.AttributeId]"
                                        class="form-control"
                                        value="@attr.Value"
+                                       @(Model.CanEdit ? null : "readonly")
                                        required />
                                 break;
 
@@ -184,6 +190,7 @@
                                 <textarea name="DynamicAttributes[@attr.AttributeId]"
                                           class="form-control"
                                           rows="4"
+                                          @(Model.CanEdit ? null : "readonly")
                                           required>@attr.Value</textarea>
                                 break;
 
@@ -194,6 +201,7 @@
                                        name="DynamicAttributes[@attr.AttributeId]"
                                        class="form-control"
                                        value="@attr.Value"
+                                       @(Model.CanEdit ? null : "readonly")
                                        required />
                                 break;
 
@@ -203,6 +211,7 @@
                                        name="DynamicAttributes[@attr.AttributeId]"
                                        class="form-control"
                                        value="@attr.Value"
+                                       @(Model.CanEdit ? null : "readonly")
                                        required />
                                 break;
 
@@ -219,16 +228,18 @@
                                            value="@attr.Value" />
 
                                     <input type="date"
-                                           class="form-control"
-                                           value="@(periodParts.Length > 0 ? periodParts[0] : "")"
-                                           data-period-start
-                                           required />
+                                       class="form-control"
+                                       value="@(periodParts.Length > 0 ? periodParts[0] : "")"
+                                       @(Model.CanEdit ? null : "readonly")
+                                       data-period-start
+                                       required />
 
                                     <span>-</span>
 
                                     <input type="date"
                                            class="form-control"
                                            value="@(periodParts.Length > 1 ? periodParts[1] : "")"
+                                           @(Model.CanEdit ? null : "readonly")
                                            data-period-end
                                            required />
 
@@ -246,10 +257,11 @@
                                            value="false" />
 
                                     <input type="checkbox"
-                                           class="form-check-input"
-                                           name="DynamicAttributes[@attr.AttributeId]"
-                                           value="true"
-                                           @(attr.Value == "true" ? "checked" : null) />
+                                       class="form-check-input"
+                                       name="DynamicAttributes[@attr.AttributeId]"
+                                       value="true"
+                                       @(attr.Value == "true" ? "checked" : null)
+                                       @(Model.CanEdit ? null : "disabled") />
 
                                     <label class="form-check-label">
                                         Да / Нет
@@ -263,8 +275,9 @@
                             case 7:
 
                                 <select name="DynamicAttributes[@attr.AttributeId]"
-                                        class="form-select"
-                                        required>
+                                    class="form-select"
+                                    @(Model.CanEdit ? null : "disabled")
+                                    required>
 
                                     <option value="">
                                         -- Выберите --
@@ -375,9 +388,12 @@
         </a>
 
 
-        <button type="submit" class="btn btn-primary">
-            Создать резюме
-        </button>
+        @if (Model.CanEdit)
+        {
+            <button type="submit" class="btn btn-primary">
+                Сохранить резюме
+            </button>
+        }
 
     </div>
 

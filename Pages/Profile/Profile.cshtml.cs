@@ -364,6 +364,79 @@ public class ProfileModel : PageModel
         ViewData["AllTagsJson"] = JsonSerializer.Serialize(allTags);
     }
 
+    public async Task<IActionResult> OnGetResumeAsync(int resumeId)
+    {
+        var (currentUser, targetUser, errorResult) =
+            await GetUserContextAsync();
+
+        if (errorResult != null)
+        {
+            return errorResult;
+        }
+
+        await LoadPageDataAsync(
+            currentUser!,
+            targetUser!);
+
+        if (!CanView)
+        {
+            return Forbid();
+        }
+
+        var resume = await _dbContext.Resumes
+            .Where(r => r.Id == resumeId)
+            .Select(r => new
+            {
+                r.Id,
+                r.UserId,
+                r.PositionId,
+                VacancyId = r.VacancyResumes
+                    .OrderByDescending(vr => vr.ApplyTime)
+                    .Select(vr => (Guid?)vr.VacancyId)
+                    .FirstOrDefault()
+            })
+            .FirstOrDefaultAsync();
+
+        if (resume == null)
+        {
+            return NotFound();
+        }
+
+        if (resume.UserId != targetUser!.Id)
+        {
+            return Forbid();
+        }
+
+        if (resume.VacancyId.HasValue)
+        {
+            return RedirectToPage(
+                "/Resumes/Create",
+                new
+                {
+                    vacancyId = resume.VacancyId.Value,
+                    resumeId = resume.Id
+                });
+        }
+
+        var fallbackVacancyId = await _dbContext.Vacancies
+            .Where(v => v.PositionId == resume.PositionId)
+            .Select(v => (Guid?)v.Id)
+            .FirstOrDefaultAsync();
+
+        if (!fallbackVacancyId.HasValue)
+        {
+            return NotFound();
+        }
+
+        return RedirectToPage(
+            "/Resumes/Create",
+            new
+            {
+                vacancyId = fallbackVacancyId.Value,
+                resumeId = resume.Id
+            });
+    }
+
     public class ProfileAttributeViewModel
     {
         public int AttributeId { get; set; }
@@ -426,4 +499,5 @@ public class ProfileModel : PageModel
         public string PositionName { get; set; } = string.Empty;
         public Guid? VacancyId { get; set; }
     }
+
 }

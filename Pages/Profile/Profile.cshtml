@@ -329,20 +329,16 @@
 
                             @foreach (var resume in Model.Resumes)
                             {
-                                <tr data-url="@(
-                                    resume.VacancyId.HasValue
-                                        ? Url.Page(
-                                            "/Resumes/Create",
-                                            new
-                                            {
-                                                vacancyId = resume.VacancyId.Value
-                                            })
-                                        : null
-                                )"
-                                    style="cursor: pointer;">
+                                <tr>
 
                                     <td class="text-start fw-semibold">
-                                        @resume.PositionName
+
+                                        <a asp-page-handler="Resume"
+                                           asp-route-resumeId="@resume.Id"
+                                           class="text-decoration-none">
+                                            @resume.PositionName
+                                        </a>
+
                                     </td>
 
                                 </tr>
@@ -1743,39 +1739,20 @@
 
         const resumesTable = document.getElementById("resumes-table")
 
-            if (resumesTable) {
+        if (resumesTable) {
 
-                new DataTable(resumesTable, {
-                    autoWidth: false,
-                    pageLength: 10,
+            new DataTable(resumesTable, {
+                autoWidth: false,
+                pageLength: 10,
 
-                    lengthMenu: [
-                        [10, 25, 50, 100, -1],
-                        [10, 25, 50, 100, "Все"]
-                    ],
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "Все"]
+                ],
 
-                    order: [[0, "asc"]]
-                })
+                order: [[0, "asc"]]
+            })
 
-
-                const resumesTbody = resumesTable.querySelector("tbody")
-
-                resumesTbody?.addEventListener("click", function (event) {
-
-                    const row = event.target.closest("tr")
-
-                    if (!row) {
-                        return
-                    }
-
-                    const url = row.dataset.url
-
-                    if (url) {
-                        window.location.href = url
-                    }
-
-                })
-
-            }
+        }
     </script>
 }

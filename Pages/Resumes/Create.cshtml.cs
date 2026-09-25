@@ -27,6 +27,11 @@ public class CreateModel : PageModel
 
     [BindProperty]
     public Dictionary<int, string> DynamicAttributes { get; set; } = new();
+
+    [BindProperty(SupportsGet = true)]
+    public int? ResumeId { get; set; }
+
+    public bool CanEdit { get; set; }
     public ResumeVacancyViewModel Vacancy { get; set; } = null!;
 
 
@@ -43,6 +48,34 @@ public class CreateModel : PageModel
             return Challenge();
         }
 
+        Resume? resume = null;
+
+        if (ResumeId.HasValue)
+        {
+            resume = await _dbContext.Resumes
+                .Include(r => r.Position)
+                .FirstOrDefaultAsync(r => r.Id == ResumeId.Value);
+
+            if (resume == null)
+            {
+                return NotFound();
+            }
+
+            var isAdministrator =
+                await _userManager.IsInRoleAsync(currentUser, "Administrator");
+
+            CanEdit =
+                resume.UserId == currentUser.Id ||
+                isAdministrator;
+        }
+        else
+        {
+            CanEdit = true;
+        }
+
+
+
+
         var vacancy = await _dbContext.Vacancies
             .Include(v => v.Position)
             .Include(v => v.VacancyTags)
@@ -54,6 +87,17 @@ public class CreateModel : PageModel
             return NotFound();
         }
 
+
+
+
+
+
+
+        var resumeUserId = resume?.UserId ?? currentUser.Id;
+
+        var requiredAttributes = await _dbContext.RequiredUserAttributes
+            .FirstOrDefaultAsync(x => x.UserId == resumeUserId);
+
         var vacancyTagTitles = vacancy.VacancyTags
             .Select(vt => vt.Tag.Title)
             .Where(title => !string.IsNullOrWhiteSpace(title))
@@ -62,37 +106,34 @@ public class CreateModel : PageModel
         var userExperiences = await _dbContext.Experiences
             .Include(e => e.ExperienceTags)
                 .ThenInclude(et => et.Tag)
-            .Where(e => e.UserId == currentUser.Id)
+            .Where(e => e.UserId == resumeUserId)
             .ToListAsync();
 
         Experiences = userExperiences
-            .Select(experience => new
-            {
-                Experience = experience,
-                MatchCount = experience.ExperienceTags
-                    .Select(et => et.Tag.Title)
-                    .Count(title => vacancyTagTitles.Contains(title))
-            })
-            .Where(x => x.MatchCount > 0)
-            .OrderByDescending(x => x.MatchCount)
-            .Take(vacancy.MaxProjects)
-            .Select(x => new ResumeExperienceViewModel
-            {
-                Id = x.Experience.Id,
-                CompanyName = x.Experience.CompanyName,
-                StartDate = x.Experience.StartDate,
-                EndDate = x.Experience.EndDate,
-                Description = x.Experience.Description,
-                Tags = x.Experience.ExperienceTags
-                    .Select(et => et.Tag.Title)
-                    .ToList()
-            })
-            .ToList();
+           .Select(experience => new
+           {
+               Experience = experience,
+               MatchCount = experience.ExperienceTags
+                   .Select(et => et.Tag.Title)
+                   .Count(title => vacancyTagTitles.Contains(title))
+           })
+           .Where(x => x.MatchCount > 0)
+           .OrderByDescending(x => x.MatchCount)
+           .Take(vacancy.MaxProjects)
+           .Select(x => new ResumeExperienceViewModel
+           {
+               Id = x.Experience.Id,
+               CompanyName = x.Experience.CompanyName,
+               StartDate = x.Experience.StartDate,
+               EndDate = x.Experience.EndDate,
+               Description = x.Experience.Description,
+               Tags = x.Experience.ExperienceTags
+                   .Select(et => et.Tag.Title)
+                   .ToList()
+           })
+           .ToList();
 
 
-
-        var requiredAttributes = await _dbContext.RequiredUserAttributes
-            .FirstOrDefaultAsync(x => x.UserId == currentUser.Id);
 
         if (requiredAttributes == null)
         {
@@ -117,7 +158,7 @@ public class CreateModel : PageModel
 
         var userAttributes = await _dbContext.UserAttributes
             .Where(x =>
-                x.UserId == currentUser.Id &&
+                x.UserId == resumeUserId &&
                 attributeIds.Contains(x.AttributeId))
             .ToListAsync();
 
