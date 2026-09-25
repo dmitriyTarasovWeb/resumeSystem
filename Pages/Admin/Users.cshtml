@@ -1,0 +1,199 @@
+﻿@page "/Admin/Users"
+@model resumeSystem.Pages.Admin.UsersModel
+
+@{
+    ViewData["Title"] = "Пользователи";
+}
+
+<div class="container py-4 pb-5">
+
+    <div class="border rounded bg-white">
+
+        <div class="border-bottom px-3 px-md-4 py-3">
+            <h1 class="h5 mb-0 fw-semibold">
+                Пользователи
+            </h1>
+        </div>
+
+        <div class="p-3 p-md-4">
+
+            <form method="post" id="users-form">
+
+                <div class="d-flex gap-2 flex-wrap mb-3">
+
+                    <button type="submit"
+                            formaction="?handler=SetRole"
+                            name="role"
+                            value="Candidate"
+                            class="btn btn-outline-primary">
+                        Сделать кандидатом
+                    </button>
+
+                    <button type="submit"
+                            formaction="?handler=SetRole"
+                            name="role"
+                            value="Recruiter"
+                            class="btn btn-outline-primary">
+                        Сделать рекрутером
+                    </button>
+
+                    <button type="submit"
+                            formaction="?handler=SetRole"
+                            name="role"
+                            value="Administrator"
+                            class="btn btn-outline-primary">
+                        Сделать администратором
+                    </button>
+
+                    <button type="submit"
+                            formaction="?handler=Delete"
+                            id="delete-users-button"
+                            class="btn btn-danger">
+                        Удалить
+                    </button>
+
+                </div>
+
+                <div class="table-responsive">
+
+                    <table id="users-table"
+                           class="table table-striped table-hover align-middle w-100"
+                           style="table-layout: fixed;">
+
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;"></th>
+                                <th class="text-start">Email</th>
+                                <th class="text-start">Роль</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var user in Model.Users)
+                            {
+                                <tr>
+                                    <td>
+                                        <input type="checkbox"
+                                               class="form-check-input user-checkbox"
+                                               value="@user.Id" />
+                                    </td>
+
+                                    <td class="text-start">
+                                        @user.Email
+                                    </td>
+
+                                    <td class="text-start">
+                                        @user.Role
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+            </form>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const table = document.getElementById("users-table")
+            const form = document.getElementById("users-form")
+            const deleteButton = document.getElementById("delete-users-button")
+
+            if (!table || !form) {
+                return
+            }
+
+            const selectedUsers = new Set()
+
+            const dataTable = new DataTable(table, {
+                autoWidth: false,
+                pageLength: 10,
+
+                lengthMenu: [
+                    [10, 25, 50, 100, -1],
+                    [10, 25, 50, 100, "Все"]
+                ],
+
+                order: [[1, "asc"]],
+
+                drawCallback: function () {
+
+                    table.querySelectorAll(".user-checkbox")
+                        .forEach(function (checkbox) {
+
+                            checkbox.checked =
+                                selectedUsers.has(checkbox.value)
+
+                        })
+                }
+            })
+
+            table.addEventListener("change", function (event) {
+
+                const checkbox =
+                    event.target.closest(".user-checkbox")
+
+                if (!checkbox) {
+                    return
+                }
+
+                if (checkbox.checked) {
+                    selectedUsers.add(checkbox.value)
+                }
+                else {
+                    selectedUsers.delete(checkbox.value)
+                }
+
+            })
+
+            form.addEventListener("submit", function (event) {
+
+                if (selectedUsers.size === 0) {
+                    event.preventDefault()
+                    return
+                }
+
+                form.querySelectorAll(".selected-user-hidden")
+                    .forEach(function (input) {
+                        input.remove()
+                    })
+
+                selectedUsers.forEach(function (userId) {
+
+                    const input = document.createElement("input")
+
+                    input.type = "hidden"
+                    input.name = "selectedUserIds"
+                    input.value = userId
+                    input.className = "selected-user-hidden"
+
+                    form.appendChild(input)
+
+                })
+
+            })
+
+            deleteButton.addEventListener("click", function (event) {
+
+                if (selectedUsers.size === 0) {
+                    event.preventDefault()
+                    return
+                }
+
+                if (!confirm("Удалить выбранных пользователей?")) {
+                    event.preventDefault()
+                }
+
+            })
+
+        })
+    </script>
+}

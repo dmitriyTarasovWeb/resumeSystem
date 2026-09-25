@@ -188,62 +188,6 @@
 
             </div>
 
-
-            <div class="text-center text-body-secondary small my-4">
-                или
-            </div>
-
-
-            <div class="border rounded bg-white">
-
-                <div class="border-bottom px-4 py-3">
-
-                    <h2 class="h6 mb-0 fw-semibold">
-                        Регистрация через другой сервис
-                    </h2>
-
-                </div>
-
-
-                <div class="p-4">
-
-                    @{
-                        if ((Model.ExternalLogins?.Count ?? 0) == 0)
-                        {
-                            <p class="text-body-secondary small mb-0">
-                                Внешние способы регистрации не настроены.
-                            </p>
-                        }
-                        else
-                        {
-                            <form id="external-account"
-                                  asp-page="./ExternalLogin"
-                                  asp-route-returnUrl="@Model.ReturnUrl"
-                                  method="post">
-
-                                <div class="d-grid gap-2">
-
-                                    @foreach (var provider in Model.ExternalLogins!)
-                                    {
-                                        <button type="submit"
-                                                class="btn btn-outline-secondary"
-                                                name="provider"
-                                                value="@provider.Name"
-                                                title="Зарегистрироваться через @provider.DisplayName">
-                                            @provider.DisplayName
-                                        </button>
-                                    }
-
-                                </div>
-
-                            </form>
-                        }
-                    }
-
-                </div>
-
-            </div>
-
         </div>
 
     </div>
