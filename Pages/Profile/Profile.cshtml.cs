@@ -50,7 +50,7 @@ public class ProfileModel : PageModel
     public List<ProfileAttributeViewModel> ProfileAttributes { get; set; } = new();
     public List<Category> AvailableCategories { get; set; } = new();
     public List<ExperienceViewModel> Experiences { get; set; } = new();
-
+    public List<ResumeViewModel> Resumes { get; set; } = new();
     public async Task<IActionResult> OnGetAsync()
     {
         var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
@@ -83,6 +83,7 @@ public class ProfileModel : PageModel
 
         if (!await HasEditPermissionAsync(currentUser!, targetUser!)) return Forbid();
 
+        ModelState.Remove("");
         if (!ModelState.IsValid)
         {
             Input.Email = targetUser!.Email ?? string.Empty;
@@ -167,7 +168,7 @@ public class ProfileModel : PageModel
 
     private async Task ProcessDynamicAttributesAsync(string targetUserId)
     {
-        if (DynamicAttributes == null || !DynamicAttributes.Any()) return;
+        DynamicAttributes ??= new Dictionary<int, string>();
 
         var existingUserAttributes = await _dbContext.UserAttributes
             .Where(ua => ua.UserId == targetUserId)
@@ -187,13 +188,14 @@ public class ProfileModel : PageModel
         }
 
         var newAttributes = DynamicAttributes
+            .Where(attr => !string.IsNullOrWhiteSpace(attr.Value))
             .Select(attr => new UserAttribute
             {
                 UserId = targetUserId,
                 AttributeId = attr.Key,
                 Value = CleanCheckboxValue(attr.Value)
             })
-            .Where(x => !string.IsNullOrWhiteSpace(x.Value));
+            .ToList();
 
         _dbContext.UserAttributes.AddRange(newAttributes);
     }
@@ -339,12 +341,100 @@ public class ProfileModel : PageModel
             Tags = e.ExperienceTags.Select(et => et.Tag.Title).ToList()
         }).ToList();
 
+        var userResumes = await _dbContext.Resumes
+            .Include(r => r.Position)
+            .Where(r => r.UserId == targetUser.Id)
+            .OrderBy(r => r.Position.Name)
+            .ToListAsync();
+
+        Resumes = userResumes
+            .Select(r => new ResumeViewModel
+            {
+                Id = r.Id,
+                PositionId = r.PositionId,
+                PositionName = r.Position.Name
+            })
+            .ToList();
+
         var allTags = await _dbContext.Tags
             .Where(t => t.IsDisplay)
             .Select(t => t.Title)
             .ToListAsync();
 
         ViewData["AllTagsJson"] = JsonSerializer.Serialize(allTags);
+    }
+
+    public async Task<IActionResult> OnGetResumeAsync(int resumeId)
+    {
+        var (currentUser, targetUser, errorResult) =
+            await GetUserContextAsync();
+
+        if (errorResult != null)
+        {
+            return errorResult;
+        }
+
+        await LoadPageDataAsync(
+            currentUser!,
+            targetUser!);
+
+        if (!CanView)
+        {
+            return Forbid();
+        }
+
+        var resume = await _dbContext.Resumes
+            .Where(r => r.Id == resumeId)
+            .Select(r => new
+            {
+                r.Id,
+                r.UserId,
+                r.PositionId,
+                VacancyId = r.VacancyResumes
+                    .OrderByDescending(vr => vr.ApplyTime)
+                    .Select(vr => (Guid?)vr.VacancyId)
+                    .FirstOrDefault()
+            })
+            .FirstOrDefaultAsync();
+
+        if (resume == null)
+        {
+            return NotFound();
+        }
+
+        if (resume.UserId != targetUser!.Id)
+        {
+            return Forbid();
+        }
+
+        if (resume.VacancyId.HasValue)
+        {
+            return RedirectToPage(
+                "/Resumes/Create",
+                new
+                {
+                    vacancyId = resume.VacancyId.Value,
+                    resumeId = resume.Id
+                });
+        }
+
+        var fallbackVacancyId = await _dbContext.Vacancies
+            .Where(v => v.PositionId == resume.PositionId)
+            .Select(v => (Guid?)v.Id)
+            .FirstOrDefaultAsync();
+
+        if (!fallbackVacancyId.HasValue)
+        {
+            return NotFound();
+        }
+
+        return RedirectToPage(
+            "/Resumes/Create",
+            new
+            {
+                vacancyId = fallbackVacancyId.Value,
+                resumeId = resume.Id
+            });
     }
 
     public class ProfileAttributeViewModel
@@ -401,4 +491,13 @@ public class ProfileModel : PageModel
 
         public string Email { get; set; } = string.Empty;
     }
+
+    public class ResumeViewModel
+    {
+        public int Id { get; set; }
+        public int PositionId { get; set; }
+        public string PositionName { get; set; } = string.Empty;
+        public Guid? VacancyId { get; set; }
+    }
+
 }
