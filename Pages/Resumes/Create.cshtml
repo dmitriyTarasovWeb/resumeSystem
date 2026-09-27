@@ -29,7 +29,7 @@
     </div>
 
 
-    <section class="border rounded bg-white mb-4">
+    <section class="border rounded bg-body mb-4">
 
         <div class="border-bottom px-3 px-md-4 py-3 d-flex justify-content-between align-items-center">
 
@@ -139,7 +139,7 @@
                     О себе
                 </label>
 
-                <div class="form-control bg-light">
+                <div class="form-control bg-body">
                     @Html.Raw(
                         Markdig.Markdown.ToHtml(
                             Model.RequiredAttributes.Description ?? string.Empty
@@ -154,7 +154,7 @@
     </section>
 
 
-    <section class="border rounded bg-white mb-4">
+    <section class="border rounded bg-body mb-4">
 
         <div class="border-bottom px-3 px-md-4 py-3">
 
@@ -316,7 +316,7 @@
 
 
 
-    <section class="border rounded bg-white mb-4">
+    <section class="border rounded bg-body mb-4">
 
         <div class="border-bottom px-3 px-md-4 py-3">
             <h2 class="h6 mb-0 fw-semibold">
@@ -359,7 +359,7 @@
 
                             @if (!string.IsNullOrWhiteSpace(experience.Description))
                             {
-                                <div class="form-control bg-light">
+                                <div class="form-control bg-body">
                                     @Html.Raw(
                                         Markdig.Markdown.ToHtml(
                                             experience.Description ?? string.Empty
