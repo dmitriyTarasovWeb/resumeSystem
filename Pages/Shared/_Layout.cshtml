@@ -4,7 +4,14 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - resumeSystem</title>
+    <script>
+        const savedTheme = localStorage.getItem("theme") || "light"
 
+        document.documentElement.setAttribute(
+            "data-bs-theme",
+            savedTheme
+        )
+    </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/resumeSystem.styles.css" asp-append-version="true" />
@@ -15,7 +22,7 @@
 
 <body>
     <header>
-        <nav class="navbar navbar-expand-sm navbar-light bg-white border-bottom mb-3">
+        <nav class="navbar navbar-expand-xxl navbar-light bg-body border-bottom mb-3">
             <div class="container">
                 <a class="navbar-brand fw-semibold"
                    asp-area=""
@@ -33,7 +40,7 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                <div class="navbar-collapse collapse d-xxl-inline-flex justify-content-between">
                     <ul class="navbar-nav flex-grow-1">
                     </ul>
 

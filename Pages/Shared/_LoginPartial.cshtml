@@ -4,6 +4,8 @@
 @inject UserManager<ApplicationUser> UserManager
 
 <ul class="navbar-nav align-items-lg-center gap-lg-2">
+
+
 @if (SignInManager.IsSignedIn(User))
 {
     @if (User.Identity != null && User.Identity.IsAuthenticated)
@@ -11,7 +13,7 @@
         @if (User.IsInRole("Administrator"))
         {
             <li class="nav-item">
-                <a class="btn btn-light btn-sm" asp-page="/Admin/Users">
+                <a class="btn btn-outline-secondary btn-sm" asp-page="/Admin/Users">
                     Управление пользователями
                 </a>
             </li>
@@ -22,19 +24,19 @@
         @if (User.IsInRole("Administrator") || User.IsInRole("Recruiter"))
         {
             <li class="nav-item">
-                <a class="btn btn-light btn-sm" asp-page="/Resumes/Index">
+                <a class="btn btn-outline-secondary btn-sm" asp-page="/Resumes/Index">
                     Банк резюме
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="btn btn-light btn-sm" asp-area="" asp-page="/Vacancies/Create">
+                <a class="btn btn-outline-secondary btn-sm" asp-area="" asp-page="/Vacancies/Create">
                     Создать вакансию
                 </a>
             </li>
 
             <li class="nav-item">
-                <a class="btn btn-light btn-sm" asp-area="" asp-page="/Attributes/Index">
+                <a class="btn btn-outline-secondary btn-sm" asp-area="" asp-page="/Attributes/Index">
                     Библиотека атрибутов
                 </a>
             </li>
@@ -45,29 +47,29 @@
     }
 
     <li class="nav-item">
-        <a class="btn btn-light btn-sm" href="/Profile">
+        <a class="btn btn-outline-secondary btn-sm" href="/Profile">
             Профиль
         </a>
     </li>
 
-    <li class="nav-item">
-        <a class="nav-link fw-bold"
+    <li class="nav-item d-flex align-items-center">
+        <a class="nav-link"
            asp-area="Identity"
            asp-page="/Account/Manage/Index"
            title="Manage">
             @User.Identity?.Name
         </a>
-    </li>
 
-    <li class="nav-item">
         <form asp-area="Identity"
               asp-page="/Account/Logout"
               asp-route-returnUrl="@Url.Page("/Index", new { area = "" })">
+
             <button type="submit" class="btn btn-outline-secondary btn-sm">
                 Выйти
             </button>
         </form>
     </li>
+
 }
 else
 {
@@ -83,4 +85,53 @@ else
         </a>
     </li>
 }
+
+
+    <li class="nav-item">
+        <button type="button"
+                id="theme-toggle"
+                class="btn btn-outline-secondary btn-sm"
+                title="Сменить тему">
+            🌙
+        </button>
+    </li>
+    
 </ul>
+
+<script>
+
+
+    const themeToggle = document.getElementById("theme-toggle")
+
+    if (themeToggle) {
+
+        function updateTheme() {
+
+            const theme =
+                document.documentElement.getAttribute("data-bs-theme")
+
+            themeToggle.textContent =
+                theme === "dark" ? "☀️" : "🌙"
+        }
+
+        updateTheme()
+
+        themeToggle.addEventListener("click", function () {
+
+            const currentTheme =
+                document.documentElement.getAttribute("data-bs-theme")
+
+            const newTheme =
+                currentTheme === "dark" ? "light" : "dark"
+
+            document.documentElement.setAttribute(
+                "data-bs-theme",
+                newTheme
+            )
+
+            localStorage.setItem("theme", newTheme)
+
+            updateTheme()
+        })
+    }
+</script>

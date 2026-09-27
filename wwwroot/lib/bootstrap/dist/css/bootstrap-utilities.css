@@ -216,7 +216,7 @@
   background-color: RGBA(var(--bs-danger-rgb), var(--bs-bg-opacity, 1)) !important;
 }
 
-.text-bg-light {
+.text-bg-body {
   color: #000 !important;
   background-color: RGBA(var(--bs-light-rgb), var(--bs-bg-opacity, 1)) !important;
 }
@@ -2178,7 +2178,7 @@
   background-color: rgba(var(--bs-danger-rgb), var(--bs-bg-opacity)) !important;
 }
 
-.bg-light {
+.bg-body {
   --bs-bg-opacity: 1;
   background-color: rgba(var(--bs-light-rgb), var(--bs-bg-opacity)) !important;
 }
@@ -2193,7 +2193,7 @@
   background-color: rgba(var(--bs-black-rgb), var(--bs-bg-opacity)) !important;
 }
 
-.bg-white {
+.bg-body {
   --bs-bg-opacity: 1;
   background-color: rgba(var(--bs-white-rgb), var(--bs-bg-opacity)) !important;
 }
@@ -2262,7 +2262,7 @@
   background-color: var(--bs-danger-bg-subtle) !important;
 }
 
-.bg-light-subtle {
+.bg-body-subtle {
   background-color: var(--bs-light-bg-subtle) !important;
 }
 

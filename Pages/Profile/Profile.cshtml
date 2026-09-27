@@ -16,7 +16,7 @@
 
     <form method="post" enctype="multipart/form-data" id="profile-form">
 
-        <section class="border rounded bg-white mb-4">
+        <section class="border rounded bg-body mb-4">
 
             <div class="border-bottom px-3 px-md-4 py-3">
                 <h2 class="h6 mb-0 fw-semibold">
@@ -191,7 +191,7 @@
                                   style="display:none;"
                                   rows="5"></textarea>
 
-                        <div id="profile-description-editor"></div>
+                        <div class="bg-body" id="profile-description-editor"></div>
 
                         <span asp-validation-for="Input.Description"
                               class="text-danger small"></span>
@@ -233,7 +233,7 @@
         </section>
 
 
-        <section class="border rounded bg-white mb-4">
+        <section class="border rounded bg-body mb-4">
 
             <div class="border-bottom px-3 px-md-4 py-3">
                 <h2 class="h6 mb-0 fw-semibold">
@@ -263,7 +263,7 @@
         </section>
 
 
-        <section class="border rounded bg-white mb-4">
+        <section class="border rounded bg-body mb-4">
 
             <div class="border-bottom px-3 px-md-4 py-3">
                 <h2 class="h6 mb-0 fw-semibold">
@@ -294,7 +294,7 @@
         </section>
 
 
-        <section class="border rounded bg-white mb-4">
+        <section class="border rounded bg-body mb-4">
 
             <div class="border-bottom px-3 px-md-4 py-3">
 
@@ -406,7 +406,7 @@
                           id="avatarForm">
 
                         <div id="avatarDropZone"
-                             class="border border-2 border-secondary-subtle rounded bg-light p-4 text-center">
+                             class="border border-2 border-secondary-subtle rounded bg-body p-4 text-center">
 
                             <div class="mb-2">
                                 Перетащите изображение сюда
@@ -828,16 +828,16 @@
 
                 dropZone.addEventListener("dragover", function (event) {
                     event.preventDefault()
-                    dropZone.classList.add("bg-light")
+                    dropZone.classList.add("bg-body")
                 })
 
                 dropZone.addEventListener("dragleave", function () {
-                    dropZone.classList.remove("bg-light")
+                    dropZone.classList.remove("bg-body")
                 })
 
                 dropZone.addEventListener("drop", function (event) {
                     event.preventDefault()
-                    dropZone.classList.remove("bg-light")
+                    dropZone.classList.remove("bg-body")
                     handleFile(event.dataTransfer.files[0])
                 })
             }
@@ -1369,10 +1369,10 @@
                                         </button>
                                         <button
                                             type="button"
-                                            class="btn btn-sm btn-outline-danger js-remove-experience"
+                                            class="btn btn-sm btn-outline-secondary js-remove-experience"
                                             data-id="${experience.id}">
                                             <svg width="20" height="20" viewBox="0 0 16 16" xmlns="http://www.w3.org/2000/svg">
-                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.999.992h2l1 1.002h3V4h-10V1.994h3l1-1.002zm-3 4.01h8v8.99a1 1 0 01-1 1h-6a1 1 0 01-1-1v-8.99z" fill="#000"></path>
+                                                <path fill-rule="evenodd" clip-rule="evenodd" d="M6.999.992h2l1 1.002h3V4h-10V1.994h3l1-1.002zm-3 4.01h8v8.99a1 1 0 01-1 1h-6a1 1 0 01-1-1v-8.99z" fill="red"></path>
                                             </svg>
                                         </button>
                                     </div>
