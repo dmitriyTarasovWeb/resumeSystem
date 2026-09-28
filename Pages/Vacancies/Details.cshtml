@@ -142,7 +142,20 @@
                                     </td>
 
                                     <td>
-                                        @attr.Value
+                                        @switch (attr.Value)
+                                        {
+                                            case "true":
+                                                @:Да
+                                                break;
+
+                                            case "false":
+                                                @:Нет
+                                                break;
+
+                                            default:
+                                                @attr.Value
+                                                break;
+                                        }
                                     </td>
 
                                 </tr>

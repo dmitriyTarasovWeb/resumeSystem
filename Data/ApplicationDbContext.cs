@@ -38,6 +38,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<VacancyResume> VacancyResumes { get; set; } = null!;
     public DbSet<ResumeExperience> ResumeExperiences { get; set; } = null!;
 
+    public DbSet<ResumeLike> ResumeLikes { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
@@ -669,6 +671,40 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
                 .WithMany()
                 .HasForeignKey(x => x.ExperienceId)
                 .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        builder.Entity<ResumeLike>(entity =>
+        {
+            entity.ToTable("resume_likes");
+
+            entity.HasKey(x => x.Id)
+                .HasName("pk");
+
+            entity.Property(x => x.Id)
+                .HasColumnName("pk");
+
+            entity.Property(x => x.ResumeId)
+                .HasColumnName("resume");
+
+            entity.Property(x => x.UserId)
+                .HasColumnName("user");
+
+            entity.HasOne(x => x.Resume)
+                .WithMany()
+                .HasForeignKey(x => x.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(x => x.User)
+                .WithMany()
+                .HasForeignKey(x => x.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasIndex(x => new
+            {
+                x.ResumeId,
+                x.UserId
+            })
+            .IsUnique();
         });
 
     }

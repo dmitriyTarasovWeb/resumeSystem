@@ -926,6 +926,35 @@ namespace resumeSystem.Migrations
                     b.ToTable("resume_experiences", (string)null);
                 });
 
+            modelBuilder.Entity("resumeSystem.Domain.ResumeLike", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer")
+                        .HasColumnName("pk");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("ResumeId")
+                        .HasColumnType("integer")
+                        .HasColumnName("resume");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("user");
+
+                    b.HasKey("Id")
+                        .HasName("pk");
+
+                    b.HasIndex("UserId");
+
+                    b.HasIndex("ResumeId", "UserId")
+                        .IsUnique();
+
+                    b.ToTable("resume_likes", (string)null);
+                });
+
             modelBuilder.Entity("resumeSystem.Domain.Tag", b =>
                 {
                     b.Property<int>("Id")
@@ -1317,6 +1346,25 @@ namespace resumeSystem.Migrations
                     b.Navigation("Experience");
 
                     b.Navigation("Resume");
+                });
+
+            modelBuilder.Entity("resumeSystem.Domain.ResumeLike", b =>
+                {
+                    b.HasOne("resumeSystem.Domain.Resume", "Resume")
+                        .WithMany()
+                        .HasForeignKey("ResumeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("resumeSystem.Domain.ApplicationUser", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Resume");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("resumeSystem.Domain.UserAttribute", b =>

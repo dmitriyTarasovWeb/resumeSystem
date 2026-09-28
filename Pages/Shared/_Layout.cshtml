@@ -6,11 +6,7 @@
     <title>@ViewData["Title"] - resumeSystem</title>
     <script>
         const savedTheme = localStorage.getItem("theme") || "light"
-
-        document.documentElement.setAttribute(
-            "data-bs-theme",
-            savedTheme
-        )
+        document.documentElement.setAttribute("data-bs-theme",savedTheme)
     </script>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
