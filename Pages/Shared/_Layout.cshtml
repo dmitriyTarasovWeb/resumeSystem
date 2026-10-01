@@ -61,37 +61,43 @@
     <footer class="border-top bg-body-tertiary mt-auto">
         <div class="container py-4">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <span class="text-body-secondary">
+                    © @DateTime.Now.Year Resume System
+                </span>
                 @if (SignInManager.IsSignedIn(User))
                 {
-
                     <a href="#"
-                    class="text-decoration-none"
-                    data-bs-toggle="modal"
-                    data-bs-target="#supportTicketModal">
-                        Обращение в службу поддержки
+                       class="text-decoration-none"
+                       data-bs-toggle="modal"
+                       data-bs-target="#supportTicketModal">
+                        Создание обращения
                     </a>                
                 }
-            </div>
+                </div>
         </div>
     </footer>
 
-    <div class="modal fade" id="supportTicketModal" tabindex="-1" aria-labelledby="supportTicketModalLabel" aria-hidden="true">
+    <div class="modal fade" id="supportTicketModal" tabindex="-1">
         <div class="modal-dialog modal-dialog-centered">
             <div class="modal-content">
-                <form method="post" asp-page="/Support" asp-page-handler="Create">
+
+                <form id="supportTicketForm">
+                    @Html.AntiForgeryToken()
+
                     <div class="modal-header">
-                        <h5 class="modal-title" id="supportTicketModalLabel">
-                            Create support ticket
-                        </h5>
+                        <h5 class="modal-title">Создание обращения</h5>
                         <button type="button"
                                 class="btn-close"
-                                data-bs-dismiss="modal"
-                                aria-label="Close"></button>
+                                data-bs-dismiss="modal"></button>
                     </div>
 
                     <div class="modal-body">
+
                         <div class="mb-3">
-                            <label for="supportSummary" class="form-label">Текст обращения:</label>
+                            <label for="supportSummary" class="form-label">
+                                Текст обращения:
+                            </label>
+
                             <textarea id="supportSummary"
                                       name="Summary"
                                       class="form-control"
@@ -100,34 +106,75 @@
                         </div>
 
                         <div class="mb-3">
-                            <label for="supportPriority" class="form-label">Приоритет</label>
+                            <label for="supportPriority" class="form-label">
+                                Приоритет:
+                            </label>
+
                             <select id="supportPriority"
                                     name="Priority"
                                     class="form-select"
                                     required>
                                 <option value="High">Высокий</option>
-                                <option value="Average" selected>Средний</option>
+                                <option value="Normal" selected>Средний</option>
                                 <option value="Low">Низкий</option>
                             </select>
                         </div>
+
                     </div>
 
                     <div class="modal-footer">
                         <button type="button"
                                 class="btn btn-secondary"
                                 data-bs-dismiss="modal">
-                            Cancel
+                            Отменить
                         </button>
 
                         <button type="submit"
                                 class="btn btn-primary">
-                            Create ticket
+                            Создать обращение
                         </button>
                     </div>
+
                 </form>
+
             </div>
         </div>
     </div>
+
+    <script>
+            document.getElementById("supportTicketForm")
+                .addEventListener("submit", async function (e) {
+
+                    e.preventDefault();
+
+                    const form = this;
+                    const formData = new FormData(form);
+
+                    formData.append("SourceUrl", window.location.href);
+
+                    const token = form.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    ).value;
+
+                    const response = await fetch("/Support?handler=Create", {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": token
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        form.reset();
+
+                        const modal = bootstrap.Modal.getInstance(
+                            document.getElementById("supportTicketModal")
+                        );
+
+                        modal.hide();
+                    }
+                });
+    </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
