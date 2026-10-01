@@ -1,4 +1,10 @@
-﻿<!DOCTYPE html>
+﻿@using Microsoft.AspNetCore.Identity
+@using resumeSystem.Domain;
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -51,6 +57,124 @@
             @RenderBody()
         </main>
     </div>
+
+    <footer class="border-top bg-body-tertiary mt-auto">
+        <div class="container py-4">
+            <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-2">
+                <span class="text-body-secondary">
+                    © @DateTime.Now.Year Resume System
+                </span>
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <a href="#"
+                       class="text-decoration-none"
+                       data-bs-toggle="modal"
+                       data-bs-target="#supportTicketModal">
+                        Создание обращения
+                    </a>                
+                }
+                </div>
+        </div>
+    </footer>
+
+    <div class="modal fade" id="supportTicketModal" tabindex="-1">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <form id="supportTicketForm">
+                    @Html.AntiForgeryToken()
+
+                    <div class="modal-header">
+                        <h5 class="modal-title">Создание обращения</h5>
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"></button>
+                    </div>
+
+                    <div class="modal-body">
+
+                        <div class="mb-3">
+                            <label for="supportSummary" class="form-label">
+                                Текст обращения:
+                            </label>
+
+                            <textarea id="supportSummary"
+                                      name="Summary"
+                                      class="form-control"
+                                      rows="4"
+                                      required></textarea>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="supportPriority" class="form-label">
+                                Приоритет:
+                            </label>
+
+                            <select id="supportPriority"
+                                    name="Priority"
+                                    class="form-select"
+                                    required>
+                                <option value="High">Высокий</option>
+                                <option value="Normal" selected>Средний</option>
+                                <option value="Low">Низкий</option>
+                            </select>
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button"
+                                class="btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Отменить
+                        </button>
+
+                        <button type="submit"
+                                class="btn btn-primary">
+                            Создать обращение
+                        </button>
+                    </div>
+
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+            document.getElementById("supportTicketForm")
+                .addEventListener("submit", async function (e) {
+
+                    e.preventDefault();
+
+                    const form = this;
+                    const formData = new FormData(form);
+
+                    formData.append("SourceUrl", window.location.href);
+
+                    const token = form.querySelector(
+                        'input[name="__RequestVerificationToken"]'
+                    ).value;
+
+                    const response = await fetch("/Support?handler=Create", {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": token
+                        },
+                        body: formData
+                    });
+
+                    if (response.ok) {
+                        form.reset();
+
+                        const modal = bootstrap.Modal.getInstance(
+                            document.getElementById("supportTicketModal")
+                        );
+
+                        modal.hide();
+                    }
+                });
+    </script>
 
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
