@@ -18,15 +18,20 @@ public class ProfileModel : PageModel
     private readonly ApplicationDbContext _dbContext;
     private readonly CloudinaryService _cloudinaryService;
 
+    private readonly SalesforceService _salesforceService;
+
     public ProfileModel(
         UserManager<ApplicationUser> userManager,
         ApplicationDbContext dbContext,
-        CloudinaryService cloudinaryService)
+        CloudinaryService cloudinaryService,
+        SalesforceService salesforceService)
     {
         _userManager = userManager;
         _dbContext = dbContext;
         _cloudinaryService = cloudinaryService;
+        _salesforceService = salesforceService;
     }
+
 
     [BindProperty]
     public InputModel Input { get; set; } = new();
@@ -53,6 +58,7 @@ public class ProfileModel : PageModel
     public List<ResumeViewModel> Resumes { get; set; } = new();
     public async Task<IActionResult> OnGetAsync()
     {
+        var token = await _salesforceService.GetAccessTokenAsync();
         var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
         if (errorResult != null) return errorResult;
 
@@ -437,6 +443,41 @@ public class ProfileModel : PageModel
             });
     }
 
+
+    public async Task<IActionResult> OnPostCreateSalesforceAsync()
+    {
+        var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
+
+        if (errorResult != null)
+            return errorResult;
+
+        if (!await HasEditPermissionAsync(currentUser!, targetUser!))
+            return Forbid();
+
+        var requiredAttributes =
+            await _dbContext.RequiredUserAttributes.FindAsync(targetUser!.Id);
+
+        if (requiredAttributes == null)
+            return NotFound();
+
+        var roles = await _userManager.GetRolesAsync(targetUser);
+
+        var created =
+         await _salesforceService.CreateAccountAndContactAsync(
+             SalesforceInput.CompanyName,
+             SalesforceInput.Description,
+             requiredAttributes.Name,
+             requiredAttributes.SecondName,
+             targetUser.Email ?? string.Empty,
+             SalesforceInput.Phone);
+
+        return new JsonResult(new
+        {
+            success = true,
+            created
+        });
+    }
+
     public class ProfileAttributeViewModel
     {
         public int AttributeId { get; set; }
@@ -498,6 +539,21 @@ public class ProfileModel : PageModel
         public int PositionId { get; set; }
         public string PositionName { get; set; } = string.Empty;
         public Guid? VacancyId { get; set; }
+    }
+
+
+
+    [BindProperty]
+    public SalesforceInputModel SalesforceInput { get; set; } = new();
+
+    public class SalesforceInputModel
+    {
+        [Required]
+        public string CompanyName { get; set; } = string.Empty;
+
+        public string Phone { get; set; } = string.Empty;
+
+        public string Description { get; set; } = string.Empty;
     }
 
 }
