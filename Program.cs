@@ -47,6 +47,7 @@ builder.Services.AddDefaultIdentity<ApplicationUser>(options =>
 builder.Services.AddRazorPages();
 
 builder.Services.AddHttpClient<DropboxService>();
+builder.Services.AddHttpClient<SalesforceService>();
 
 
 var app = builder.Build();
