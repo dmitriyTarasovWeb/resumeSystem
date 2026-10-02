@@ -446,7 +446,8 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostCreateSalesforceAsync()
     {
-        var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
+        var (currentUser, targetUser, errorResult) =
+            await GetUserContextAsync();
 
         if (errorResult != null)
             return errorResult;
@@ -460,21 +461,60 @@ public class ProfileModel : PageModel
         if (requiredAttributes == null)
             return NotFound();
 
-        var roles = await _userManager.GetRolesAsync(targetUser);
-
         var created =
-         await _salesforceService.CreateAccountAndContactAsync(
-             SalesforceInput.CompanyName,
-             SalesforceInput.Description,
-             requiredAttributes.Name,
-             requiredAttributes.SecondName,
-             targetUser.Email ?? string.Empty,
-             SalesforceInput.Phone);
+            await _salesforceService.CreateOrUpdateAccountAndContactAsync(
+                SalesforceInput.CompanyName,
+                SalesforceInput.Description,
+                requiredAttributes.Name,
+                requiredAttributes.SecondName,
+                targetUser.Email ?? string.Empty,
+                SalesforceInput.Phone);
 
         return new JsonResult(new
         {
             success = true,
             created
+        });
+    }
+
+    public async Task<IActionResult> OnGetSalesforceStatusAsync()
+    {
+        var (currentUser, targetUser, errorResult) =
+            await GetUserContextAsync();
+
+        if (errorResult != null)
+            return errorResult;
+
+        if (!await HasEditPermissionAsync(currentUser!, targetUser!))
+            return Forbid();
+
+        var email = targetUser!.Email;
+
+        if (string.IsNullOrWhiteSpace(email))
+        {
+            return new JsonResult(new
+            {
+                connected = false
+            });
+        }
+
+        var contact =
+            await _salesforceService.FindContactByEmailAsync(email);
+
+        if (contact == null)
+        {
+            return new JsonResult(new
+            {
+                connected = false
+            });
+        }
+
+        return new JsonResult(new
+        {
+            connected = true,
+            companyName = contact.AccountName,
+            phone = contact.Phone,
+            description = contact.Description
         });
     }
 
