@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using resumeSystem.Domain;
+using resumeSystem.Models;
 
 namespace resumeSystem.Data;
 
@@ -39,6 +40,8 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     public DbSet<ResumeExperience> ResumeExperiences { get; set; } = null!;
 
     public DbSet<ResumeLike> ResumeLikes { get; set; } = null!;
+
+    public DbSet<VacancyApiToken> VacancyApiTokens { get; set; }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -706,6 +709,27 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             })
             .IsUnique();
         });
+
+
+        builder.Entity<VacancyApiToken>()
+            .HasIndex(x => x.Token)
+            .IsUnique();
+
+        builder.Entity<VacancyApiToken>()
+            .HasIndex(x => new { x.UserId, x.PositionId })
+            .IsUnique();
+
+        builder.Entity<VacancyApiToken>()
+            .HasOne(x => x.User)
+            .WithMany(x => x.VacancyApiTokens)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.Cascade);
+
+        builder.Entity<VacancyApiToken>()
+            .HasOne(x => x.Position)
+            .WithMany(x => x.VacancyApiTokens)
+            .HasForeignKey(x => x.PositionId)
+            .OnDelete(DeleteBehavior.Cascade);
 
     }
 }

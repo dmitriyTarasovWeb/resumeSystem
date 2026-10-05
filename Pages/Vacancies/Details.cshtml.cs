@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using resumeSystem.Data;
 using resumeSystem.Domain;
+using resumeSystem.Models;
+using System.Security.Cryptography;
 
 namespace resumeSystem.Pages.Vacancies;
 
@@ -50,7 +52,8 @@ public class DetailsModel : PageModel
             Id = vacancy.Id,
             Title = vacancy.Title,
             Description = vacancy.Description,
-            PositionName = vacancy.Position.Name
+            PositionName = vacancy.Position.Name,
+            PositionId = vacancy.Position.Id
         };
 
         Attributes = await _dbContext.VacancyAttributes
@@ -211,6 +214,68 @@ public class DetailsModel : PageModel
         return RedirectToPage("/Index");
     }
 
+    public async Task<IActionResult> OnGetApiTokenAsync(int positionId)
+    {
+        if (!User.IsInRole("Administrator") && !User.IsInRole("Recruiter"))
+        {
+            return Forbid();
+        }
+
+        var userId = _userManager.GetUserId(User);
+
+        if (string.IsNullOrEmpty(userId))
+        {
+            return Unauthorized();
+        }
+
+        var positionExists = await _dbContext.Positions
+            .AnyAsync(x => x.Id == positionId);
+
+        if (!positionExists)
+        {
+            return NotFound(new
+            {
+                message = $"Position {positionId} not found"
+            });
+        }
+
+        var existingToken = await _dbContext.VacancyApiTokens
+            .FirstOrDefaultAsync(x =>
+                x.UserId == userId &&
+                x.PositionId == positionId &&
+                x.IsActive);
+
+        if (existingToken != null)
+        {
+            return new JsonResult(new
+            {
+                token = existingToken.Token
+            });
+        }
+
+        var token = Convert.ToHexString(
+            RandomNumberGenerator.GetBytes(32)
+        );
+
+        var apiToken = new VacancyApiToken
+        {
+            UserId = userId,
+            PositionId = positionId,
+            Token = token,
+            CreatedAt = DateTime.UtcNow,
+            IsActive = true
+        };
+
+        _dbContext.VacancyApiTokens.Add(apiToken);
+
+        await _dbContext.SaveChangesAsync();
+
+        return new JsonResult(new
+        {
+            token
+        });
+    }
+
     public class VacancyDetailsViewModel
     {
         public Guid Id { get; set; }
@@ -218,6 +283,8 @@ public class DetailsModel : PageModel
         public string Title { get; set; } = string.Empty;
 
         public string PositionName { get; set; } = string.Empty;
+
+        public int PositionId { get; set; }
 
         public string? Description { get; set; }
     }

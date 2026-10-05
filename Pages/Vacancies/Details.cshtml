@@ -65,10 +65,62 @@
                     </button>
 
                 </form>
+
+
+
             }
 
         </div>
 
+    </div>
+
+
+    <div class="border rounded bg-body mb-4">
+        <div class="border-bottom px-3 px-md-4 py-3">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-1">API access</h5>
+                    <div class="text-body-secondary">
+                        Use this token to import aggregated position results into Odoo.
+                    </div>
+                </div>
+
+                <button type="button"
+                        id="getApiTokenButton"
+                        class="btn btn-outline-primary">
+                    Get API token
+                </button>
+            </div>
+
+            <div id="apiTokenLoading"
+                 class="d-none mt-3 text-body-secondary">
+                Loading...
+            </div>
+
+            <div id="apiTokenResult"
+                 class="d-none mt-3">
+                <label for="apiTokenInput" class="form-label">
+                    API token
+                </label>
+
+                <div class="input-group">
+                    <input type="text"
+                           id="apiTokenInput"
+                           class="form-control"
+                           readonly>
+
+                    <button type="button"
+                            id="copyApiTokenButton"
+                            class="btn btn-outline-secondary">
+                        Copy
+                    </button>
+                </div>
+            </div>
+
+            <div id="apiTokenError"
+                 class="d-none mt-3 text-danger">
+            </div>
+        </div>
     </div>
 
 
@@ -274,6 +326,10 @@
 </div>
 
 @section Scripts {
+    <script>
+        window.positionId = @Model.Vacancy.PositionId
+    </script>
+    <script src="~/js/position-api-token.js"></script>
 
     <script>
         const applicationsTable = document.getElementById("applications-table")
@@ -293,4 +349,8 @@
             })
         }
     </script>
+
+    
+
+
 }
