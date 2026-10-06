@@ -48,7 +48,7 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddHttpClient<DropboxService>();
 builder.Services.AddHttpClient<SalesforceService>();
-
+builder.Services.AddControllers();
 
 var app = builder.Build();
 
@@ -76,6 +76,9 @@ app.UseRouting();
 app.UseAuthorization();
 
 app.MapStaticAssets();
+
+app.MapControllers();
+
 app.MapRazorPages()
    .WithStaticAssets();
 

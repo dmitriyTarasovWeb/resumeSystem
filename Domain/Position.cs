@@ -1,4 +1,6 @@
-﻿namespace resumeSystem.Domain;
+﻿using resumeSystem.Models;
+
+namespace resumeSystem.Domain;
 
 public class Position
 {
@@ -7,4 +9,5 @@ public class Position
     public bool IsDisplay { get; set; } = true;
 
     public ICollection<Experience> Experiences { get; set; } = new List<Experience>();
+    public ICollection<VacancyApiToken> VacancyApiTokens { get; set; } = new List<VacancyApiToken>();
 }
