@@ -449,26 +449,55 @@ public class ProfileModel : PageModel
         var (currentUser, targetUser, errorResult) =
             await GetUserContextAsync();
 
+
         if (errorResult != null)
             return errorResult;
+
 
         if (!await HasEditPermissionAsync(currentUser!, targetUser!))
             return Forbid();
 
+
         var requiredAttributes =
             await _dbContext.RequiredUserAttributes.FindAsync(targetUser!.Id);
+
 
         if (requiredAttributes == null)
             return NotFound();
 
+
         var created =
             await _salesforceService.CreateOrUpdateAccountAndContactAsync(
                 SalesforceInput.CompanyName,
+                SalesforceInput.CompanyPhone,
+                SalesforceInput.Website,
+                SalesforceInput.Industry,
+
+                SalesforceInput.BillingStreet,
+                SalesforceInput.BillingCity,
+                SalesforceInput.BillingPostalCode,
+
+                SalesforceInput.ShippingStreet,
+                SalesforceInput.ShippingCity,
+                SalesforceInput.ShippingPostalCode,
+
                 SalesforceInput.Description,
+
                 requiredAttributes.Name,
                 requiredAttributes.SecondName,
                 targetUser.Email ?? string.Empty,
-                SalesforceInput.Phone);
+
+                SalesforceInput.Phone,
+                SalesforceInput.MobilePhone,
+                SalesforceInput.Title,
+                SalesforceInput.Department,
+
+                SalesforceInput.MailingStreet,
+                SalesforceInput.MailingCity,
+                SalesforceInput.MailingPostalCode,
+
+                SalesforceInput.Description);
+
 
         return new JsonResult(new
         {
@@ -476,6 +505,7 @@ public class ProfileModel : PageModel
             created
         });
     }
+
 
     public async Task<IActionResult> OnGetSalesforceStatusAsync()
     {
@@ -512,11 +542,37 @@ public class ProfileModel : PageModel
         return new JsonResult(new
         {
             connected = true,
+
             companyName = contact.AccountName,
+            companyPhone = contact.AccountPhone,
+            website = contact.AccountWebsite,
+            industry = contact.AccountIndustry,
+
+            billingStreet = contact.BillingStreet,
+            billingCity = contact.BillingCity,
+            billingPostalCode = contact.BillingPostalCode,
+
+            shippingStreet = contact.ShippingStreet,
+            shippingCity = contact.ShippingCity,
+            shippingPostalCode = contact.ShippingPostalCode,
+
+            firstName = contact.FirstName,
+            lastName = contact.LastName,
+            email = contact.Email,
+
             phone = contact.Phone,
+            mobilePhone = contact.MobilePhone,
+            title = contact.Title,
+            department = contact.Department,
+
+            mailingStreet = contact.MailingStreet,
+            mailingCity = contact.MailingCity,
+            mailingPostalCode = contact.MailingPostalCode,
+
             description = contact.Description
         });
     }
+
 
     public class ProfileAttributeViewModel
     {
@@ -591,9 +647,32 @@ public class ProfileModel : PageModel
         [Required]
         public string CompanyName { get; set; } = string.Empty;
 
-        public string Phone { get; set; } = string.Empty;
+        public string? CompanyPhone { get; set; }
+        public string? Website { get; set; }
+        public string? Industry { get; set; }
 
-        public string Description { get; set; } = string.Empty;
+        public string? BillingStreet { get; set; }
+        public string? BillingCity { get; set; }
+        public string? BillingState { get; set; }
+        public string? BillingPostalCode { get; set; }
+
+        public string? ShippingStreet { get; set; }
+        public string? ShippingCity { get; set; }
+        public string? ShippingState { get; set; }
+        public string? ShippingPostalCode { get; set; }
+
+        public string? Phone { get; set; }
+        public string? MobilePhone { get; set; }
+        public string? Title { get; set; }
+        public string? Department { get; set; }
+
+        public string? MailingStreet { get; set; }
+        public string? MailingCity { get; set; }
+        public string? MailingState { get; set; }
+        public string? MailingPostalCode { get; set; }
+        public string? MailingCountry { get; set; }
+
+        public string? Description { get; set; }
     }
 
 }

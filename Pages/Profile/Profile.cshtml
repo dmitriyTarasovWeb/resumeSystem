@@ -700,75 +700,267 @@
 
     </div>
 
-    <div class="modal fade" id="salesforceModal" tabindex="-1">
-                        <div class="modal-dialog modal-dialog-centered">
-                            <div class="modal-content">
-                                <form id="salesforceForm">
-                                    @Html.AntiForgeryToken()
 
-                                    <div class="modal-header">
-                                        <h5 class="modal-title">Salesforce</h5>
+<div class="modal fade" id="salesforceModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <form id="salesforceForm">
+                @Html.AntiForgeryToken()
 
-                                        <button type="button"
-                                                class="btn-close"
-                                                data-bs-dismiss="modal">
-                                        </button>
-                                    </div>
+                <div class="modal-header">
+                    <h5 class="modal-title">Salesforce</h5>
 
-                                    <div class="modal-body">
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal">
+                    </button>
+                </div>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Company name
-                                            </label>
+                <div class="modal-body">
 
-                                            <input type="text"
-                                                   name="SalesforceInput.CompanyName"
-                                                   id="salesforceCompanyName"
-                                                   class="form-control"
-                                                   required>
-                                        </div>
+                    <h6 class="mb-3">Company</h6>
 
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Phone
-                                            </label>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Company name</label>
+                                <input type="text"
+                                       name="SalesforceInput.CompanyName"
+                                       id="salesforceCompanyName"
+                                       class="form-control"
+                                       required>
+                            </div>
+                        </div>
 
-                                            <input type="text"
-                                                   name="SalesforceInput.Phone"
-                                                   id="salesforcePhone"
-                                                   class="form-control">
-                                        </div>
-
-                                        <div class="mb-3">
-                                            <label class="form-label">
-                                                Additional information
-                                            </label>
-
-                                            <textarea name="SalesforceInput.Description"
-                                                      id="salesforceDescription"
-                                                      class="form-control"
-                                                      rows="4"></textarea>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button type="button"
-                                                class="btn btn-secondary"
-                                                data-bs-dismiss="modal">
-                                            Cancel
-                                        </button>
-
-                                        <button type="submit"
-                                                class="btn btn-primary">
-                                            Save
-                                        </button>
-                                    </div>
-                                </form>
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Company phone</label>
+                                <input type="text"
+                                       name="SalesforceInput.CompanyPhone"
+                                       id="salesforceCompanyPhone"
+                                       class="form-control">
                             </div>
                         </div>
                     </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Website</label>
+                                <input type="url"
+                                       name="SalesforceInput.Website"
+                                       id="salesforceWebsite"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Industry</label>
+                                <input type="text"
+                                       name="SalesforceInput.Industry"
+                                       id="salesforceIndustry"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Billing street</label>
+                        <input type="text"
+                               name="SalesforceInput.BillingStreet"
+                               id="salesforceBillingStreet"
+                               class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label class="form-label">Billing city</label>
+                                <input type="text"
+                                       name="SalesforceInput.BillingCity"
+                                       id="salesforceBillingCity"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                <label class="form-label">Billing postal code</label>
+                                <input type="text"
+                                       name="SalesforceInput.BillingPostalCode"
+                                       id="salesforceBillingPostalCode"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label class="form-label">Shipping street</label>
+                        <input type="text"
+                               name="SalesforceInput.ShippingStreet"
+                               id="salesforceShippingStreet"
+                               class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label class="form-label">Shipping city</label>
+                                <input type="text"
+                                       name="SalesforceInput.ShippingCity"
+                                       id="salesforceShippingCity"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div class="mb-4">
+                                <label class="form-label">Shipping postal code</label>
+                                <input type="text"
+                                       name="SalesforceInput.ShippingPostalCode"
+                                       id="salesforceShippingPostalCode"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <h6 class="mb-3">Contact</h6>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">First name</label>
+                                <input type="text"
+                                       id="salesforceFirstName"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Last name</label>
+                                <input type="text"
+                                       id="salesforceLastName"
+                                       class="form-control"
+                                       readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email"
+                               id="salesforceEmail"
+                               class="form-control"
+                               readonly>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Phone</label>
+                                <input type="text"
+                                       name="SalesforceInput.Phone"
+                                       id="salesforcePhone"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Mobile phone</label>
+                                <input type="text"
+                                       name="SalesforceInput.MobilePhone"
+                                       id="salesforceMobilePhone"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Job title</label>
+                                <input type="text"
+                                       name="SalesforceInput.Title"
+                                       id="salesforceTitle"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                <label class="form-label">Department</label>
+                                <input type="text"
+                                       name="SalesforceInput.Department"
+                                       id="salesforceDepartment"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Mailing street</label>
+                        <input type="text"
+                               name="SalesforceInput.MailingStreet"
+                               id="salesforceMailingStreet"
+                               class="form-control">
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-5">
+                            <div class="mb-3">
+                                <label class="form-label">Mailing city</label>
+                                <input type="text"
+                                       name="SalesforceInput.MailingCity"
+                                       id="salesforceMailingCity"
+                                       class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="col-md-7">
+                            <div class="mb-3">
+                                <label class="form-label">Mailing postal code</label>
+                                <input type="text"
+                                       name="SalesforceInput.MailingPostalCode"
+                                       id="salesforceMailingPostalCode"
+                                       class="form-control">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Additional information</label>
+                        <textarea name="SalesforceInput.Description"
+                                  id="salesforceDescription"
+                                  class="form-control"
+                                  rows="4"></textarea>
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit"
+                            class="btn btn-primary">
+                        Save
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 
 
 }
@@ -1855,118 +2047,149 @@
         }
     </script>
 
+@if (canEdit)
+{
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            const container = document.getElementById("salesforce-action-container")
+            const form = document.getElementById("salesforceForm")
 
-    @if (canEdit)
-    {
-        <script>
-            document.addEventListener("DOMContentLoaded", async function () {
-                const container = document.getElementById("salesforce-action-container")
-                const form = document.getElementById("salesforceForm")
+            if (!container || !form) {
+                return
+            }
 
-                if (!container || !form) {
+            function renderSalesforceAction(connected) {
+                container.innerHTML = connected
+                    ? `
+                        <div class="d-flex align-items-center gap-3">
+                            <button type="button"
+                                    class="btn btn-outline-primary"
+                                    data-bs-toggle="modal"
+                                    data-bs-target="#salesforceModal">
+                                Change Salesforce data
+                            </button>
+
+                            <span class="text-success">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Connected
+                            </span>
+                        </div>
+                    `
+                    : `
+                        <button type="button"
+                                class="btn btn-primary"
+                                data-bs-toggle="modal"
+                                data-bs-target="#salesforceModal">
+                            Connect Salesforce
+                        </button>
+                    `
+            }
+
+            function setValue(id, value) {
+                const element = document.getElementById(id)
+
+                if (element) {
+                    element.value = value ?? ""
+                }
+            }
+
+            try {
+                const response = await fetch(
+                    window.location.pathname + "?handler=SalesforceStatus"
+                )
+
+                if (!response.ok) {
                     return
                 }
 
-                function renderSalesforceAction(connected) {
-                    container.innerHTML = connected
-                        ? `
-                            <div class="d-flex align-items-center gap-3">
-                                <button type="button"
-                                        class="btn btn-outline-primary"
-                                        data-bs-toggle="modal"
-                                        data-bs-target="#salesforceModal">
-                                    Change Salesforce data
-                                </button>
+                const result = await response.json()
 
-                                <span class="text-success">
-                                    <i class="bi bi-check-circle-fill me-1"></i>
-                                    Connected
-                                </span>
-                            </div>
-                        `
-                        : `
-                            <button type="button"
-                                    class="btn btn-primary"
-                                    data-bs-toggle="modal"
-                                    data-bs-target="#salesforceModal">
-                                Connect Salesforce
-                            </button>
-                        `
+                renderSalesforceAction(result.connected)
+
+                if (result.connected) {
+                    setValue("salesforceCompanyName", result.companyName)
+                    setValue("salesforceCompanyPhone", result.companyPhone)
+                    setValue("salesforceWebsite", result.website)
+                    setValue("salesforceIndustry", result.industry)
+
+                    setValue("salesforceBillingStreet", result.billingStreet)
+                    setValue("salesforceBillingCity", result.billingCity)
+                    setValue("salesforceBillingPostalCode", result.billingPostalCode)
+
+                    setValue("salesforceShippingStreet", result.shippingStreet)
+                    setValue("salesforceShippingCity", result.shippingCity)
+                    setValue("salesforceShippingPostalCode", result.shippingPostalCode)
+
+                    setValue("salesforceFirstName", result.firstName)
+                    setValue("salesforceLastName", result.lastName)
+                    setValue("salesforceEmail", result.email)
+
+                    setValue("salesforcePhone", result.phone)
+                    setValue("salesforceMobilePhone", result.mobilePhone)
+                    setValue("salesforceTitle", result.title)
+                    setValue("salesforceDepartment", result.department)
+
+                    setValue("salesforceMailingStreet", result.mailingStreet)
+                    setValue("salesforceMailingCity", result.mailingCity)
+                    setValue("salesforceMailingPostalCode", result.mailingPostalCode)
+
+                    setValue("salesforceDescription", result.description)
+                }
+            } catch {
+                container.innerHTML = `
+                    <span class="text-body-secondary">
+                        Salesforce status unavailable
+                    </span>
+                `
+            }
+
+            form.addEventListener("submit", async function (e) {
+                e.preventDefault()
+
+                const formData = new FormData(form)
+
+                const token = form.querySelector(
+                    'input[name="__RequestVerificationToken"]'
+                ).value
+
+                const response = await fetch(
+                    window.location.pathname + "?handler=CreateSalesforce",
+                    {
+                        method: "POST",
+                        headers: {
+                            "RequestVerificationToken": token
+                        },
+                        body: formData
+                    }
+                )
+
+                if (!response.ok) {
+                    alert("Salesforce operation failed.")
+                    return
                 }
 
-                try {
-                    const response = await fetch(
-                        window.location.pathname + "?handler=SalesforceStatus"
-                    )
+                const result = await response.json()
 
-                    if (!response.ok) {
-                        return
-                    }
+                const modalElement =
+                    document.getElementById("salesforceModal")
 
-                    const result = await response.json()
+                const modal =
+                    bootstrap.Modal.getInstance(modalElement)
 
-                    renderSalesforceAction(result.connected)
-
-                    if (result.connected) {
-                        document.getElementById("salesforceCompanyName").value =
-                            result.companyName ?? ""
-
-                        document.getElementById("salesforcePhone").value =
-                            result.phone ?? ""
-
-                        document.getElementById("salesforceDescription").value =
-                            result.description ?? ""
-                    }
-                } catch {
-                    container.innerHTML = `
-                        <span class="text-body-secondary">
-                            Salesforce status unavailable
-                        </span>
-                    `
-                }
-
-                form.addEventListener("submit", async function (e) {
-                    e.preventDefault()
-
-                    const formData = new FormData(form)
-
-                    const token = form.querySelector(
-                        'input[name="__RequestVerificationToken"]'
-                    ).value
-
-                    const response = await fetch(
-                        window.location.pathname + "?handler=CreateSalesforce",
-                        {
-                            method: "POST",
-                            headers: {
-                                "RequestVerificationToken": token
-                            },
-                            body: formData
-                        }
-                    )
-
-                    if (!response.ok) {
-                        alert("Salesforce operation failed.")
-                        return
-                    }
-
-                    const result = await response.json()
-
-                    const modal = bootstrap.Modal.getInstance(
-                        document.getElementById("salesforceModal")
-                    )
-
+                if (modal) {
                     modal.hide()
+                }
 
-                    alert(
-                        result.created
-                            ? "Salesforce account and contact created."
-                            : "Salesforce data updated."
-                    )
+                alert(
+                    result.created
+                        ? "Salesforce account and contact created."
+                        : "Salesforce data updated."
+                )
 
-                    renderSalesforceAction(true)
-                })
+                renderSalesforceAction(true)
             })
-        </script>
-    }
+        })
+    </script>
+}
+
 }

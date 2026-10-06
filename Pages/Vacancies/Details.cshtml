@@ -83,43 +83,36 @@
                         <h5 class="mb-1">API key for Odoo</h5>
                     </div>
 
-                    <button type="button"
-                    id="getApiTokenButton"
-                    class="btn btn-outline-primary">
+                    <button type="button" id="getApiTokenButton" class="btn btn-outline-primary">
                         Get API token
                     </button>
                 </div>
 
-                <div id="apiTokenLoading"
-                class="d-none mt-3 text-body-secondary">
+                <div id="apiTokenLoading" class="d-none mt-3 text-body-secondary">
                     Loading...
                 </div>
 
-                <div id="apiTokenResult"
-                class="d-none mt-3">
-                    <label for="apiTokenInput" class="form-label">
-                        API token
-                    </label>
+                <div id="apiTokenResult" class="d-none mt-3">
+                    <label for="apiTokenInput" class="form-label">API token</label>
 
                     <div class="input-group">
-                        <input type="text"
-                        id="apiTokenInput"
-                        class="form-control"
-                        readonly>
+                        <input type="password" id="apiTokenInput" class="form-control" readonly autocomplete="off">
 
-                        <button type="button"
-                        id="copyApiTokenButton"
-                        class="btn btn-outline-secondary">
+                        <button type="button" id="toggleApiTokenButton" class="btn btn-outline-secondary" title="Show token" aria-label="Show token">
+                            <svg id="eyeIcon" class="d-none" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2.06 12.35a1 1 0 0 1 0-.7C3.54 7.26 7.54 4 12 4c4.46 0 8.46 3.26 9.94 7.65a1 1 0 0 1 0 .7C20.46 16.74 16.46 20 12 20c-4.46 0-8.46-3.26-9.94-7.65z" /><circle cx="12" cy="12" r="3" /></svg>
+                            <svg id="eyeOffIcon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18" /><path d="M10.58 10.58a2 2 0 0 0 2.83 2.83" /><path d="M9.88 4.24A9.93 9.93 0 0 1 12 4c4.46 0 8.46 3.26 9.94 7.65a1 1 0 0 1 0 .7c-.52 1.55-1.4 2.93-2.53 4.07" /><path d="M6.61 6.61C4.65 7.83 3.09 9.7 2.06 11.65a1 1 0 0 0 0 .7C3.54 16.74 7.54 20 12 20c1.61 0 3.15-.42 4.52-1.16" /></svg>
+                        </button>
+
+                        <button type="button" id="copyApiTokenButton" class="btn btn-outline-secondary">
                             Copy
                         </button>
                     </div>
                 </div>
 
-                <div id="apiTokenError"
-                class="d-none mt-3 text-danger">
-                </div>
+                <div id="apiTokenError" class="d-none mt-3 text-danger"></div>
             </div>
         </div>
+
     }
 
     <section class="border rounded bg-body mb-4">
@@ -346,7 +339,28 @@
                 order: [[1, "desc"]]
             })
         }
+
+
+        toggleApiTokenButton.addEventListener('click', function () {
+            const isHidden = apiTokenInput.type === 'password';
+
+            apiTokenInput.type = isHidden ? 'text' : 'password';
+
+            eyeIcon.classList.toggle('d-none', !isHidden);
+            eyeOffIcon.classList.toggle('d-none', isHidden);
+
+            toggleApiTokenButton.title = isHidden
+                ? 'Hide token'
+                : 'Show token';
+
+            toggleApiTokenButton.setAttribute(
+                'aria-label',
+                isHidden ? 'Hide token' : 'Show token'
+            );
+        });
     </script>
+
+
 
     
 
