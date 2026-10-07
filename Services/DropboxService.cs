@@ -1,6 +1,7 @@
 ﻿using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace resumeSystem.Services;
 
@@ -17,9 +18,10 @@ public class DropboxService
         _configuration = configuration;
     }
 
-    public async Task UploadFileAsync(string fileName, string content)
+    public async Task UploadFileAsync(string fileName, string fileContent)
     {
-        var token = _configuration["Dropbox:AccessToken"];
+        var accessToken = await GetAccessTokenAsync();
+
         var folder = _configuration["Dropbox:Folder"] ?? "/SupportTickets";
 
         var apiArg = JsonSerializer.Serialize(new
@@ -34,17 +36,18 @@ public class DropboxService
             "https://content.dropboxapi.com/2/files/upload");
 
         request.Headers.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
+            new AuthenticationHeaderValue("Bearer", accessToken);
 
         request.Headers.Add("Dropbox-API-Arg", apiArg);
 
-        var contentBytes = Encoding.UTF8.GetBytes(content);
+        var fileBytes = Encoding.UTF8.GetBytes(fileContent);
 
-        var contentBody = new ByteArrayContent(contentBytes);
-        contentBody.Headers.ContentType =
+        var body = new ByteArrayContent(fileBytes);
+
+        body.Headers.ContentType =
             new MediaTypeHeaderValue("application/octet-stream");
 
-        request.Content = contentBody;
+        request.Content = body;
 
         var response = await _httpClient.SendAsync(request);
 
@@ -53,7 +56,74 @@ public class DropboxService
         if (!response.IsSuccessStatusCode)
         {
             throw new Exception(
-                $"Dropbox error {response.StatusCode}: {responseBody}");
+                $"Dropbox upload error {response.StatusCode}: {responseBody}");
         }
+    }
+
+    private async Task<string> GetAccessTokenAsync()
+    {
+        var appKey = _configuration["Dropbox:AppKey"];
+        var appSecret = _configuration["Dropbox:AppSecret"];
+        var refreshToken = _configuration["Dropbox:RefreshToken"];
+
+        using var request = new HttpRequestMessage(
+            HttpMethod.Post,
+            "https://api.dropbox.com/oauth2/token");
+
+        var auth =
+            Convert.ToBase64String(
+                Encoding.UTF8.GetBytes($"{appKey}:{appSecret}"));
+
+        request.Headers.Authorization =
+            new AuthenticationHeaderValue("Basic", auth);
+
+        request.Content = new FormUrlEncodedContent(
+            new Dictionary<string, string>
+            {
+                ["grant_type"] = "refresh_token",
+                ["refresh_token"] = refreshToken
+            });
+
+        var response = await _httpClient.SendAsync(request);
+
+        var responseBody = await response.Content.ReadAsStringAsync();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new Exception(
+                $"Dropbox token refresh error {response.StatusCode}: {responseBody}");
+        }
+
+        var tokenResponse =
+            JsonSerializer.Deserialize<DropboxTokenResponse>(
+                responseBody,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+        if (tokenResponse == null ||
+            string.IsNullOrWhiteSpace(tokenResponse.AccessToken))
+        {
+            throw new Exception(
+                $"Dropbox returned invalid token response: {responseBody}");
+        }
+
+        return tokenResponse.AccessToken;
+    }
+
+    private class DropboxTokenResponse
+    {
+        [JsonPropertyName("access_token")]
+        public string AccessToken { get; set; } = string.Empty;
+
+        [JsonPropertyName("token_type")]
+        public string TokenType { get; set; } = string.Empty;
+
+        [JsonPropertyName("expires_in")]
+        public int ExpiresIn { get; set; }
+
+        [JsonPropertyName("refresh_token")]
+        public string? RefreshToken { get; set; }
     }
 }
