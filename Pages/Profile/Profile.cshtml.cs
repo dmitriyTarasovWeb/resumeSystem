@@ -84,13 +84,18 @@ public class ProfileModel : PageModel
 
     public async Task<IActionResult> OnPostAsync()
     {
-        var (currentUser, targetUser, errorResult) = await GetUserContextAsync();
-        if (errorResult != null) return errorResult;
+        var (currentUser, targetUser, errorResult) =
+            await GetUserContextAsync();
 
-        if (!await HasEditPermissionAsync(currentUser!, targetUser!)) return Forbid();
+        if (errorResult != null)
+            return errorResult;
 
-        ModelState.Remove("");
-        if (!ModelState.IsValid)
+        if (!await HasEditPermissionAsync(currentUser!, targetUser!))
+            return Forbid();
+
+        ModelState.Clear();
+
+        if (!TryValidateModel(Input, nameof(Input)))
         {
             Input.Email = targetUser!.Email ?? string.Empty;
             await LoadPageDataAsync(currentUser!, targetUser!);
@@ -98,7 +103,9 @@ public class ProfileModel : PageModel
         }
 
         var requiredAttributes = await _dbContext.RequiredUserAttributes.FindAsync(targetUser!.Id);
-        if (requiredAttributes == null) return NotFound();
+
+        if (requiredAttributes == null)
+            return NotFound();
 
         UpdateBasicInformation(requiredAttributes);
 
